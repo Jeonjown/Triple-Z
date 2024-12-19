@@ -5,74 +5,20 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
-# Runtime data
-pids
-*.pid
-*.pid.lock
+node_modules
+dist
+dist-ssr
+*.local
 
-# Node modules
-node_modules/
-
-# Dependency directories
-jspm_packages/
-bower_components/
-
-# Environment variables
-.env
-.env.*.local
-
-# Build output
-dist/
-build/
-coverage/
-
-# TypeScript
-*.tsbuildinfo
-
-# Cache
-.cache/
-.nyc_output/
-.next/
-out/
-.vscode/
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-
-# IDE/Editor specific files
-*.swp
-*.swo
-*.idea/
-*.vscode/
-*.code-workspace
-
-# Debug files
-*.log
-
-# MacOS
-.DS_Store
-
-# Windows
-Thumbs.db
-ehthumbs.db
-
-# Linux
-*~
-
-# Optional npm cache directory
-.npm/
-
-# Yarn Integrity file
-.yarn-integrity
-
-# Testing
-.jest/
-jest.config.js
-test-results/
-
-# VSCode specific
-.vscode/
-
-# Other
-/.history
-*.bak
-*.tmp
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
