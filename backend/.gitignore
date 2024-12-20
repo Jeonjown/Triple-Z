@@ -21,6 +21,8 @@ bower_components/
 # Environment variables
 .env
 .env.*.local
+.env.development
+.env.production
 
 # Build output
 dist/
