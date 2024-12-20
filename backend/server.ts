@@ -7,7 +7,10 @@ dotenv.config();
 const server = express();
 server.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://triple-ps2oxjnl2-jeonjowns-projects.vercel.app",
+    ],
   })
 );
 server.use(userRoutes);
