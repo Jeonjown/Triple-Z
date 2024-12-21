@@ -21,7 +21,10 @@ function App() {
 
   return (
     <>
-      <button onClick={fetchData}>press me</button>
+      <button onClick={fetchData} className="text-secondary">
+        press me
+      </button>
+      <h2 className="font-body">Heading</h2>
       <div>{data}</div>
     </>
   );
