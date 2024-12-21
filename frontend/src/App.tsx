@@ -1,31 +1,24 @@
-import { useState } from "react";
-import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Navbar from "./components/Navbar";
+import About from "./pages/About";
+import Events from "./pages/Events";
+import Menu from "./pages/Menu";
+import Contacts from "./pages/Contacts";
 
 function App() {
-  const fetchData = async () => {
-    try {
-      const response = await fetch(import.meta.env.VITE_API_URL);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      setData(data.message);
-    } catch (error) {
-      console.error("error fetching data", error);
-    }
-  };
-
-  const [data, setData] = useState();
-
   return (
     <>
-      <button onClick={fetchData} className="text-secondary">
-        press me
-      </button>
-      <h2 className="font-body">Heading</h2>
-      <div>{data}</div>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/contacts" element={<Contacts />} />
+        </Routes>
+      </Router>
     </>
   );
 }
