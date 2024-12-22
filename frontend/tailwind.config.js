@@ -6,6 +6,21 @@ export default {
   ],
   theme: {
     extend: {
+      animation: {
+        rotateLeftSlowly: 'rotateLeftSlowly .3s linear infinite',
+        rotateRightSlowly: 'rotateRightSlowly .3s linear infinite',
+
+      },
+      keyframes: {
+        rotateLeftSlowly: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(-360deg)' },
+        },
+        rotateRightSlowly: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+      },
       colors: {
         primary: '#fffef9',
         secondary: '#7b4f41',
