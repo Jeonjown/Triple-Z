@@ -9,7 +9,6 @@ import useToggle from "../hooks/useToggle";
 
 const Navbar = () => {
   const { toggleState, toggle } = useToggle({
-    isProfileOpen: false,
     isHamburgerOpen: false,
     isScheduleOpen: false,
     isAccountOpen: false,
@@ -22,10 +21,7 @@ const Navbar = () => {
         <NavLinks />
         <div className="relative ml-auto flex gap-2">
           <NotificationIcon />
-          <ProfileIcon
-            isProfileOpen={toggleState.isProfileOpen}
-            toggle={toggle}
-          />
+          <ProfileIcon />
           <HamburgerIcon
             isHamburgerOpen={toggleState.isHamburgerOpen}
             isScheduleOpen={toggleState.isScheduleOpen}
