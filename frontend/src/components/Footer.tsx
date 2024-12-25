@@ -3,19 +3,21 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <>
-      <footer className="fixed bottom-0 left-0 flex w-full bg-[#2E2522] p-4 text-white">
-        <div className="flex w-2/6 items-center justify-center md:w-1/6">
-          <img src="/triple-z-logo.png" alt="logo" className="w-20" />
-        </div>
-
-        <div className="w-4/6 p-1 md:w-5/6">
-          <ul className="m-4 flex justify-center space-x-5 text-sm">
+      <footer className="fixed bottom-0 left-0 flex w-full justify-center bg-[#2E2522] p-4 text-white">
+        <div className="text-center">
+          <ul className="m-4 flex justify-center space-x-5 text-sm md:text-base">
             <li>
               <Link to={"/about"}> ABOUT</Link>
             </li>
-            <li>MENU</li>
-            <li>EVENTS</li>
-            <li>CONTACTS</li>
+            <li>
+              <Link to={"/events"}> EVENTS</Link>
+            </li>
+            <li>
+              <Link to={"/menu"}> MENU</Link>
+            </li>
+            <li>
+              <Link to={"/contacts"}> CONTACTS</Link>
+            </li>
           </ul>
           <hr className="mx-3" />
           <p className="w-fit pt-3 text-sm font-extralight">
@@ -24,6 +26,7 @@ const Footer = () => {
             reiciendis quia excepturi repudiandae quas placeat aliquid velit
             amet ipsum esse molestiae?
           </p>
+
           <div className="h-13 mr-4 flex justify-center space-x-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -120,6 +123,7 @@ const Footer = () => {
               </g>
             </svg>
           </div>
+          <p className="text-sm">&copy; 2024 Triple Z. All rights reserved.</p>
         </div>
       </footer>
     </>
