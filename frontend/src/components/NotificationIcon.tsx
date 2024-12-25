@@ -6,7 +6,7 @@ const NotificationIcon = () => {
 
   return (
     <>
-      <div className="relative ml-auto flex gap-2">
+      <div className="relative ml-auto flex gap-2 hover:scale-105 active:scale-110">
         {/* notification icon */}
         <svg
           ref={iconRef}

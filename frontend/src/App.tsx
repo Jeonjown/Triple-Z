@@ -8,13 +8,13 @@ import Contacts from "./pages/Contacts";
 import Schedule from "./pages/Schedule";
 import Blogs from "./pages/Blogs";
 import MyAccount from "./pages/MyAccount";
+import Footer from "./components/Footer";
 
 function App() {
   return (
     <>
       <Router>
         <Navbar />
-
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -25,6 +25,7 @@ function App() {
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/my-account" element={<MyAccount />} />
         </Routes>
+        <Footer />
       </Router>
     </>
   );
