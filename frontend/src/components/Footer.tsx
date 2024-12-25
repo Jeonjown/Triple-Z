@@ -20,7 +20,7 @@ const Footer = () => {
             </li>
           </ul>
           <hr className="mx-3" />
-          <p className="w-fit pt-3 text-sm font-extralight">
+          <p className="w-fit px-2 pt-3 text-sm font-extralight">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure
             quisquam deserunt modi! Hic quod veritatis neque, harum dicta
             reiciendis quia excepturi repudiandae quas placeat aliquid velit
