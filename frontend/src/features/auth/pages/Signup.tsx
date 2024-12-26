@@ -1,28 +1,26 @@
 const Signup = () => {
   return (
     <>
-      <div className="mt-20 flex h-[70h] w-full items-center justify-center">
-        <form className="shadow-aesthetic mx-10 flex w-full max-w-screen-sm flex-col px-12 py-8 md:py-14">
-          <h2 className="text-center text-xl md:text-2xl">Create an account</h2>
-          <p className="mb-4 text-center text-sm md:mb-10 md:text-base">
-            Please enter your details
-          </p>
-          <input
-            type="text"
-            placeholder="Username"
-            className="mb-3 rounded border p-2 text-sm md:mb-4 md:p-3 md:text-base"
-          />
+      <div className="mt-40 flex h-[40vh] w-full items-center justify-center md:h-[60vh]">
+        <form className="md:shadow-aesthetic flex w-full max-w-screen-sm flex-col px-12 py-8 md:mx-10 md:py-14">
+          <h2 className="text-center text-2xl">Create an Account</h2>
+          <p className="mb-10 text-center">Please enter your details</p>
           <input
             type="email"
             placeholder="Email"
-            className="mb-3 rounded border p-2 text-sm md:mb-4 md:p-3 md:text-base"
+            className="mb-4 rounded border p-3"
+          />
+          <input
+            type="text"
+            placeholder="Username"
+            className="mb-4 rounded border p-3"
           />
           <input
             type="password"
             placeholder="Password"
-            className="mb-6 rounded border p-2 text-sm md:mb-10 md:p-3 md:text-base"
+            className="mb-10 rounded border p-3"
           />
-          <button className="rounded bg-accent py-2 text-sm text-white hover:scale-105 hover:opacity-90 active:scale-110 active:opacity-95 md:text-base">
+          <button className="rounded bg-accent py-2 text-white hover:scale-105 hover:opacity-90 active:scale-110 active:opacity-95 md:text-base">
             Signup
           </button>
           <hr className="my-4 border-t-2" />
@@ -51,7 +49,7 @@ const Signup = () => {
                 d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
               ></path>
             </svg>
-            <p className="text-sm md:text-base">Sign up with Google</p>
+            <p className="text-base">Sign up with Google</p>
           </button>
         </form>
       </div>
