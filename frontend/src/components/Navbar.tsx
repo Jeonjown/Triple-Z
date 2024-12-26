@@ -6,6 +6,7 @@ import HamburgerIcon from "./HamburgerIcon";
 import HamburgerMenu from "./HamburgerMenu";
 
 import useToggle from "../hooks/useToggle";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const { toggleState, toggle } = useToggle({
@@ -21,10 +22,10 @@ const Navbar = () => {
         <NavLinks />
         <div className="relative ml-auto flex items-center gap-2">
           <button className="mr-1 h-9 whitespace-nowrap px-2 text-[15px] hover:scale-105 hover:cursor-pointer active:scale-110">
-            SIGN UP
+            <Link to={"/signup"}>SIGN UP</Link>
           </button>
           <button className="mr-1 h-9 whitespace-nowrap border-[1px] border-accent px-6 text-[15px] hover:scale-105 hover:cursor-pointer active:scale-110">
-            LOG IN
+            <Link to={"/login"}> LOG IN</Link>
           </button>
           <NotificationIcon />
           <ProfileIcon />

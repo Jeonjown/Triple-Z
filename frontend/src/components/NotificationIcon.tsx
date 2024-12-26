@@ -6,14 +6,14 @@ const NotificationIcon = () => {
 
   return (
     <>
-      <div className="relative ml-auto flex gap-2 hover:scale-105 active:scale-110">
+      <div className="relative ml-auto flex gap-2">
         {/* notification icon */}
         <svg
           ref={iconRef}
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="relative w-8 hover:cursor-pointer"
+          className="relative w-8 hover:scale-105 hover:cursor-pointer active:scale-110"
           onClick={togglePopUpVisibility}
         >
           <path

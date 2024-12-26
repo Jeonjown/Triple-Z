@@ -21,6 +21,9 @@ export default {
           '100%': { transform: 'rotate(360deg)' },
         },
       },
+      boxShadow: {
+        aesthetic: '0 3px 10px rgba(0, 0, 0, 0.2)',
+      },
       colors: {
         primary: '#fffef9',
         secondary: '#7b4f41',

@@ -1,17 +1,14 @@
-const Signup = () => {
+import { Link } from "react-router-dom";
+
+const Login = () => {
   return (
     <>
       <div className="mt-20 flex h-[70h] w-full items-center justify-center">
         <form className="shadow-aesthetic mx-10 flex w-full max-w-screen-sm flex-col px-12 py-8 md:py-14">
-          <h2 className="text-center text-xl md:text-2xl">Create an account</h2>
+          <h2 className="text-center text-xl md:text-2xl">Welcome Back!</h2>
           <p className="mb-4 text-center text-sm md:mb-10 md:text-base">
             Please enter your details
           </p>
-          <input
-            type="text"
-            placeholder="Username"
-            className="mb-3 rounded border p-2 text-sm md:mb-4 md:p-3 md:text-base"
-          />
           <input
             type="email"
             placeholder="Email"
@@ -53,10 +50,16 @@ const Signup = () => {
             </svg>
             <p className="text-sm md:text-base">Sign up with Google</p>
           </button>
+          <div className="mt-4 text-center text-xs text-accent">
+            need an account?
+            <span className="ml-1 underline">
+              <Link to={"/signup"}>Create an account</Link>
+            </span>
+          </div>
         </form>
       </div>
     </>
   );
 };
 
-export default Signup;
+export default Login;

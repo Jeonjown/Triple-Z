@@ -9,6 +9,8 @@ import Schedule from "./pages/Schedule";
 import Blogs from "./pages/Blogs";
 import MyAccount from "./pages/MyAccount";
 import Footer from "./components/Footer";
+import Signup from "./features/auth/pages/Signup";
+import Login from "./features/auth/pages/Login";
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/my-account" element={<MyAccount />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
         <Footer />
       </Router>
