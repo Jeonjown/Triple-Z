@@ -7,14 +7,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const server = express();
+
 server.use(express.json());
 server.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://triple-z.vercel.app",
-      "https://triple-5e2z5dqbv-jeonjowns-projects.vercel.app",
-    ],
+    origin: ["http://localhost:5173", "https://triple-z.vercel.app"],
   })
 );
 

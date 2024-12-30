@@ -25,15 +25,15 @@ const Signup = () => {
   return (
     <>
       <Formik
-        initialValues={{ name: "", email: "", password: "" }}
+        initialValues={{ username: "", email: "", password: "" }}
         validateOnChange={true} // Validate on change
         validateOnBlur={true} // Validate on blur
         validationSchema={validationSchema}
         onSubmit={(values, { resetForm }) => {
           console.log("logged values", values);
-          const { name, email, password } = values;
+          const { username, email, password } = values;
           resetForm();
-          signupUser(name, email, password);
+          signupUser(username, email, password);
         }}
       >
         {({ touched, errors }) => (
@@ -47,7 +47,7 @@ const Signup = () => {
                 type="text"
                 autoComplete="fullName"
                 placeholder="Full Name"
-                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.name && errors.name ? "border-red-500" : ""}`}
+                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.username && errors.username ? "border-red-500" : ""}`}
               />
               <ErrorMessage
                 component={"div"}
@@ -60,7 +60,7 @@ const Signup = () => {
                 type="email"
                 autoComplete="email"
                 placeholder="Email"
-                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.email && errors.name ? "border-red-500" : ""}`}
+                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.email && errors.username ? "border-red-500" : ""}`}
               />
               <ErrorMessage
                 component={"div"}
@@ -73,7 +73,7 @@ const Signup = () => {
                 type="password"
                 placeholder="Password"
                 autoComplete="new-password"
-                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.password && errors.name ? "border-red-500" : ""}`}
+                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.password && errors.username ? "border-red-500" : ""}`}
               />
               <ErrorMessage
                 component={"div"}
