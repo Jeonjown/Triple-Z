@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import userRoutes from "./routes/authRoutes";
 import mongoose from "mongoose";
 
@@ -8,10 +9,13 @@ dotenv.config();
 
 const server = express();
 
+server.use(cookieParser());
+
 server.use(express.json());
 server.use(
   cors({
     origin: ["http://localhost:5173", "https://triple-z.vercel.app"],
+    credentials: true,
   })
 );
 

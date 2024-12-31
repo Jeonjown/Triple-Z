@@ -7,7 +7,7 @@ if (!process.env.JWT_SECRET) {
 }
 const secretKey = process.env.JWT_SECRET;
 
-export const jwtSign = (id: string, username: string, role: string) => {
+export const generateToken = (id: string, username: string, role: string) => {
   const payload = {
     id,
     username,
@@ -20,5 +20,6 @@ export const jwtSign = (id: string, username: string, role: string) => {
   };
 
   const token = jwt.sign(payload, secretKey, options);
+
   return token;
 };

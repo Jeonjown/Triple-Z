@@ -8,18 +8,26 @@ const api = axios.create({
 });
 
 export const signupUser = async (
-  name: string,
+  username: string,
   email: string,
   password: string,
+  confirmPassword: string,
 ) => {
   try {
-    const response = await api.post("/api/user/jwtSignup", {
-      name,
-      email,
-      password,
-    });
-    console.log(response.data);
+    const response = await api.post(
+      "/api/user/jwtSignup",
+      {
+        username,
+        email,
+        password,
+        confirmPassword,
+      },
+      { withCredentials: true },
+    );
+    console.log("user signed up successfully", response.data);
   } catch (error) {
-    console.error(error);
+    if (axios.isAxiosError(error)) {
+      console.error(error.response?.data?.message || "an error occured");
+    }
   }
 };

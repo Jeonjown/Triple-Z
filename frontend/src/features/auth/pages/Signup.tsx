@@ -5,12 +5,11 @@ import { signupUser } from "../api/auth";
 
 const Signup = () => {
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Username is required"),
+    username: Yup.string().required("Username is required"),
     email: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
     password: Yup.string()
-
       .min(8, "Password must be at least 8 characters")
       .matches(/[a-z]/, "Password must contain at least one lowercase letter")
       .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
@@ -20,20 +19,28 @@ const Signup = () => {
         "Password must contain at least one special character",
       ) // At least one special character
       .required("Password is required"),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Confirm Password is required"),
   });
 
   return (
     <>
       <Formik
-        initialValues={{ username: "", email: "", password: "" }}
+        initialValues={{
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        }}
         validateOnChange={true} // Validate on change
         validateOnBlur={true} // Validate on blur
         validationSchema={validationSchema}
         onSubmit={(values, { resetForm }) => {
           console.log("logged values", values);
-          const { username, email, password } = values;
+          const { username, email, password, confirmPassword } = values;
           resetForm();
-          signupUser(username, email, password);
+          signupUser(username, email, password, confirmPassword);
         }}
       >
         {({ touched, errors }) => (
@@ -43,15 +50,15 @@ const Signup = () => {
               <p className="mb-10 text-center">Please enter your details</p>
 
               <Field
-                name="name"
+                name="username"
                 type="text"
-                autoComplete="fullName"
-                placeholder="Full Name"
+                autoComplete="username"
+                placeholder="Username"
                 className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.username && errors.username ? "border-red-500" : ""}`}
               />
               <ErrorMessage
                 component={"div"}
-                name="name"
+                name="username"
                 className="-mt-3 ml-2 text-xs text-red-700"
               />
 
@@ -78,6 +85,18 @@ const Signup = () => {
               <ErrorMessage
                 component={"div"}
                 name="password"
+                className="-mt-3 ml-2 text-xs text-red-700"
+              />
+              <Field
+                name="confirmPassword"
+                type="password"
+                placeholder="Confirm Password"
+                autoComplete="password"
+                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.password && errors.username ? "border-red-500" : ""}`}
+              />
+              <ErrorMessage
+                component={"div"}
+                name="confirmPassword"
                 className="-mt-3 ml-2 text-xs text-red-700"
               />
 

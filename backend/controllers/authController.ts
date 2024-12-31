@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import User from "../models/userModel";
 import { hashPassword } from "../utils/hashPassword";
 import { comparePasswords } from "../utils/comparePasswords";
-import { jwtSign } from "../utils/jwtSign";
+import { generateToken } from "../utils/generateToken";
 
 // JWT AUTH
 export const jwtSignup = async (req: Request, res: Response): Promise<void> => {
@@ -52,11 +50,19 @@ export const jwtSignup = async (req: Request, res: Response): Promise<void> => {
     await newUser.save();
 
     // Generate JWT token
-    const token = jwtSign(
+    const token = generateToken(
       newUser._id.toString(),
       newUser.username,
       newUser.role
     );
+
+    // give cookie
+    res.cookie("auth_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production" ? true : false,
+      sameSite: "strict",
+      maxAge: 259200000,
+    });
 
     // Respond with success message and token
     res.json({
@@ -79,3 +85,7 @@ export const jwtSignup = async (req: Request, res: Response): Promise<void> => {
     });
   }
 };
+
+export const jwtLogin = async (req: Request, res: Response) => {};
+
+// Google Auth

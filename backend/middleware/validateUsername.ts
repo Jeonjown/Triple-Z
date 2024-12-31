@@ -14,12 +14,6 @@ export const validateUsername = (
   }
 
   const trimmedUsername = validator.trim(username);
-  const isValidUsername = /^[a-zA-Z\s\-']+$/.test(trimmedUsername);
-
-  if (!isValidUsername) {
-    res.status(400).json({ message: "Invalid name format" });
-    return;
-  }
 
   req.body.validUsername = trimmedUsername;
 
