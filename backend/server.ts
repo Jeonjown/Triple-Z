@@ -1,16 +1,19 @@
-import express from "express";
+import express, {
+  NextFunction,
+  Request,
+  ErrorRequestHandler,
+  Response,
+} from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/authRoutes";
 import mongoose from "mongoose";
-
 import dotenv from "dotenv";
 dotenv.config();
 
 const server = express();
 
 server.use(cookieParser());
-
 server.use(express.json());
 server.use(
   cors({
@@ -19,7 +22,18 @@ server.use(
   })
 );
 
-server.use("/api/user", userRoutes);
+server.use("/api/auth", userRoutes);
+
+type Error = {
+  status?: number;
+  message?: string;
+};
+
+server.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  res
+    .status(error.status || 500)
+    .json({ message: error.message || "internal server error" });
+});
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 

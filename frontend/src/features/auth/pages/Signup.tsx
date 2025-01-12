@@ -1,9 +1,22 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
-
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
 import { signupUser } from "../api/auth";
+import { useMutation } from "@tanstack/react-query";
+import useAuthStore from "../stores/useAuthStore";
 
 const Signup = () => {
+  const { login } = useAuthStore();
+  const navigate = useNavigate();
+
+  const mutation = useMutation({
+    mutationFn: signupUser,
+    onSuccess: (data) => {
+      navigate("/", { replace: true });
+      login(data);
+    },
+  });
+
   const validationSchema = Yup.object().shape({
     username: Yup.string().required("Username is required"),
     email: Yup.string()
@@ -36,11 +49,14 @@ const Signup = () => {
         validateOnChange={true} // Validate on change
         validateOnBlur={true} // Validate on blur
         validationSchema={validationSchema}
-        onSubmit={(values, { resetForm }) => {
-          console.log("logged values", values);
-          const { username, email, password, confirmPassword } = values;
-          resetForm();
-          signupUser(username, email, password, confirmPassword);
+        onSubmit={async (values, { resetForm }) => {
+          try {
+            const { username, email, password, confirmPassword } = values;
+            resetForm();
+            mutation.mutate({ username, email, password, confirmPassword });
+          } catch (error) {
+            console.error(error);
+          }
         }}
       >
         {({ touched, errors }) => (
@@ -67,7 +83,7 @@ const Signup = () => {
                 type="email"
                 autoComplete="email"
                 placeholder="Email"
-                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.email && errors.username ? "border-red-500" : ""}`}
+                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.email && errors.email ? "border-red-500" : ""}`}
               />
               <ErrorMessage
                 component={"div"}
@@ -80,7 +96,7 @@ const Signup = () => {
                 type="password"
                 placeholder="Password"
                 autoComplete="new-password"
-                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.password && errors.username ? "border-red-500" : ""}`}
+                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.password && errors.password ? "border-red-500" : ""}`}
               />
               <ErrorMessage
                 component={"div"}
@@ -99,6 +115,12 @@ const Signup = () => {
                 name="confirmPassword"
                 className="-mt-3 ml-2 text-xs text-red-700"
               />
+
+              {mutation.isError && (
+                <div className="-mt-3 ml-2 text-xs text-red-700">
+                  {mutation.error.message}
+                </div>
+              )}
 
               <button
                 type="submit"
@@ -134,6 +156,9 @@ const Signup = () => {
                 </svg>
                 <p className="text-base">Sign up with Google</p>
               </button>
+              {/* <span className="ml-1 underline">
+                <Link to={"/signup"}>Create an account</Link>
+              </span> */}
             </Form>
           </div>
         )}

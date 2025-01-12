@@ -1,19 +1,30 @@
 import { Router } from "express";
-import { jwtSignup } from "../controllers/authController";
+import { Response, Request } from "express";
+import {
+  checkAuth,
+  jwtLogin,
+  jwtSignup,
+  logoutUser,
+} from "../controllers/authController";
 import { validateUsername } from "../middleware/validateUsername";
 import { validateEmail } from "../middleware/validateEmail";
 import { validatePassword } from "../middleware/validatePassword";
+import { verifyToken } from "../middleware/verifyToken";
 
 const router = Router();
 
+router.post("/logout", logoutUser);
+
+router.get("/check-auth", verifyToken, checkAuth);
 //JWT
 router.post(
-  "/jwtSignup",
+  "/jwt-signup",
   validateUsername,
   validateEmail,
   validatePassword,
   jwtSignup
 );
+router.post("/jwt-login", validateEmail, validatePassword, jwtLogin);
 
 //GOOGLE AUTH
 
