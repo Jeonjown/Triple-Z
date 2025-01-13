@@ -6,6 +6,13 @@ import { comparePasswords } from "../utils/comparePasswords";
 import { generateToken } from "../utils/generateToken";
 import { createError } from "../utils/createError";
 
+const GoogleStrategy: any = require("passport-google-oauth20").Strategy;
+
+interface RequestInterface extends Request {
+  user?: JwtPayload;
+  cookies: { [key: string]: string };
+}
+
 // JWT AUTH
 export const jwtSignup = async (
   req: Request,
@@ -125,11 +132,6 @@ export const jwtLogin = async (
   }
 };
 
-interface RequestInterface extends Request {
-  user?: JwtPayload;
-  cookies: { [key: string]: string };
-}
-
 export const checkAuth = (
   req: RequestInterface,
   res: Response,
@@ -164,3 +166,5 @@ export const logoutUser = async (
     return next(createError("Internal Server Error", 500)); // Pass the error to the error handler
   }
 };
+
+// GOOGLE AUTH

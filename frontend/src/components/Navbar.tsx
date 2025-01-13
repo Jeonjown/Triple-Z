@@ -36,19 +36,6 @@ const Navbar = () => {
             </>
           )}
 
-          {isAuthenticated ? (
-            <div className="hidden md:block">{user?.username}</div>
-          ) : (
-            <div>
-              <button className="mr-1 h-9 whitespace-nowrap px-2 text-[15px] hover:scale-105 hover:cursor-pointer active:scale-110">
-                <Link to={"/signup"}>SIGN UP</Link>
-              </button>
-              <button className="mr-1 h-9 whitespace-nowrap border-[1px] border-accent px-6 text-[15px] hover:scale-105 hover:cursor-pointer active:scale-110">
-                <Link to={"/login"}> LOG IN</Link>
-              </button>
-            </div>
-          )}
-
           <NotificationIcon />
           <ProfileIcon />
           <HamburgerIcon
