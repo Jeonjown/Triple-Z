@@ -1,4 +1,6 @@
 import { NavLink } from "react-router-dom";
+import useAuthStore from "../features/auth/stores/useAuthStore";
+import { logout } from "../features/auth/api/auth";
 
 type HamburgerMenuProps = {
   isHamburgerOpen: boolean;
@@ -13,18 +15,29 @@ const HamburgerMenu = ({
   isAccountOpen,
   toggle,
 }: HamburgerMenuProps) => {
+  const { user, logout: logoutStore } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    logoutStore();
+  };
+
   return (
     <>
       {/* overlay */}
+
       {isHamburgerOpen && (
         <div className="fixed inset-0 z-10 bg-black opacity-50"></div>
       )}
 
       {/* burger menu */}
+
       <div
         className={`fixed right-0 top-20 z-20 h-full w-3/4 transform bg-white p-5 font-semibold text-text ${isHamburgerOpen ? "translate-x-0" : "translate-x-full"} delay-250 transition-transform duration-300 ease-in`}
       >
         <ul className="px-5 py-6 text-xl">
+          <p>{user && user.username}</p>
+          <hr className="mb-6 border-2 border-secondary" />
           <li className="py-2">
             <NavLink
               to={"/about"}
@@ -141,7 +154,13 @@ const HamburgerMenu = ({
                   My Account
                 </NavLink>
               </li>
-              <button className="ml-5 p-1">Logout</button>
+              {/* <button className="ml-5 p-1">Logout</button> */}
+              <button
+                onClick={handleLogout}
+                className="ml-5 whitespace-nowrap border-[1px] border-accent p-1 px-6 text-[15px] hover:scale-105 hover:cursor-pointer active:scale-110"
+              >
+                LOG OUT
+              </button>
             </>
           )}
         </ul>
