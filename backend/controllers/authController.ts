@@ -123,7 +123,6 @@ export const jwtLogin = async (
       secure: process.env.NODE_ENV === "production",
       // sameSite: "strict",
       sameSite: "none",
-      domain: ".ondigitalocean.app",
       maxAge: 259200000, // 3 days
     });
 
