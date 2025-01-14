@@ -64,7 +64,6 @@ export const loginUser = async ({ email, password }: loginData) => {
 export const checkAuth = async () => {
   try {
     const response = await api.get("/api/auth/check-auth");
-    console.log("from: api", response.data.user);
     return response.data.user;
   } catch (error) {
     if (axios.isAxiosError(error)) {

@@ -116,6 +116,14 @@ export const jwtLogin = async (
     // Generate a JWT token
     const token = generateToken(user._id.toString(), user.username, user.role);
 
+    // Set the token as a cookie
+    res.cookie("auth_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Ensure this is secure in production
+      sameSite: "strict",
+      maxAge: 259200000, // 3 days
+    });
+
     // Send the token in the response
     res.status(200).json({
       message: "Login successful",

@@ -41,7 +41,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
   (req: Request, res: Response) => {
-    const { user, token }: any = req.user;
+    const { token }: any = req.user;
 
     if (token) {
       res.cookie("auth_token", token, {
