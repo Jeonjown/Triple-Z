@@ -70,6 +70,7 @@ export const jwtSignup = async (
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Ensure this is secure in production
       sameSite: "strict",
+      // sameSite: "none",
       maxAge: 259200000, // 3 days
     });
 
@@ -119,8 +120,10 @@ export const jwtLogin = async (
     // Set the token as a cookie
     res.cookie("auth_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Ensure this is secure in production
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      // sameSite: "strict",
+      sameSite: "none",
+      domain: ".ondigitalocean.app",
       maxAge: 259200000, // 3 days
     });
 
