@@ -67,7 +67,7 @@ export const jwtSignup = async (
 
     res.cookie("auth_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
       domain:
         process.env.NODE_ENV === "development"
@@ -122,7 +122,7 @@ export const jwtLogin = async (
     // Set the token as a cookie
     res.cookie("auth_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
       domain:
         process.env.NODE_ENV === "development"
@@ -172,12 +172,13 @@ export const logoutUser = async (
     // Clear the cookie
     res.clearCookie("auth_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
       domain:
         process.env.NODE_ENV === "development"
           ? "localhost"
           : ".ondigitalocean.app",
+      path: "/",
     });
 
     // Send success message

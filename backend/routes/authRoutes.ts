@@ -46,7 +46,7 @@ router.get(
     if (token) {
       res.cookie("auth_token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "none",
         domain:
           process.env.NODE_ENV === "development"
