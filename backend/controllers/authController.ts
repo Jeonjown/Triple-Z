@@ -69,10 +69,6 @@ export const jwtSignup = async (
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      domain:
-        process.env.NODE_ENV === "development"
-          ? "localhost"
-          : ".ondigitalocean.app",
       maxAge: 259200000,
     });
 
@@ -124,10 +120,6 @@ export const jwtLogin = async (
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      domain:
-        process.env.NODE_ENV === "development"
-          ? "localhost"
-          : ".ondigitalocean.app",
       maxAge: 259200000,
     });
 
@@ -174,10 +166,6 @@ export const logoutUser = async (
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      domain:
-        process.env.NODE_ENV === "development"
-          ? "localhost"
-          : ".ondigitalocean.app",
       path: "/",
     });
 

@@ -48,10 +48,6 @@ router.get(
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        domain:
-          process.env.NODE_ENV === "development"
-            ? "localhost"
-            : ".ondigitalocean.app",
         maxAge: 259200000,
       });
 
