@@ -69,8 +69,8 @@ export const jwtSignup = async (
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Ensure this is secure in production
-      sameSite: "strict",
-      // sameSite: "none",
+      // sameSite: "strict",
+      sameSite: "none",
       maxAge: 259200000, // 3 days
     });
 
@@ -122,7 +122,7 @@ export const jwtLogin = async (
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       // sameSite: "strict",
-      sameSite: "none",
+      // sameSite: "true",
       maxAge: 259200000, // 3 days
     });
 
@@ -159,13 +159,20 @@ export const logoutUser = async (
   next: NextFunction
 ) => {
   try {
+    console.log(req.cookies.auth_token);
     // Check if the cookie exists
     if (!req.cookies.auth_token) {
       return next(createError("No Valid Cookie", 400)); // Throw error if no cookie found
     }
 
     // Clear the cookie
-    res.clearCookie("auth_token", { httpOnly: true, secure: true, path: "/" });
+    res.clearCookie("auth_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      domain: ".ondigitalocean.app",
+      path: "/",
+    });
 
     // Send success message
     res.status(200).json({ message: "Logged out Successfully" });
