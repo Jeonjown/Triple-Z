@@ -1,9 +1,19 @@
 import { Link } from "react-router-dom";
 import usePopUpControl from "../hooks/usePopUpControl";
+import { logout } from "../features/auth/api/auth";
+import useAuthStore from "../features/auth/stores/useAuthStore";
 
 const ProfileIcon = () => {
   const { togglePopUpVisibility, isPopUpVisible, iconRef, popUpRef } =
     usePopUpControl();
+
+  const { logout: logoutStore } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    logoutStore();
+  };
+
   return (
     <>
       <div className="relative ml-auto flex gap-2">
@@ -30,7 +40,9 @@ const ProfileIcon = () => {
             <Link to={"/my-account"}>
               <div className="ml-5 p-1">My Account</div>
             </Link>
-            <button className="ml-5 p-1">Logout</button>
+            <button className="ml-5 p-1" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
         )}
       </div>

@@ -2,11 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
 import User from "../models/userModel";
 import { hashPassword } from "../utils/hashPassword";
-import { comparePasswords } from "../utils/comparePasswords";
 import { generateToken } from "../utils/generateToken";
 import { createError } from "../utils/createError";
-
-const GoogleStrategy: any = require("passport-google-oauth20").Strategy;
 
 interface RequestInterface extends Request {
   user?: JwtPayload;
@@ -23,6 +20,11 @@ export const jwtSignup = async (
     req.body;
 
   try {
+    // Ensure no fields are empty
+    if (!validUsername || !validEmail || !validPassword || !confirmPassword) {
+      return next(createError("Fields cannot be empty.", 400));
+    }
+
     // Check if username is already taken
     const foundUser = await User.findOne({ username: validUsername });
     if (foundUser) {
@@ -37,14 +39,13 @@ export const jwtSignup = async (
       return next(createError("Email already taken. Please use another.", 400));
     }
 
+    // Ensure password and confirm password match
+    if (validPassword !== confirmPassword) {
+      return next(createError("Passwords do not match!", 400));
+    }
+
     // Hash password
     const { hashedPassword } = await hashPassword(validPassword);
-
-    // Compare password and confirm password
-    const isMatch = await comparePasswords(confirmPassword, hashedPassword);
-    if (!isMatch) {
-      return next(createError("Password does not match!", 400));
-    }
 
     // Create new user
     const newUser = new User({
@@ -54,7 +55,7 @@ export const jwtSignup = async (
       role: "user", // Default role
     });
 
-    // Save the user
+    // Save the user to the database
     await newUser.save();
 
     // Generate JWT token
@@ -64,15 +65,15 @@ export const jwtSignup = async (
       newUser.role
     );
 
-    // Set cookie
+    // Set the token as a cookie
     res.cookie("auth_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production", // Ensure this is secure in production
       sameSite: "strict",
       maxAge: 259200000, // 3 days
     });
 
-    // Respond with success message and token
+    // Respond with success
     res.json({
       message: "User created successfully",
       user: { id: newUser._id, username: newUser.username, role: newUser.role },
@@ -112,11 +113,6 @@ export const jwtLogin = async (
       return next(createError("User not found.", 404));
     }
 
-    // Compare the provided password with the hashed password in the database
-    const isPasswordValid = await comparePasswords(password, user.password);
-
-    if (!isPasswordValid) return next(createError("invalid password", 400));
-
     // Generate a JWT token
     const token = generateToken(user._id.toString(), user.username, user.role);
 
@@ -139,7 +135,9 @@ export const checkAuth = (
 ) => {
   try {
     const user = req.user;
+    console.log(user);
     res.status(200).json({ user });
+    return;
   } catch (error) {
     return next(createError("Internal Server Error", 500));
   }

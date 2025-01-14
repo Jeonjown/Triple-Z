@@ -1,4 +1,5 @@
-interface ResponseError extends Error {
+// Define the custom error interface
+export interface ResponseError extends Error {
   status?: number;
 }
 

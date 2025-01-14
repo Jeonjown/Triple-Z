@@ -33,6 +33,10 @@ const Login = () => {
       .required("Password is required"),
   });
 
+  const handleGoogleLogin = async () => {
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
+  };
+
   return (
     <>
       <Formik
@@ -101,7 +105,10 @@ const Login = () => {
                 Log in
               </button>
               <hr className="my-4 border-t-2" />
-              <button className="flex items-center justify-center rounded border-2 bg-white p-2 py-2 hover:scale-105 active:scale-110 active:opacity-95">
+              <a
+                onClick={handleGoogleLogin}
+                className="flex items-center justify-center rounded border-2 bg-white p-2 py-2 hover:scale-105 hover:cursor-pointer active:scale-110 active:opacity-95"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   x="0px"
@@ -127,7 +134,8 @@ const Login = () => {
                   ></path>
                 </svg>
                 <p className="text-base">Sign up with Google</p>
-              </button>
+              </a>
+
               <div className="mt-4 text-center text-xs text-accent">
                 need an account?
                 <span className="ml-1 underline">

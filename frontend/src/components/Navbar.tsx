@@ -4,13 +4,14 @@ import NotificationIcon from "./NotificationIcon";
 import NavLinks from "./NavLinks";
 import HamburgerIcon from "./HamburgerIcon";
 import HamburgerMenu from "./HamburgerMenu";
-
 import useToggle from "../hooks/useToggle";
 import { Link } from "react-router-dom";
 import useAuthStore from "../features/auth/stores/useAuthStore";
+import useFetchUserData from "../features/auth/hooks/useFetchUserData";
 
 const Navbar = () => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useFetchUserData();
+  const { isAuthenticated } = useAuthStore();
 
   const { toggleState, toggle } = useToggle({
     isHamburgerOpen: false,
@@ -23,7 +24,6 @@ const Navbar = () => {
       <nav className="relative z-50 flex items-center border-2 bg-white px-6 py-4 align-middle font-semibold text-text shadow md:px-6 md:py-6">
         <Logo />
         <NavLinks />
-
         <div className="relative ml-auto flex items-center gap-2">
           {!isAuthenticated && (
             <>
@@ -35,7 +35,7 @@ const Navbar = () => {
               </button>
             </>
           )}
-
+          {user && <div className="hidden lg:block">{user.username}</div>}
           <NotificationIcon />
           <ProfileIcon />
           <HamburgerIcon

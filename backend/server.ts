@@ -1,18 +1,15 @@
-import express, {
-  NextFunction,
-  Request,
-  ErrorRequestHandler,
-  Response,
-} from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/authRoutes";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import passport from "./config/passport";
+
 dotenv.config();
 
 const server = express();
-
+server.use(passport.initialize());
 server.use(cookieParser());
 server.use(express.json());
 server.use(

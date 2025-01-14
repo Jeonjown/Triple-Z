@@ -96,3 +96,14 @@ export const logout = async () => {
     throw new Error("An unexpected error occurred during logout");
   }
 };
+
+export const googleLogin = async () => {
+  try {
+    const response = await api.get("api/auth/google");
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error Fetching data:  ", error);
+    return null;
+  }
+};

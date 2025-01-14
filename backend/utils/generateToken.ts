@@ -16,7 +16,6 @@ export const generateToken = (id: string, username: string, role: string) => {
 
   const options = {
     expiresIn: "7d",
-    issuer: "yourAppName",
   };
 
   const token = jwt.sign(payload, secretKey, options);

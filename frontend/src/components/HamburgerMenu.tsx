@@ -12,7 +12,6 @@ type HamburgerMenuProps = {
 const HamburgerMenu = ({
   isHamburgerOpen,
   isScheduleOpen,
-  isAccountOpen,
   toggle,
 }: HamburgerMenuProps) => {
   const { user, logout: logoutStore } = useAuthStore();
@@ -118,50 +117,25 @@ const HamburgerMenu = ({
               CONTACTS
             </NavLink>
           </li>
+          <li className="py-2">
+            <NavLink
+              to={"/my-account"}
+              className={({ isActive }) =>
+                isActive ? "border-l-4 border-solid border-accent px-2" : ""
+              }
+            >
+              ACCOUNT
+            </NavLink>
+          </li>
           <hr className="border-t-3 my-10 border-gray-300" />
 
-          <li
-            className="flex items-center py-2"
-            onClick={() => toggle("isAccountOpen")}
-          >
-            <NavLink to={"/contacts"}> ACCOUNT</NavLink>
-
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className={`ml-auto w-7 pl-2 ${isAccountOpen && "rotate-90 duration-100"}`}
+          {user && (
+            <button
+              onClick={handleLogout}
+              className="whitespace-nowrap border-[1px] border-red-700 p-1 px-6 text-[15px] text-red-800 hover:scale-105 hover:cursor-pointer active:scale-110"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-              />
-            </svg>
-          </li>
-
-          {isAccountOpen && (
-            <>
-              <li className="ml-5 p-1">
-                <NavLink
-                  to={"/my-account"}
-                  className={({ isActive }) =>
-                    isActive ? "border-l-4 border-solid border-accent px-2" : ""
-                  }
-                >
-                  My Account
-                </NavLink>
-              </li>
-              {/* <button className="ml-5 p-1">Logout</button> */}
-              <button
-                onClick={handleLogout}
-                className="ml-5 whitespace-nowrap border-[1px] border-accent p-1 px-6 text-[15px] hover:scale-105 hover:cursor-pointer active:scale-110"
-              >
-                LOG OUT
-              </button>
-            </>
+              LOG OUT
+            </button>
           )}
         </ul>
       </div>
