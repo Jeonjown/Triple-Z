@@ -65,13 +65,12 @@ export const jwtSignup = async (
       newUser.role
     );
 
-    // Set the token as a cookie
     res.cookie("auth_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Ensure this is secure in production
-      // sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
       sameSite: "none",
-      maxAge: 259200000, // 3 days
+      domain: process.env.NODE_ENV ? "localhost" : ".ondigitalocean.app",
+      maxAge: 259200000,
     });
 
     // Respond with success
@@ -121,9 +120,9 @@ export const jwtLogin = async (
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      // sameSite: "strict",
-      // sameSite: "true",
-      maxAge: 259200000, // 3 days
+      sameSite: "none",
+      domain: process.env.NODE_ENV ? "localhost" : ".ondigitalocean.app",
+      maxAge: 259200000,
     });
 
     // Send the token in the response
@@ -159,7 +158,6 @@ export const logoutUser = async (
   next: NextFunction
 ) => {
   try {
-    console.log(req.cookies.auth_token);
     // Check if the cookie exists
     if (!req.cookies.auth_token) {
       return next(createError("No Valid Cookie", 400)); // Throw error if no cookie found
@@ -170,8 +168,7 @@ export const logoutUser = async (
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
-      domain: ".ondigitalocean.app",
-      path: "/",
+      domain: process.env.NODE_ENV ? "localhost" : ".ondigitalocean.app",
     });
 
     // Send success message

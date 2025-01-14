@@ -47,9 +47,9 @@ router.get(
       res.cookie("auth_token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        // sameSite: "strict",
         sameSite: "none",
-        maxAge: 259200000, // 3 days
+        domain: process.env.NODE_ENV ? "localhost" : ".ondigitalocean.app",
+        maxAge: 259200000,
       });
 
       res.redirect(`${process.env.FRONTEND_URL}`);
