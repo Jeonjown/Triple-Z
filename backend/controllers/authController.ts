@@ -176,5 +176,3 @@ export const logoutUser = async (
     return next(createError("Internal Server Error", 500)); // Pass the error to the error handler
   }
 };
-
-// GOOGLE AUTH

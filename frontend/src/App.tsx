@@ -5,7 +5,7 @@ import About from "./pages/About";
 import Events from "./pages/Events";
 import Menu from "./pages/Menu";
 import Contacts from "./pages/Contacts";
-import Schedule from "./pages/Schedule";
+import Schedule from "./features/scheduling/pages/Schedule";
 import Blogs from "./pages/Blogs";
 import MyAccount from "./pages/MyAccount";
 import Footer from "./components/Footer";

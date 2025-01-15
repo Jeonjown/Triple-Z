@@ -26,6 +26,16 @@ const NavLinks = () => {
         </li>
         <li>
           <NavLink
+            to="/schedule"
+            className={({ isActive }) =>
+              isActive ? "border-b-2 border-solid border-accent p-1" : "p-1"
+            }
+          >
+            SCHEDULE
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
             to="/menu"
             className={({ isActive }) =>
               isActive ? "border-b-2 border-solid border-accent p-1" : "p-1"
