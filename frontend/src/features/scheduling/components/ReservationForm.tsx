@@ -56,7 +56,9 @@ const ReservationForm = () => {
         <div className="mt-15 flex w-full items-center justify-center md:mt-16">
           <Form className="flex w-full max-w-screen-sm flex-col px-12 py-8 md:mx-10 md:py-14 md:shadow-aesthetic">
             <div>
-              <h2 className="text-center text-2xl">Make a Reservation</h2>
+              <h2 className="text-center font-heading text-2xl">
+                Make a Reservation
+              </h2>
               <p className="mb-10 text-center">
                 Select your details and we'll try get the best seats for you
               </p>
