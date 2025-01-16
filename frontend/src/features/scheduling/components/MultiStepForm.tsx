@@ -82,7 +82,46 @@ const MultiStepForm = () => {
               </>
             )}
 
-            <div className="text-sm">
+            <div className="relative mb-10 mt-10 hidden md:block">
+              {/* Progress Bar */}
+              <div className="relative m-auto h-1 w-[90%] rounded-full bg-gray-200">
+                <div
+                  className="h-1 rounded-full bg-secondary transition-all duration-300"
+                  style={{ width: `${((currentStep - 1) / (4 - 1)) * 100}%` }} // Adjust width to align with circles
+                ></div>
+              </div>
+
+              {/* Milestone Circles and Labels */}
+              <div className="absolute -top-3 left-[5px] flex w-full justify-between">
+                {[
+                  { step: 1, label: "Date" },
+                  { step: 2, label: "Menu Pre-Order" },
+                  { step: 3, label: "Confirmation" },
+                  { step: 4, label: "Checkout" },
+                ].map(({ step, label }) => (
+                  <div key={step} className="flex flex-col items-center">
+                    {/* Milestone Circle */}
+                    <div
+                      className={`h-8 w-8 rounded-full border-2 ${
+                        currentStep >= step
+                          ? "border-secondary bg-secondary"
+                          : "bg-gray-200"
+                      } flex items-center justify-center text-sm font-semibold text-white`}
+                    >
+                      {step}
+                    </div>
+
+                    {/* Label */}
+                    <div className="mt-2 text-xs font-medium text-gray-600">
+                      {label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Breadcrumbs */}
+            <div className="text-sm md:hidden">
               {currentStep === 1 && <span className="text-gray-400">Date</span>}
               {currentStep === 2 && (
                 <span className="text-gray-400">
@@ -100,6 +139,8 @@ const MultiStepForm = () => {
                 </span>
               )}
             </div>
+
+            {/* Step Components */}
             {currentStep === 1 && (
               <Step1 nextStep={nextStep} touched={touched} errors={errors} />
             )}
