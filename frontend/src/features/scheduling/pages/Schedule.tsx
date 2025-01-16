@@ -1,6 +1,6 @@
 import Login from "../../auth/pages/Login";
 import useAuthStore from "../../auth/stores/useAuthStore";
-import ReservationForm from "../components/ReservationForm";
+import MultiStepForm from "../components/MultiStepForm";
 
 const Schedule = () => {
   const { isAuthenticated } = useAuthStore();
@@ -9,7 +9,7 @@ const Schedule = () => {
     <>
       {isAuthenticated ? (
         <>
-          <ReservationForm />
+          <MultiStepForm />
         </>
       ) : (
         <div>

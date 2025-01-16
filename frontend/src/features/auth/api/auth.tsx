@@ -34,8 +34,6 @@ export const signupUser = async ({
       confirmPassword,
     });
 
-    console.log("from api: ", response.data.user);
-
     return response.data.user;
   } catch (error) {
     if (axios.isAxiosError(error)) {
