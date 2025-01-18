@@ -1,18 +1,13 @@
 import { Link } from "react-router-dom";
 import usePopUpControl from "../hooks/usePopUpControl";
-import { logout } from "../features/auth/api/auth";
-import useAuthStore from "../features/auth/stores/useAuthStore";
+
+import useLogout from "../features/auth/hooks/useLogout";
 
 const ProfileIcon = () => {
   const { togglePopUpVisibility, isPopUpVisible, iconRef, popUpRef } =
     usePopUpControl();
 
-  const { logout: logoutStore } = useAuthStore();
-
-  const handleLogout = () => {
-    logout();
-    logoutStore();
-  };
+  const { logoutUser } = useLogout();
 
   return (
     <>
@@ -40,7 +35,7 @@ const ProfileIcon = () => {
             <Link to={"/my-account"}>
               <div className="ml-5 p-1">My Account</div>
             </Link>
-            <button className="ml-5 p-1" onClick={handleLogout}>
+            <button className="ml-5 p-1" onClick={logoutUser}>
               Logout
             </button>
           </div>

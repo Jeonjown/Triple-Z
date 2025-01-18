@@ -73,7 +73,6 @@ export const checkAuth = async () => {
 
 export const logout = async () => {
   try {
-    console.log("logout clicked");
     const response = await api.post("/api/auth/logout");
     if (response?.data && response.data.message) {
       return response.data.message;

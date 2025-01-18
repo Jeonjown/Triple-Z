@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import useAuthStore from "../features/auth/stores/useAuthStore";
-import { logout } from "../features/auth/api/auth";
+import useLogout from "../features/auth/hooks/useLogout";
 
 type HamburgerMenuProps = {
   isHamburgerOpen: boolean;
@@ -14,12 +14,8 @@ const HamburgerMenu = ({
   isScheduleOpen,
   toggle,
 }: HamburgerMenuProps) => {
-  const { user, logout: logoutStore } = useAuthStore();
-
-  const handleLogout = () => {
-    logout();
-    logoutStore();
-  };
+  const { user } = useAuthStore();
+  const { logoutUser } = useLogout();
 
   return (
     <>
@@ -179,7 +175,7 @@ const HamburgerMenu = ({
 
           {user && (
             <button
-              onClick={handleLogout}
+              onClick={logoutUser}
               className="whitespace-nowrap border-[1px] border-red-700 p-1 px-6 text-[15px] text-red-800 hover:scale-105 hover:cursor-pointer active:scale-110"
             >
               LOG OUT
