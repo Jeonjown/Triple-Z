@@ -37,7 +37,6 @@ const HamburgerMenu = ({
             </>
           )}
 
-          <hr className="mb-6 border-2 border-secondary" />
           <li className="py-2">
             <NavLink
               to="/about"
