@@ -25,12 +25,18 @@ const HamburgerMenu = ({
 
       {/* Hamburger Menu */}
       <div
-        className={`fixed right-0 top-20 z-20 h-full w-3/4 transform bg-white p-5 font-semibold text-text ${
+        className={`fixed right-0 top-20 z-20 h-full w-3/4 transform overflow-y-scroll bg-white p-5 font-semibold text-text ${
           isHamburgerOpen ? "translate-x-0" : "translate-x-full"
-        } overflow-y-auto transition-transform duration-300 ease-in-out`}
+        } transition-transform duration-300 ease-in-out`}
       >
         <ul className="px-5 py-6 text-xl">
-          {user && <p>{user.username}</p>}
+          {user && (
+            <>
+              <p>{user.username}</p>
+              <hr className="mb-6 border-2 border-secondary" />
+            </>
+          )}
+
           <hr className="mb-6 border-2 border-secondary" />
           <li className="py-2">
             <NavLink
@@ -163,19 +169,20 @@ const HamburgerMenu = ({
                   Settings
                 </NavLink>
               </li>
+
+              <hr className="border-t-3 my-5 border-gray-300" />
+
+              {user && (
+                <li
+                  onClick={logoutUser}
+                  className="mb-16 whitespace-nowrap border border-red-700 p-1 text-center text-[15px] text-red-800 hover:scale-105 hover:cursor-pointer active:scale-110"
+                >
+                  LOG OUT
+                </li>
+              )}
             </>
           )}
         </ul>
-        <hr className="border-t-3 my-5 border-gray-300" />
-
-        {user && (
-          <button
-            onClick={logoutUser}
-            className="whitespace-nowrap border-[1px] border-red-700 p-1 px-6 text-[15px] text-red-800 hover:scale-105 hover:cursor-pointer active:scale-110"
-          >
-            LOG OUT
-          </button>
-        )}
       </div>
     </>
   );
