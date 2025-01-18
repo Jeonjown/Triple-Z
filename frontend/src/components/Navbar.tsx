@@ -55,7 +55,7 @@ const Navbar = () => {
       <HamburgerMenu
         isHamburgerOpen={toggleState.isHamburgerOpen}
         isScheduleOpen={toggleState.isScheduleOpen}
-        isAccountOpen={toggleState.isAccountOpen}
+        // isAccountOpen={toggleState.isAccountOpen}
         toggle={toggle}
       />
     </>
