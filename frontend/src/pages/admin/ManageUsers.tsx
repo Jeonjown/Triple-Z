@@ -27,9 +27,10 @@ const ManageUsers = () => {
 
   return (
     <>
+      <h3 className="font-bold">Users:</h3>
       {data?.length &&
         data.map((user: User) => (
-          <ul key={user._id}>
+          <ul key={user._id} className="mb-4 border border-black p-4">
             <li>ID: {user._id}</li>
             <li>USERNAME: {user.username}</li>
             <li>EMAIL: {user.email}</li>

@@ -44,7 +44,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             {/* admin */}
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/manage-users" element={<ManageUsers data={[]} />} />
+            <Route path="/manage-users" element={<ManageUsers />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/manage-menu" element={<ManageMenu />} />
