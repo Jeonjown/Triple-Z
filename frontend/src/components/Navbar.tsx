@@ -36,8 +36,14 @@ const Navbar = () => {
             </>
           )}
           {user && <div className="hidden lg:block">{user.username}</div>}
-          <NotificationIcon />
-          <ProfileIcon />
+
+          {user && (
+            <>
+              <NotificationIcon />
+              <ProfileIcon />
+            </>
+          )}
+
           <HamburgerIcon
             isHamburgerOpen={toggleState.isHamburgerOpen}
             isScheduleOpen={toggleState.isScheduleOpen}

@@ -4,6 +4,7 @@ import User from "../models/userModel";
 import { hashPassword } from "../utils/hashPassword";
 import { generateToken } from "../utils/generateToken";
 import { createError } from "../utils/createError";
+import bcrypt from "bcryptjs";
 
 interface RequestInterface extends Request {
   user?: JwtPayload;
@@ -110,6 +111,13 @@ export const jwtLogin = async (
     const user = await User.findOne({ email });
     if (!user) {
       return next(createError("User not found.", 404));
+    }
+
+    const isPasswordMatch =
+      user.password && (await bcrypt.compare(password, user.password));
+
+    if (!isPasswordMatch) {
+      return next(createError("Password does not match.", 400));
     }
 
     // Generate a JWT token
