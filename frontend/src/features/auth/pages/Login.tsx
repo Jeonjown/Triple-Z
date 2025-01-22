@@ -12,8 +12,9 @@ const Login = () => {
   const mutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      navigate("/", { replace: true });
+      console.log("data from login:", data);
       login(data);
+      navigate("/", { replace: true });
     },
   });
 

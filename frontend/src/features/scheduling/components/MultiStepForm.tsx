@@ -61,8 +61,8 @@ const MultiStepForm = () => {
       onSubmit={handleSubmit}
     >
       {({ values, touched, errors, submitForm }) => (
-        <div className="mt-15 flex w-full items-center justify-center md:mt-16">
-          <Form className="flex w-full max-w-screen-sm flex-col px-12 py-8 md:mx-10 md:py-14 md:shadow-aesthetic">
+        <div className="mt-15 ml:64 flex w-auto items-center justify-center py-20">
+          <Form className="flex w-5/6 max-w-screen-sm flex-col px-12 py-8 md:mx-10 md:py-14 md:shadow-aesthetic">
             {currentStep !== 4 && (
               <>
                 <h2 className="mb text-center font-heading text-2xl">

@@ -59,6 +59,10 @@ export const jwtSignup = async (
     // Save the user to the database
     await newUser.save();
 
+    if (!newUser._id) {
+      throw new Error("User ID is missing.");
+    }
+
     // Generate JWT token
     const token = generateToken(
       newUser._id.toString(),
@@ -121,7 +125,7 @@ export const jwtLogin = async (
     }
 
     // Generate a JWT token
-    const token = generateToken(user._id.toString(), user.username, user.role);
+    const token = generateToken(user.id.toString(), user.username, user.role);
 
     // Set the token as a cookie
     res.cookie("auth_token", token, {
@@ -134,7 +138,7 @@ export const jwtLogin = async (
     // Send the token in the response
     res.status(200).json({
       message: "Login successful",
-      user: { id: user._id, username: user.username, role: user.role },
+      user: { _id: user._id, username: user.username, role: user.role },
       token,
     });
   } catch (error) {

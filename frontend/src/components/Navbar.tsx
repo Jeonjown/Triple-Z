@@ -21,7 +21,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="relative z-50 flex items-center border-2 bg-white px-6 py-4 align-middle font-semibold text-text shadow md:px-6 md:py-6">
+      <nav className="fixed top-0 z-50 flex min-h-24 w-full items-center border-2 bg-white px-6 font-semibold text-text shadow md:px-6 md:py-6">
         <Logo />
         <NavLinks />
         <div className="relative ml-auto flex items-center gap-2">

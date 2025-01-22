@@ -20,4 +20,14 @@ const useAuthStore = create<AuthState>()((set) => ({
   logout: () => set({ isAuthenticated: false, user: null }),
 }));
 
+// Accessing the current state
+
+// Log the state values that exist
+const logState = () => {
+  const state = useAuthStore.getState(); // Get the state directly from the store
+  console.log("Current state:", state); // Log the entire state
+};
+
+logState();
+
 export default useAuthStore;

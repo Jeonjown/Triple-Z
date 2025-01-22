@@ -20,7 +20,7 @@ const HamburgerMenu = ({
     <>
       {/* Overlay */}
       {isHamburgerOpen && (
-        <div className="fixed inset-0 z-10 bg-black opacity-50"></div>
+        <div className="fixed inset-0 z-20 bg-black opacity-50"></div>
       )}
 
       {/* Hamburger Menu */}

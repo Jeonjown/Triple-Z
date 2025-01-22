@@ -1,8 +1,9 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import userRoutes from "./routes/authRoutes";
+import authRoutes from "./routes/authRoutes";
 import adminRoutes from "./routes/admin/adminRoutes";
+import userRoutes from "./routes/userRoutes";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import passport from "./config/passport";
@@ -21,8 +22,9 @@ server.use(
   })
 );
 
-server.use("/api/auth", userRoutes);
+server.use("/api/auth", authRoutes);
 server.use("/api/admin", verifyAdminToken, adminRoutes);
+server.use("/api/user", userRoutes);
 
 type Error = {
   status?: number;

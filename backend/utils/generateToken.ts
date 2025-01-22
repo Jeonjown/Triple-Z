@@ -7,9 +7,9 @@ if (!process.env.JWT_SECRET) {
 }
 const secretKey = process.env.JWT_SECRET;
 
-export const generateToken = (id: string, username: string, role: string) => {
+export const generateToken = (_id: string, username: string, role: string) => {
   const payload = {
-    id,
+    _id,
     username,
     role,
   };

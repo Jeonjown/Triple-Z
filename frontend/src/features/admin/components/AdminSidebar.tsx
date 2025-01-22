@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const AdminSidebar = () => {
   return (
-    <div className="relative hidden min-h-screen w-64 border-2 bg-white md:block">
+    <div className="fixed top-24 z-10 hidden min-h-screen w-64 border-2 bg-white md:block">
       {/* Sidebar */}
       <aside className="flex flex-col font-semibold text-text">
         {/* Logo Section */}
