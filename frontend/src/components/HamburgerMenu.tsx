@@ -168,18 +168,18 @@ const HamburgerMenu = ({
                   Settings
                 </NavLink>
               </li>
-
-              <hr className="border-t-3 my-5 border-gray-300" />
-
-              {user && (
-                <li
-                  onClick={logoutUser}
-                  className="mb-16 whitespace-nowrap border border-red-700 p-1 text-center text-[15px] text-red-800 hover:scale-105 hover:cursor-pointer active:scale-110"
-                >
-                  LOG OUT
-                </li>
-              )}
             </>
+          )}
+
+          <hr className="border-t-3 my-5 border-gray-300" />
+
+          {user && (
+            <li
+              onClick={logoutUser}
+              className="mb-16 whitespace-nowrap border border-red-700 p-1 text-center text-[15px] text-red-800 hover:scale-105 hover:cursor-pointer active:scale-110"
+            >
+              LOG OUT
+            </li>
           )}
         </ul>
       </div>
