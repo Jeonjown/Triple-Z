@@ -1,0 +1,902 @@
+[
+  {
+    "_id": "a59dcad3febddb9eb9ef8abb",
+    "image": "https://loremflickr.com/2698/3862?lock=6956581263827365",
+    "itemName": "Unbranded Marble Chips",
+    "description": "Usitas subvenio natus dignissimos cognatus contego tergiversatio voro conatus angustus. Damnatio viduo sopor. Sollers aeneus deprimo.",
+    "price": 14.45,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "9cd96caaef649ba2ff6cdbc2",
+    "image": "https://loremflickr.com/1995/2402?lock=732159846320650",
+    "itemName": "Incredible Aluminum Bike",
+    "description": "Assumenda apud degenero. Cotidie hic suppono benigne sortitus cedo voluntarius curatio arto. Ultio terebro tres alveus uxor deduco capillus carbo.",
+    "price": 33.29,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "e9f3cb4eee61465ea85a17fe",
+    "image": "https://picsum.photos/seed/w0h6P9/1379/3158",
+    "itemName": "Tasty Marble Pants",
+    "description": "Carus solium calculus tutamen strenuus numquam. Supra stipes alii cresco cura dolor adfero vorax calco. Accendo advoco curis.",
+    "price": 43.56,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "0eaccf1558caf0b1f2892b7e",
+    "image": "https://picsum.photos/seed/RpJxFZidi/2243/2064",
+    "itemName": "Practical Wooden Table",
+    "description": "Quidem delibero benigne adaugeo decipio suppellex deinde absque. Toties baiulus excepturi cariosus. Audentia omnis complectus stipes vinco tergiversatio argumentum.",
+    "price": 16.45,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "af0dfe4bcccd41e531d9a6eb",
+    "image": "https://loremflickr.com/1008/439?lock=3338319978921785",
+    "itemName": "Generic Concrete Mouse",
+    "description": "Talis catena conitor aptus thorax viriliter aegrotatio xiphias utrimque. Ustilo victoria molestiae tepidus arto strenuus creator agnitio. Sufficio correptius totus volutabrum impedit omnis.",
+    "price": 37.59,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "cfeef9cfff0ee437c7d490d4",
+    "image": "https://loremflickr.com/3577/2994?lock=4725825530937611",
+    "itemName": "Sleek Gold Keyboard",
+    "description": "Averto vitiosus impedit amo. Administratio congregatio accendo sint. Vulnus corrigo adimpleo solutio assumenda vinitor admiratio attero a.",
+    "price": 42.86,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "be9a3af195dc123dfecf76b7",
+    "image": "https://loremflickr.com/3968/2956?lock=1057794020648502",
+    "itemName": "Luxurious Bamboo Keyboard",
+    "description": "Colligo amo adiuvo creber. Colligo quo vetus vomito. Curvo advoco desipio denuncio deficio acquiro nemo anser cohors sit.",
+    "price": 18.05,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "50e1db262fe397146fd18f4a",
+    "image": "https://picsum.photos/seed/3PlHoZr/1439/1823",
+    "itemName": "Handcrafted Plastic Tuna",
+    "description": "Debeo vaco cado timidus rem territo speciosus. Vaco cavus umquam cur deprecator curriculum accusator omnis appono clamo. Accusamus porro templum varietas audax.",
+    "price": 27.69,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "af0ede0efbecabc8dc7517c3",
+    "image": "https://picsum.photos/seed/DjfvA0Lw/357/3162",
+    "itemName": "Handmade Plastic Soap",
+    "description": "Vado occaecati annus cernuus. Eum aiunt nisi clibanus. Provident caelestis civitas sono torqueo vester.",
+    "price": 14.19,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "fab2cf31a579776cce8deacb",
+    "image": "https://loremflickr.com/2857/3119?lock=8753196050832308",
+    "itemName": "Tasty Plastic Chips",
+    "description": "Viscus alo a constans eius collum cavus vulnero antepono. Acidus tunc decimus adipisci consuasor condico admiratio. Basium conspergo tempus audax socius surculus.",
+    "price": 2.59,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "afcfab4b0dfad6db9bcde6e9",
+    "image": "https://loremflickr.com/1552/1551?lock=6294575974878266",
+    "itemName": "Soft Ceramic Gloves",
+    "description": "Bardus ager avaritia caelestis adduco angelus clarus condico. Necessitatibus cui ratione. Crapula vesica subiungo sulum voluptas illo acer aptus vilis id.",
+    "price": 10.5,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "ed9ce959c4cc9def2d0aabd0",
+    "image": "https://picsum.photos/seed/duoyYet/3138/2160",
+    "itemName": "Electronic Cotton Sausages",
+    "description": "Timor theologus certe. Audacia quibusdam demens tergeo cognomen. Tenuis deputo caecus artificiose ver torrens cur decretum crapula attollo.",
+    "price": 31.09,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "9cfa40e1b9ab79ae05a5c7a5",
+    "image": "https://loremflickr.com/1738/2837?lock=531039927407700",
+    "itemName": "Luxurious Aluminum Hat",
+    "description": "Suggero tantum caelestis. Eum tamdiu clibanus adhuc armarium temeritas aliqua dolor vulnus ante. Vero vos tabernus torqueo amplus sunt cupio cum apto.",
+    "price": 6.29,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "e2bd0ffb8cdf59ee0f55d243",
+    "image": "https://picsum.photos/seed/N7V8j/3931/1351",
+    "itemName": "Handcrafted Silk Towels",
+    "description": "Nam chirographum qui capitulus vacuus viduo. A thesis vociferor accusator adulatio denique dedecor pecto adulescens vivo. Arbustum aduro speculum cattus degusto angustus cubo agnitio.",
+    "price": 36.09,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "ce6bcf8edf49aa5aaa5caeaf",
+    "image": "https://picsum.photos/seed/xFC8j/2881/880",
+    "itemName": "Intelligent Concrete Gloves",
+    "description": "Sponte angelus minima tepesco approbo absum. Cariosus amo non vulticulus absum comis absens vinitor sperno id. Carcer vorago articulus quidem ex beneficium tergiversatio colligo totidem accusamus.",
+    "price": 14.39,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "e44bc2dc1bdeef82a5af3b33",
+    "image": "https://picsum.photos/seed/nZfk7YS/3285/2231",
+    "itemName": "Recycled Wooden Towels",
+    "description": "Odit aestivus cohaero tego. Tergum coadunatio amiculum deleniti adsum decimus maiores sollicito attollo animadverto. In vulpes aegre vilis somniculosus brevis recusandae excepturi asporto.",
+    "price": 8,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "e02aaf8ad7a4c1170262611b",
+    "image": "https://loremflickr.com/3788/1310?lock=6369674347634228",
+    "itemName": "Licensed Cotton Chair",
+    "description": "Textus varietas synagoga abbas provident. Aspernatur sperno ara asperiores odio adduco benevolentia vester taedium apto. Depopulo depono bellum cruciamentum viduo copiose aedificium super.",
+    "price": 18.7,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "abf5a6a7ba9bf7bf3671af5f",
+    "image": "https://loremflickr.com/1925/3041?lock=860541422963844",
+    "itemName": "Soft Bamboo Chair",
+    "description": "Beneficium velit carmen doloremque suppono trans amicitia thymbra. Textor nisi tego aer talis suppono. Ex celer armarium surgo comprehendo quam undique similique mollitia.",
+    "price": 40.49,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "a63ce5d6a185b3bc5fea4989",
+    "image": "https://picsum.photos/seed/MUobV/2238/231",
+    "itemName": "Bespoke Cotton Hat",
+    "description": "Coruscus terra antiquus. Atqui tunc creber decimus vae aspicio ut averto. Xiphias adhaero ad callide quo aspicio suus deludo.",
+    "price": 44.15,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "c44acbbb71154fc9be86f02d",
+    "image": "https://loremflickr.com/2674/2890?lock=1924892948000007",
+    "itemName": "Practical Cotton Ball",
+    "description": "Aer colo thermae. Acquiro decipio aqua utrimque viscus magni adsidue quisquam. Campana speculum adversus acquiro calamitas arto.",
+    "price": 29.85,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "a2fa6c7edcd4aedb12f33fc5",
+    "image": "https://picsum.photos/seed/tvPzuz/1661/1242",
+    "itemName": "Oriental Granite Bacon",
+    "description": "Adhuc aqua pecus sit caries. Asper patrocinor suscipio victus villa deduco casso minima. Textor trepide agnosco auditor ustilo consequatur demens crux.",
+    "price": 45.4,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "fc0bae748ca3de1a1b2bfdee",
+    "image": "https://picsum.photos/seed/saEOwJ/834/2941",
+    "itemName": "Rustic Bronze Pants",
+    "description": "Caveo commemoro ars. Curis nobis compello vito. Vulticulus amo depereo quis crudelis ventus bellicus amoveo sordeo.",
+    "price": 10.79,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "ee9efd1a8d96ad07a9f3ea3c",
+    "image": "https://loremflickr.com/2514/3240?lock=1552077360982401",
+    "itemName": "Fantastic Marble Hat",
+    "description": "Totidem ustilo aliquam creo considero voluntarius maiores vitiosus suppono astrum. Celebrer uberrime surculus colligo dens venia. Tenetur tempore repellendus pecto aggredior.",
+    "price": 30.05,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "5e2d0f74ac02ac2cc1f0ce31",
+    "image": "https://picsum.photos/seed/t4zrgJ/3505/1304",
+    "itemName": "Small Cotton Pizza",
+    "description": "Supellex vado averto doloribus comedo. Acsi cuppedia suscipio delibero suffragium omnis tutis. Stipes victoria coruscus aqua appositus.",
+    "price": 2.69,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "0c45a5a51f1eade582f3bd91",
+    "image": "https://picsum.photos/seed/iTZ8gbeOp/1700/1984",
+    "itemName": "Tasty Bronze Pizza",
+    "description": "Comedo tantillus vacuus. Turpis voluptate tamen aestivus capitulus corpus cunctatio suscipit tepesco conturbo. Degenero talus vigor.",
+    "price": 31.85,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "c13c3e5a7bace6b4fee211f3",
+    "image": "https://picsum.photos/seed/rFkOFK/2524/3660",
+    "itemName": "Sleek Bamboo Salad",
+    "description": "Comitatus titulus arbor terebro coniecto. Callide cerno suppellex valens enim spiritus aggero deserunt abbas. Adulatio ultra vulticulus crustulum.",
+    "price": 46.4,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "aeeb8bacaf1a56ab7cf1bc19",
+    "image": "https://picsum.photos/seed/v2m4Dww/1389/3731",
+    "itemName": "Elegant Bamboo Sausages",
+    "description": "Vehemens angulus averto timor optio cupressus. Validus contigo arcus voveo contego apto ducimus causa. Corrigo adaugeo cuius.",
+    "price": 39.27,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "5bc78fedd4090de67dd4ebab",
+    "image": "https://loremflickr.com/244/2460?lock=8626361381502909",
+    "itemName": "Handcrafted Rubber Shoes",
+    "description": "Sophismata dedico cibo quaerat. Cerno sapiente adeptio labore iure cohors ullus auditor. Tonsor theatrum tum.",
+    "price": 25.59,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "f92ec7a9c2621c96dab69a98",
+    "image": "https://picsum.photos/seed/wMZ1YWQJ/1065/2515",
+    "itemName": "Electronic Steel Car",
+    "description": "Approbo conculco articulus omnis terminatio contigo. Agnosco claudeo contabesco timidus virga possimus termes audeo undique. Crapula sono utor rem voluptas laudantium addo.",
+    "price": 19.49,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "14aac29ccc2af36e6c74efee",
+    "image": "https://loremflickr.com/2234/974?lock=8384205251028745",
+    "itemName": "Luxurious Ceramic Salad",
+    "description": "Blandior adflicto deludo unus sustineo. Unde arcus similique truculenter adsuesco benigne. Viscus vesco audio argentum quod conforto angulus vester clam.",
+    "price": 20.95,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "bdbea5601a1acb5337a46cbe",
+    "image": "https://picsum.photos/seed/j8alnV13HC/1502/1302",
+    "itemName": "Refined Rubber Bike",
+    "description": "Titulus vergo abscido uxor tempore. Sapiente acervus circumvenio spes volva teres spero. Perferendis vita coerceo.",
+    "price": 16.85,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "a0ddc1bc3ce8b50d0ea2e781",
+    "image": "https://picsum.photos/seed/9ipm4B/201/1132",
+    "itemName": "Gorgeous Steel Salad",
+    "description": "Decor dens deludo vinco acquiro quo vesica suffoco volo valeo. Cicuta solutio vox tego magni debeo. Demonstro ademptio temptatio verumtamen.",
+    "price": 9.39,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "bdeb5ef5aa9f23c4eb11b4cf",
+    "image": "https://picsum.photos/seed/YbhK46D/3917/3242",
+    "itemName": "Small Metal Computer",
+    "description": "Spes vinum sum claro crinis crebro decerno concido defaeco cupiditas. Vilis illo denego universe trado. Congregatio statim canis cognomen amor conscendo ascisco.",
+    "price": 38.89,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "b5c2fcd3fdade9dece6e2d9d",
+    "image": "https://loremflickr.com/2073/365?lock=6922079525266648",
+    "itemName": "Intelligent Silk Keyboard",
+    "description": "Voluntarius alius crebro asporto. Et sum suus speculum velociter uxor celer facilis. Subiungo reprehenderit auditor.",
+    "price": 40.69,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "d0afaddad8daaab5cd70b0ba",
+    "image": "https://loremflickr.com/3929/2708?lock=4945571843620239",
+    "itemName": "Fantastic Plastic Gloves",
+    "description": "Bonus cohors ustulo caritas molestiae peior subiungo delego deprimo. Calcar inventore degusto beneficium canonicus tibi pel eum. Vorax tremo verus demoror tabernus bene.",
+    "price": 2.27,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "c57f6b6d3cef65f191a2eceb",
+    "image": "https://picsum.photos/seed/0lJRTf/2160/43",
+    "itemName": "Awesome Plastic Computer",
+    "description": "Cicuta sopor ater comes repudiandae. Carus adopto trepide ea tondeo talus minima demulceo. Aliquid argentum supplanto optio carpo.",
+    "price": 4.49,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "06aad17fba5a28f8f2deaf70",
+    "image": "https://picsum.photos/seed/gC84s1mpZv/867/703",
+    "itemName": "Soft Cotton Salad",
+    "description": "Dolorem viriliter utique venustas conculco omnis. Cilicium tracto consectetur abeo adnuo. Cena trado capillus utpote vinco.",
+    "price": 11.85,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "ff77e1b2b8b4b9f2af292b99",
+    "image": "https://picsum.photos/seed/LKUUTY/870/1669",
+    "itemName": "Elegant Bronze Mouse",
+    "description": "Ullam subseco terreo. Tempore spargo arbustum tunc solum cado accedo tenus inventore. Currus cometes capillus cornu aranea.",
+    "price": 48.25,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "8f4f3ef9025adf6eaaa154af",
+    "image": "https://loremflickr.com/1331/224?lock=7752021104900861",
+    "itemName": "Fantastic Ceramic Shoes",
+    "description": "Adeo deinde doloremque decerno currus bibo aufero arca. Pecco cuius stillicidium volaticus thorax cupiditas veniam degenero. Facilis tyrannus civis suffoco ventus suppellex.",
+    "price": 42.85,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "f0b81bab1abef3ff48826bcb",
+    "image": "https://picsum.photos/seed/MoGuyilQ/3749/2946",
+    "itemName": "Refined Silk Bike",
+    "description": "Libero caelestis verumtamen. Nesciunt ultio laborum varietas umerus vinculum pectus bardus celo admoveo. Vociferor vitiosus defluo corpus cribro validus ea cado cubitum textor.",
+    "price": 28.09,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "70d34d0aaf112bc6dab917f7",
+    "image": "https://loremflickr.com/1119/157?lock=7727980488923817",
+    "itemName": "Rustic Ceramic Pants",
+    "description": "Currus stabilis adamo acquiro sonitus contabesco. Mollitia adfero centum decipio cornu altus cicuta defaeco cuppedia calamitas. Cupiditate curvo clarus tenuis deputo.",
+    "price": 27.09,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "dfb769beff09a1966ba54aaf",
+    "image": "https://picsum.photos/seed/FF1hm/1620/2702",
+    "itemName": "Refined Rubber Tuna",
+    "description": "Adfero color delectatio clam curtus. Concido comburo teneo demulceo inventore. Angulus crux damnatio claudeo verto calco vestigium.",
+    "price": 17.55,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "d1f03600dd15803dc6cd51e8",
+    "image": "https://picsum.photos/seed/o0wiE5jLv/1133/1598",
+    "itemName": "Modern Metal Soap",
+    "description": "Amissio peccatus vesco utor avarus cetera. Animadverto vicinus cupio. Reprehenderit stabilis supellex voluptate animus catena atrox acer pecto.",
+    "price": 40.75,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "db28ea8ed287ade8ec270cad",
+    "image": "https://loremflickr.com/2507/2337?lock=7818177895719182",
+    "itemName": "Bespoke Bronze Table",
+    "description": "Delibero ventus sustineo optio vulariter admoveo comitatus vinculum aranea. Provident decimus delibero pauci. Vulariter cariosus sperno.",
+    "price": 14.89,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "b8578e13fd0c8a5acfdf3e40",
+    "image": "https://loremflickr.com/493/3442?lock=8033512615287610",
+    "itemName": "Sleek Plastic Table",
+    "description": "Strenuus cerno adulatio basium adfero adulescens. Arbitro arbustum abundans tactus et decretum adnuo. Crepusculum depereo succedo tremo amissio vivo vorago.",
+    "price": 37.19,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "d99ba24de29f7f9eedd9fff6",
+    "image": "https://picsum.photos/seed/R7forqNs/972/1809",
+    "itemName": "Tasty Plastic Computer",
+    "description": "Thorax abstergo desino asperiores defungo vel. Adversus clam complectus sono deludo tum tolero ceno voluptas. Spoliatio taceo patior nobis comes amplexus.",
+    "price": 37.29,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "2e5cee8fd539f6816ae8fa07",
+    "image": "https://picsum.photos/seed/wxGhf/2165/482",
+    "itemName": "Fresh Plastic Shoes",
+    "description": "Tumultus tredecim aut fugiat arcus. Videlicet illo esse cervus celer. Thesaurus desino dignissimos sub curis cupiditas.",
+    "price": 9.6,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "12a3debcd9cc71cc38be1fe0",
+    "image": "https://loremflickr.com/10/2279?lock=5576895391662381",
+    "itemName": "Incredible Aluminum Car",
+    "description": "Templum tepidus speculum temperantia decipio thymbra tepidus vindico benevolentia. Vilis sollers reiciendis quas clamo aestas. In subiungo adfero cometes aeternus confugo.",
+    "price": 33.59,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "f1b4dfee859fff1ea6aa8737",
+    "image": "https://loremflickr.com/3446/3572?lock=7166220785998320",
+    "itemName": "Handmade Steel Cheese",
+    "description": "Advenio aeternus arbor vulnus villa bellum vita voluptatem autus. Sublime curvo patria patrocinor appono cribro. Timor argentum consuasor victus quasi compello.",
+    "price": 20.1,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "d1e1e1cc745fa9e1c36a9d26",
+    "image": "https://loremflickr.com/1669/458?lock=2561522870024579",
+    "itemName": "Modern Steel Hat",
+    "description": "Adstringo eum deserunt soleo paulatim clam cetera. Qui admitto consuasor repellat. Thema summisse caelum.",
+    "price": 30.89,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "4caa10fb8d4a08e5aeb2aaec",
+    "image": "https://picsum.photos/seed/HA1GaV/2556/1145",
+    "itemName": "Electronic Steel Chicken",
+    "description": "Eos deleniti vindico urbs vinco vado. Non turbo vinitor. Labore amissio auctus.",
+    "price": 34.94,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "7fdccfbe5fde8c4aadd0a9aa",
+    "image": "https://loremflickr.com/3216/3383?lock=4170209117407360",
+    "itemName": "Tasty Concrete Tuna",
+    "description": "Vitiosus turpis ipsa tersus decimus vapulus admitto. Adipiscor tum canto capitulus amplexus. Deprimo textus theca cohaero unde benevolentia conventus vinco ulciscor umbra.",
+    "price": 37.09,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "5cf54a9c2fd72a7efd330cfa",
+    "image": "https://picsum.photos/seed/1IToVS/2658/2351",
+    "itemName": "Sleek Rubber Keyboard",
+    "description": "Copia cervus totidem tandem veniam debilito calculus vitiosus illum. Tenax claudeo tremo tertius. Reiciendis defungo crur ex volo depereo catena terra.",
+    "price": 7.99,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "bb43adbdbf830fee2e6de345",
+    "image": "https://loremflickr.com/3559/2743?lock=5753862875310252",
+    "itemName": "Bespoke Cotton Cheese",
+    "description": "Canis valeo volaticus ab vos creta carpo utor. Culpa vado deporto tener. Atrox infit demens admitto antepono.",
+    "price": 32.59,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "97c3bebffaa88c6bfa70e39b",
+    "image": "https://loremflickr.com/3912/785?lock=714667786934303",
+    "itemName": "Electronic Cotton Bacon",
+    "description": "Utrum tabella aestivus caveo dicta ulterius thymbra cui modi aer. Vehemens deporto venio laudantium umbra. Vomer cognomen atavus supellex ustilo assumenda desidero villa.",
+    "price": 25.09,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "ec40a4f5c5eea82c26e0a0d7",
+    "image": "https://picsum.photos/seed/GFnv0p6HUY/1899/1292",
+    "itemName": "Fantastic Bamboo Chair",
+    "description": "Vulgus paens arbitro aduro aequitas delectatio vorago. Artificiose neque pel concedo reprehenderit volup aegrotatio dolores. Vacuus paulatim cupiditate deleo adaugeo eligendi depromo expedita.",
+    "price": 18.8,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "b711cbf2c6311d44a8eead3e",
+    "image": "https://picsum.photos/seed/B1RSZxtE/538/256",
+    "itemName": "Fantastic Marble Shoes",
+    "description": "Calculus adipiscor nam ullus deputo verbera solio amplexus ultra. Aliquam calculus degenero ulciscor ademptio arcus totam aeneus. Ultio dolorum vulariter.",
+    "price": 14.19,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "bef7cdfdc1c31a1068bf7fbc",
+    "image": "https://picsum.photos/seed/xMLWkAMU/563/2577",
+    "itemName": "Awesome Bamboo Bacon",
+    "description": "Absque paulatim modi dolorem officiis crinis apto. Arcus sapiente solitudo vulariter timidus. Terga despecto sumptus cavus contigo aegrotatio aggero terga.",
+    "price": 34.55,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "8c3c95a8b6efb8312695bfce",
+    "image": "https://picsum.photos/seed/GPPy0gd/1067/504",
+    "itemName": "Unbranded Wooden Salad",
+    "description": "Apostolus cunae amiculum suffragium admitto. Communis neque certus cumque velum xiphias umerus. Caelum voluptatem tonsor trans bene.",
+    "price": 49.09,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "a128871f2fc7a721bd05bca5",
+    "image": "https://loremflickr.com/2251/3587?lock=5221659392356845",
+    "itemName": "Awesome Wooden Chicken",
+    "description": "Denego porro utrimque acidus vero. Creator utroque comptus vestrum volaticus minima. Adipisci subiungo ducimus textor uberrime vitae angulus iste aranea.",
+    "price": 9.29,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "2aeee0dac8fa4a89e316daa2",
+    "image": "https://loremflickr.com/1542/2733?lock=1636517369256963",
+    "itemName": "Rustic Ceramic Keyboard",
+    "description": "Vis pecco curso coerceo defero. Creta statua creptio tempore villa auditor crudelis aspernatur aggero dedico. Adicio facilis porro harum benevolentia altus.",
+    "price": 36.45,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "06e99a34c5dab8bd016e3a4c",
+    "image": "https://loremflickr.com/2969/3935?lock=6275450221857937",
+    "itemName": "Oriental Silk Gloves",
+    "description": "Combibo confugo coma ait iste conscendo error conqueror. Amplitudo aeger textus vallum. Curtus strenuus vere alioqui voluptas.",
+    "price": 12.25,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "2ba8adf2dc2afc49c0ebbd1f",
+    "image": "https://loremflickr.com/278/837?lock=8741633136421122",
+    "itemName": "Sleek Rubber Tuna",
+    "description": "Vestigium spero voluptatum tandem crapula utroque. Mollitia stabilis casus voluptates. Amiculum cribro inventore libero.",
+    "price": 9.49,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "0b6c1c1aac0bb38fab3cfce1",
+    "image": "https://loremflickr.com/3302/3657?lock=4011106447524844",
+    "itemName": "Handcrafted Concrete Pizza",
+    "description": "Coniecto vos suppellex tantillus clam damno astrum arx hic ratione. Suadeo verbera sequi assumenda crastinus velociter. Veniam modi crastinus volutabrum adstringo sumo callide suggero trepide clementia.",
+    "price": 41.5,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "e0ebbebd71a8abafc734e022",
+    "image": "https://loremflickr.com/2552/1457?lock=1246392291334900",
+    "itemName": "Gorgeous Rubber Sausages",
+    "description": "Caritas deserunt vulariter vulnus. Solium terra acsi. Decipio careo undique aptus.",
+    "price": 34.85,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "b5efdbde6bdcd9cb2b005bd8",
+    "image": "https://loremflickr.com/2824/3677?lock=7384920230918692",
+    "itemName": "Bespoke Silk Sausages",
+    "description": "Reiciendis stultus depono quam vomer reprehenderit communis curatio. Voco avarus reprehenderit sapiente consequatur cornu. Eius viduo cruentus concedo sordeo chirographum apparatus pectus.",
+    "price": 44.69,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "aceef8323dfae1de1de0da26",
+    "image": "https://picsum.photos/seed/Mon8EMq/1346/2011",
+    "itemName": "Intelligent Marble Computer",
+    "description": "Tersus trucido aspicio ademptio vulpes officia molestiae surgo. Defero dedecor vis. Claustrum incidunt advoco.",
+    "price": 23.3,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "bc5efbfe9dfdd4dad6d02e66",
+    "image": "https://loremflickr.com/106/1526?lock=8224746165072616",
+    "itemName": "Small Bronze Computer",
+    "description": "Abscido trans nesciunt conservo. Caste tracto maiores. Suscipit triumphus ademptio super carmen arma textor varius speciosus.",
+    "price": 1.49,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "aa06ae4e8372eb26acc5cdcf",
+    "image": "https://loremflickr.com/1124/1855?lock=1710846905757684",
+    "itemName": "Unbranded Ceramic Bacon",
+    "description": "Apostolus spes thymbra ulciscor adversus adeo varius usus contego. Vereor apud conscendo ratione sustineo. Tollo defero illum officiis blanditiis.",
+    "price": 4.95,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "07fceddccd65873cc9ade717",
+    "image": "https://picsum.photos/seed/zoFr3B4/106/2035",
+    "itemName": "Tasty Metal Fish",
+    "description": "Solio urbs audax utroque sophismata colo testimonium audeo caute varius. Ara canto textus tantillus aegrotatio vapulus verus. Sustineo thymbra fugiat.",
+    "price": 13.55,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "f9d7d28b7ffd6fa0d5faeca9",
+    "image": "https://loremflickr.com/3563/558?lock=2077198084935527",
+    "itemName": "Recycled Granite Chips",
+    "description": "Demo arcus aut cursim quibusdam. Talis dolor adficio bibo volutabrum animus denuo. Una deserunt tui tandem depopulo.",
+    "price": 49.59,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "f5ff0ae453dcfdec275cb1dc",
+    "image": "https://picsum.photos/seed/4IuVY/1641/3222",
+    "itemName": "Handmade Silk Mouse",
+    "description": "Tamisium admitto careo comburo. Triduana nam vinum. Claudeo stillicidium cunctatio amitto tot thorax corroboro crebro unus.",
+    "price": 33.99,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "4bbcf00e2ecd67fabe95d740",
+    "image": "https://picsum.photos/seed/ePLg9yW9/2626/3",
+    "itemName": "Bespoke Concrete Keyboard",
+    "description": "Tepidus acerbitas absconditus. Ciminatio demergo sperno id consectetur. Verbum modi defetiscor deleo carbo supra tumultus tero valde.",
+    "price": 22.45,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "cbacfcc4c7904fafd8e3d5a8",
+    "image": "https://loremflickr.com/839/2317?lock=4606400755663061",
+    "itemName": "Fantastic Granite Fish",
+    "description": "Aut aveho libero alo dolorum vis verbum. Sordeo adipisci temeritas damno celebrer. Adversus stabilis cetera acerbitas bonus dolor delectatio adicio.",
+    "price": 35.69,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "eb2fed2bbcc8afc43c5bdbd3",
+    "image": "https://picsum.photos/seed/pTRvo6MSd/2146/1429",
+    "itemName": "Sleek Bronze Shoes",
+    "description": "Ulciscor statua rerum admiratio statim benevolentia. Stipes versus ars vigor cubitum aureus cupiditate cupio. Deputo credo depulso denuncio uxor adflicto suus traho.",
+    "price": 12.35,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "6c251ffd9d49c9cebebf1dd2",
+    "image": "https://picsum.photos/seed/UbIBt/868/283",
+    "itemName": "Sleek Aluminum Bike",
+    "description": "Aequitas consuasor cresco communis ara teneo. Velociter voluptate vesco alter. In viscus iste thermae amicitia tepidus nulla victus.",
+    "price": 38.19,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "d1a0dca51f74bf0b2cc24e5d",
+    "image": "https://picsum.photos/seed/bsq0za9sO/1216/1433",
+    "itemName": "Elegant Concrete Computer",
+    "description": "Facilis caveo combibo voluptatem abbas taedium tametsi. Debeo vociferor acsi ancilla. Vulpes tamdiu advenio vivo calco vigor carpo conforto minima mollitia.",
+    "price": 25.85,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "6ea5ff0fd67eaeb3c71445ea",
+    "image": "https://loremflickr.com/2207/3367?lock=5166701036682760",
+    "itemName": "Refined Bamboo Keyboard",
+    "description": "Vilitas denuo pecto. Copia damnatio carus conscendo voluptas testimonium collum. Aro varius stillicidium tactus illo nam advoco.",
+    "price": 35.75,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "2d9efbaee50e06f2b7fbdcb5",
+    "image": "https://loremflickr.com/3576/1704?lock=738274078529177",
+    "itemName": "Oriental Gold Cheese",
+    "description": "Cavus universe patria crebro corona victus illum. Hic neque custodia paens cubo autus rerum tantillus deficio viridis. Tepesco volubilis architecto voluptatibus synagoga tergeo debeo caelestis validus taceo.",
+    "price": 37.69,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "e73f68f2a8fef845ef7abfff",
+    "image": "https://picsum.photos/seed/0qC1N9/67/2530",
+    "itemName": "Refined Silk Car",
+    "description": "Delectatio decor speculum tardus dedecor votum addo quas. Tepidus verumtamen distinctio curso stella vester. Nulla autem xiphias titulus.",
+    "price": 13.39,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "f460f2eff735df981fbf0e8c",
+    "image": "https://loremflickr.com/2566/2628?lock=4959888224043112",
+    "itemName": "Small Gold Towels",
+    "description": "Casso ascisco vulgivagus amita. Apto territo aestivus tenax utor ultra tertius. Coepi vacuus reiciendis defero cauda sordeo.",
+    "price": 3.05,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "fddb6debbaee4dda8e7f8caf",
+    "image": "https://loremflickr.com/973/1045?lock=8049863033761350",
+    "itemName": "Ergonomic Marble Mouse",
+    "description": "Ulterius vulgaris amet conicio et. Cito centum claro. Subnecto sint conduco corrumpo corrumpo conduco absens ratione votum cicuta.",
+    "price": 18.29,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "b466ecb67ec5cc6aeec4afee",
+    "image": "https://loremflickr.com/416/2588?lock=6060661675143381",
+    "itemName": "Practical Cotton Shoes",
+    "description": "Cohibeo utor ipsam curiositas audio. Accusamus aestus molestias cursus terebro. Odit talus benevolentia carpo truculenter angelus sponte claudeo.",
+    "price": 20.4,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "9c4d76ba05c00524e0efcdff",
+    "image": "https://loremflickr.com/3505/3854?lock=8568475308132226",
+    "itemName": "Tasty Granite Chair",
+    "description": "Adflicto aeneus nostrum aegre deripio nobis balbus tribuo confido. Vomer conservo combibo contabesco vomer defungo conqueror denuo. Sono stipes arceo volva antepono delego balbus admiratio timor clam.",
+    "price": 37.49,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "da15b9ce2ffc5ffdac8a2a0f",
+    "image": "https://loremflickr.com/1898/3126?lock=2018173769296632",
+    "itemName": "Gorgeous Rubber Chair",
+    "description": "Nesciunt cunabula solitudo virga. Carmen caries creptio vinco terminatio aggredior bene ipsum. Cubicularis quia abscido corrigo.",
+    "price": 47.95,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "cbe75df86fe3b71a0cad5220",
+    "image": "https://picsum.photos/seed/SfKteAuY/2015/2301",
+    "itemName": "Electronic Cotton Cheese",
+    "description": "Esse dicta alo adimpleo voluptates aliquid. Creptio tamisium demitto patruus atrox thermae vulnero arto. Voluntarius error pauper.",
+    "price": 13.79,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "8555eec2dd185eeb7bbdcafa",
+    "image": "https://picsum.photos/seed/XuxNN23Ro/2999/3866",
+    "itemName": "Small Rubber Salad",
+    "description": "Demum cruentus arcesso maiores umquam quae contabesco uberrime. Voluptates uterque cum creptio venustas cursim varius assumenda abstergo doloremque. Conturbo bonus acies eveniet.",
+    "price": 4.99,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "35fa893d17c4f689ac3ccf22",
+    "image": "https://loremflickr.com/939/846?lock=6512415862137466",
+    "itemName": "Practical Plastic Cheese",
+    "description": "Theatrum angustus aegrus. Venia spiculum dolore ipsam alveus amitto cribro laborum. Triduana theatrum vicinus arx.",
+    "price": 40.6,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "bf7eebcfc4a866bff8f00ab8",
+    "image": "https://loremflickr.com/2072/3685?lock=1269321182435137",
+    "itemName": "Handmade Concrete Bike",
+    "description": "Sub attollo comprehendo decens verus cotidie solio. Amplitudo delectatio ullam. Stella claro vix ut ducimus dignissimos decor stipes amplus.",
+    "price": 36.89,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "91be4b5b8a4b8a36e7dcefbd",
+    "image": "https://loremflickr.com/2751/3385?lock=6634645542884127",
+    "itemName": "Fantastic Aluminum Car",
+    "description": "Vobis adulescens coadunatio cui. Tenuis cavus solitudo auditor terminatio aspicio facilis villa. Adduco abduco utique color.",
+    "price": 6.39,
+    "category": "Drinks",
+    "availability": false
+  },
+  {
+    "_id": "fea83afc2cfcc2040ec47a43",
+    "image": "https://loremflickr.com/3062/2829?lock=914282495884577",
+    "itemName": "Handmade Gold Pizza",
+    "description": "Amita culpo bardus. Consequatur decipio cibo numquam villa vociferor cultellus ab accusator. Territo vis aestas tremo alioqui ventosus basium spectaculum adflicto varius.",
+    "price": 43.29,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "acb5e3674183a235754ceb31",
+    "image": "https://loremflickr.com/3483/2214?lock=3775562560229393",
+    "itemName": "Gorgeous Cotton Tuna",
+    "description": "Victoria desino qui consequuntur defetiscor dolores torqueo est abduco. Vito tam adsum charisma censura desparatus temporibus ustilo succedo. Sed avarus complectus succedo comparo debilito decretum curo.",
+    "price": 28.05,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "bd6f06eb7d5d7cbdce95feae",
+    "image": "https://picsum.photos/seed/XiESUQS/395/670",
+    "itemName": "Elegant Bronze Towels",
+    "description": "Officia testimonium vomer adulescens cruentus caries quod ambitus tristis sonitus. Arca volubilis ambitus amicitia cumque aveho ultra caute. Argentum quo demergo.",
+    "price": 35.09,
+    "category": "Drinks",
+    "availability": true
+  },
+  {
+    "_id": "51fed29730e39b6aba68c1cc",
+    "image": "https://picsum.photos/seed/c7hZrKk31/2287/2109",
+    "itemName": "Rustic Cotton Computer",
+    "description": "Valeo iusto arca architecto canonicus sublime baiulus bene altus. Crebro abbas deporto. Dolorum curtus adimpleo quasi somnus.",
+    "price": 49.25,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "bb1fe9ac49f1ffd12ba6c7b1",
+    "image": "https://loremflickr.com/3589/1639?lock=5860330962619143",
+    "itemName": "Modern Marble Towels",
+    "description": "Vel blandior dens suadeo congregatio succurro vobis aggredior velociter callide. Volo mollitia antea. Ipsa repudiandae quaerat conturbo.",
+    "price": 5.05,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "dac0a6edf06d4cf18ec58c37",
+    "image": "https://loremflickr.com/898/258?lock=7580015631479789",
+    "itemName": "Luxurious Rubber Shirt",
+    "description": "Corona benigne approbo. Subvenio odit corrigo volaticus artificiose. Cognomen acidus timor decens confero sursum clamo cruciamentum sint delicate.",
+    "price": 25.25,
+    "category": "Specials",
+    "availability": false
+  },
+  {
+    "_id": "de3a84b5d5c7bad149c19152",
+    "image": "https://loremflickr.com/2121/2989?lock=8215256802481173",
+    "itemName": "Fresh Ceramic Salad",
+    "description": "Coadunatio incidunt apparatus quo animadverto civis magnam excepturi adstringo ventito. Unus certus amita ascisco cornu vester veniam. Adnuo vesco stultus aequus viduo.",
+    "price": 4.25,
+    "category": "Foods",
+    "availability": false
+  },
+  {
+    "_id": "65544ef2f4cdf1ef301a5aa3",
+    "image": "https://picsum.photos/seed/IZK87/64/2562",
+    "itemName": "Modern Concrete Fish",
+    "description": "Supellex ocer caterva virtus perferendis verbera consequatur apparatus tamisium adflicto. Deprimo auctor vel. Sint abbas conqueror venia laudantium cum decumbo.",
+    "price": 29.19,
+    "category": "Foods",
+    "availability": true
+  },
+  {
+    "_id": "3e73b3a3d75b42b1aefdc3ce",
+    "image": "https://loremflickr.com/115/1149?lock=3243349744866483",
+    "itemName": "Elegant Granite Bike",
+    "description": "Comburo concido cernuus ulterius approbo aliquid deduco stips auctor. Talis quos traho quis acies deprimo admoveo voveo. Rerum veritatis celo delectus succedo ut patior.",
+    "price": 14.29,
+    "category": "Specials",
+    "availability": true
+  },
+  {
+    "_id": "5cc6f0ebb9b04edc793c15e3",
+    "image": "https://picsum.photos/seed/2oyfp5Q/1332/2257",
+    "itemName": "Ergonomic Metal Salad",
+    "description": "Statim veniam aegre. Testimonium caritas umquam terror uterque tracto officiis undique. Aptus comes repellendus celer spiculum careo adimpleo.",
+    "price": 47.95,
+    "category": "Specials",
+    "availability": true
+  }
+]

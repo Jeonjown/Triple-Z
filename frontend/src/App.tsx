@@ -14,10 +14,10 @@ import Login from "./features/auth/pages/Login";
 import AdminSidebar from "./features/admin/components/AdminSidebar";
 import useAuthStore from "./features/auth/stores/useAuthStore";
 import AdminDashboard from "./features/admin/pages/AdminDashboard";
-import ManageUsers from "./features/admin/pages/ManageUsers";
 import Settings from "./features/admin/pages/Settings";
 import Reports from "./features/admin/pages/Reports";
-import ManageMenu from "./features/admin/pages/ManageMenu";
+import ManageUsers from "./features/admin/features/manage users/pages/ManageUsers";
+import ManageMenu from "./features/admin/features/manage menu/pages/ManageMenu";
 
 function App() {
   const { user } = useAuthStore();

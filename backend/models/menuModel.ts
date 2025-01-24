@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
 const menuSchema = new mongoose.Schema({
+  image: {
+    type: String,
+  },
   name: {
     type: String,
     required: [true, "Menu item name is required"],
@@ -16,17 +19,17 @@ const menuSchema = new mongoose.Schema({
     min: [0, "Price must be positive"],
   },
   category: {
-    type: String,
-    enum: ["Appetizer", "Main Course", "Dessert", "Beverage"],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
     required: true,
   },
   availability: {
     type: Boolean,
-    default: true, // Default to available
+    default: true,
   },
   createdAt: {
     type: Date,
-    default: Date.now, // Auto-set creation time
+    default: Date.now,
   },
 });
 

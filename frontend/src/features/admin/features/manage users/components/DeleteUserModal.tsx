@@ -1,16 +1,16 @@
 import { User } from "../pages/ManageUsers";
 
-interface DeleteModalProps {
+interface DeleteUserModalProps {
   user: User | null;
-  onDelete: (userId: string) => void;
-  onClose: () => void;
+  handleConfirmDelete: (value: string) => void;
+  handleCloseModal: () => void;
 }
 
-const DeleteModal: React.FC<DeleteModalProps> = ({
+const DeleteUserModal = ({
   user,
-  onDelete,
-  onClose,
-}) => {
+  handleConfirmDelete,
+  handleCloseModal,
+}: DeleteUserModalProps) => {
   if (!user) return null;
 
   return (
@@ -24,13 +24,13 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
         <div className="mt-4 flex justify-between">
           <button
             className="rounded bg-secondary px-4 py-2 text-white hover:opacity-85"
-            onClick={onClose} // Close the modal without deleting
+            onClick={handleCloseModal} // Close the modal without deleting
           >
             Cancel
           </button>
           <button
             className="rounded bg-red-600 px-4 py-2 text-white hover:opacity-85"
-            onClick={() => onDelete(user._id)} // Proceed with deletion
+            onClick={() => handleConfirmDelete(user._id)} // Proceed with deletion
           >
             Delete
           </button>
@@ -40,4 +40,4 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
   );
 };
 
-export default DeleteModal;
+export default DeleteUserModal;

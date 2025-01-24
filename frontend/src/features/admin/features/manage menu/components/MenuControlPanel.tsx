@@ -1,34 +1,26 @@
 import { Table } from "@tanstack/react-table";
-
-interface User {
-  _id: string;
-  username: string;
-  email: string;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-  actions?: JSX.Element;
-}
+import { useState } from "react";
+import { MenuItem } from "../pages/ManageMenu";
+import MenuTableView from "./MenuTableView";
+import MenuCardView from "./MenuCardView";
 
 interface CardViewProps {
-  table: Table<User>;
+  table: Table<MenuItem>;
   globalFilter: string | undefined;
-  view: string | undefined;
-  setView: React.Dispatch<React.SetStateAction<string | undefined>>;
+  title: string;
   setGlobalFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-const ControlPanel = ({
+const MenuControlPanel = ({
   table,
   globalFilter,
-  view,
-  setView,
   setGlobalFilter,
+  title,
 }: CardViewProps) => {
+  const [view, setView] = useState<string | undefined>("card");
   return (
     <>
-      <div className="sticky top-32 z-10 mb-8 w-5/6 rounded-md border bg-white px-6 py-2 pt-6 shadow-md">
+      <div className="sticky top-32 z-10 mb-8 w-5/6 rounded-md border bg-white px-6 py-2 pt-6 shadow-md sm:bg-red-200 md:bg-blue-200 lg:bg-green-200 xl:bg-yellow-200">
         <div className="relative">
           <input
             value={globalFilter ?? ""}
@@ -50,6 +42,7 @@ const ControlPanel = ({
           </svg>
         </div>
         {/* PAGINATION */}
+
         <div className="mt-6 flex flex-wrap items-center justify-evenly text-sm">
           <div className="mb-4 mr-2 flex items-center">
             <div className="mx-4 flex rounded-lg border">
@@ -197,8 +190,41 @@ const ControlPanel = ({
           </div>
         </div>
       </div>
+      {/* Title and Button */}
+      <div className="mt-4 flex w-5/6 items-center justify-between py-5 text-left font-semibold">
+        {title}
+        <button
+          // onClick={() => handleAdd(row.original)}
+          className="mr-1 rounded bg-green-500 px-3 py-2 text-white hover:scale-110 hover:opacity-85"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
+          </svg>
+        </button>
+      </div>
+      {view === "card" && (
+        <MenuCardView
+          table={table}
+          setGlobalFilter={setGlobalFilter}
+          globalFilter={globalFilter}
+        />
+      )}
+
+      {/* TABLE VIEW */}
+      {view === "table" && <MenuTableView table={table} />}
     </>
   );
 };
 
-export default ControlPanel;
+export default MenuControlPanel;

@@ -1,59 +1,46 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateUserRole } from "../../../api/user";
-import { formatCreatedAt } from "../../../utils/dateUtils";
-import { useState } from "react"; // import useState
-import useAuthStore from "../../auth/stores/useAuthStore";
+import { User } from "../pages/ManageUsers";
+import useAuthStore from "../../../../auth/stores/useAuthStore";
+import { formatCreatedAt } from "../../../../../utils/dateUtils";
 
-interface User {
-  _id: string;
-  username: string;
-  email: string;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-  actions?: JSX.Element;
-}
+import useEditUserModal from "../hooks/useEditUserModal";
+import useUpdateUserRole from "../hooks/useUpdateUserRole";
 
 interface EditModalProps {
-  setEditMode: (value: boolean) => void;
+  setIsEditModalOpen: (value: boolean) => void;
   setUserToEdit: (value: User) => void;
   userToEdit: User;
 }
 
 const EditModal = ({
-  setEditMode,
+  setIsEditModalOpen,
   userToEdit,
   setUserToEdit,
 }: EditModalProps) => {
-  const queryClient = useQueryClient();
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [roleToUpdate, setRoleToUpdate] = useState("");
+  const {
+    showConfirmation,
+    setShowConfirmation,
+    roleToUpdate,
+    setRoleToUpdate,
+  } = useEditUserModal();
+
+  const { mutate, isPending, isError, error } = useUpdateUserRole({
+    setUserToEdit,
+    setShowConfirmation,
+    userToEdit,
+  });
 
   const { user } = useAuthStore();
-
-  const { mutate, isPending, isError, error } = useMutation({
-    mutationFn: updateUserRole,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      setUserToEdit({
-        ...userToEdit,
-        role: data.user.role,
-      });
-      setShowConfirmation(false); // Hide confirmation after successful update
-    },
-    onError: (error) => {
-      console.error("Error updating role:", error);
-      setShowConfirmation(false); // Hide confirmation if there's an error
-    },
-  });
 
   if (isPending) {
     return <span>Loading...</span>;
   }
 
   if (isError) {
-    return <span className="text-sm text-red-700">Error: {error.message}</span>;
+    return (
+      <span className="text-sm text-red-700">
+        Error: {error?.message || "Unknown error"}
+      </span>
+    );
   }
 
   const handleRoleUpdate = (currentRole: string) => {
@@ -76,7 +63,7 @@ const EditModal = ({
         {/* Close Button */}
         <button
           className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
-          onClick={() => setEditMode(false)}
+          onClick={() => setIsEditModalOpen(false)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -190,13 +177,6 @@ const EditModal = ({
             </span>
           </div>
         </div>
-
-        {/* <button
-          className="mt-6 w-full rounded bg-secondary px-4 py-2 text-white transition-all hover:opacity-85"
-          onClick={() => setEditMode(false)}
-        >
-          Save Changes
-        </button> */}
       </div>
 
       {/* Confirmation Modal */}
