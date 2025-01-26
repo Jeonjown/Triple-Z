@@ -12,8 +12,8 @@ import {
 // import mockUsers from "../../../testing/users.json";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAllUsers } from "../../../api/admin";
 import UserControlPanel from "../components/UserControlPanel";
+import { getAllUsers } from "../../../../../api/user";
 
 export interface User {
   _id: string;

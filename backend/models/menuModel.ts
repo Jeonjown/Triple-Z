@@ -1,38 +1,34 @@
 import mongoose from "mongoose";
+import { menuDB } from "../db";
 
-const menuSchema = new mongoose.Schema({
-  image: {
-    type: String,
-  },
-  name: {
-    type: String,
-    required: [true, "Menu item name is required"],
-    trim: true,
-  },
-  description: {
-    type: String,
-    trim: true,
-  },
-  price: {
-    type: Number,
-    required: [true, "Price is required"],
-    min: [0, "Price must be positive"],
-  },
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
-    required: true,
-  },
-  availability: {
-    type: Boolean,
-    default: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+// Define the schema for a menu item (e.g., "Americano" or "Latte")
+const menuItemSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  image: { type: String, required: true },
+  price: { type: Number, required: true, min: 0 },
+  size: { type: String, required: true },
+  description: { type: String, required: true },
+  availability: { type: Boolean, required: true },
 });
 
-const Menu = mongoose.model("Menu", menuSchema);
+// Define the schema for a subcategory within a category (e.g., "Hot Coffees" under "Drinks")
+const menuSubcategorySchema = new mongoose.Schema({
+  subcategory: { type: String, required: true },
+  items: [menuItemSchema],
+});
+
+// Define the schema for a category (e.g., "Drinks" or "Food")
+const menuCategorySchema = new mongoose.Schema({
+  category: { type: String, required: true },
+  subcategories: [menuSubcategorySchema],
+});
+
+// Define the main menu schema which holds all categories
+export const menuSchema = new mongoose.Schema({
+  categories: [menuCategorySchema],
+});
+
+// Create the Menu model based on the schema
+const Menu = menuDB.model("Menu", menuSchema);
 
 export default Menu;

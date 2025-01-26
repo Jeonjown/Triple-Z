@@ -8,6 +8,18 @@ const api = axios.create({
   withCredentials: true,
 });
 
+export const getAllUsers = async () => {
+  try {
+    const response = await api.get("/api/users");
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || "an error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
 export const updateUserRole = async ({
   userId,
   roleToUpdate,
@@ -16,7 +28,7 @@ export const updateUserRole = async ({
   roleToUpdate: string;
 }) => {
   try {
-    const response = await api.patch(`api/user/${userId}`, {
+    const response = await api.patch(`api/users/${userId}`, {
       roleToUpdate,
     });
 
@@ -30,7 +42,7 @@ export const updateUserRole = async ({
 
 export const deleteUser = async ({ userId }: { userId: string }) => {
   try {
-    const response = await api.delete(`api/user/${userId}`);
+    const response = await api.delete(`api/users/${userId}`);
     console.log(response.data);
   } catch (error) {
     console.error("Error Updating user:", error);

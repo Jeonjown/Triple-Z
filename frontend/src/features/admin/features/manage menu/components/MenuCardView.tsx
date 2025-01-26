@@ -72,6 +72,8 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
                       alt="Image"
                       className="h-16 w-16 rounded object-cover"
                     />
+                  ) : cell.column.id === "price" ? (
+                    <span className="truncate text-sm">{`₱ ${cell.getValue()}`}</span> // Fixed concatenation syntax
                   ) : (
                     <span className="truncate text-sm">
                       {flexRender(

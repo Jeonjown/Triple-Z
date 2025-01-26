@@ -1,17 +1,20 @@
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authRoutes from "./routes/authRoutes";
-import adminRoutes from "./routes/admin/adminRoutes";
-import userRoutes from "./routes/userRoutes";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 import passport from "./config/passport";
-import { verifyAdminToken } from "./middleware/verifyAdminToken";
+import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
+import menuRoutes from "./routes/menuRoutes";
+import categoryRoutes from "./routes/categoryRoutes";
+import menuItemRoutes from "./routes/menuItemRoutes";
+import subcategoryRoutes from "./routes/subcategoryRoutes";
 
 dotenv.config();
 
 const server = express();
+
+// Middleware setup
 server.use(passport.initialize());
 server.use(cookieParser());
 server.use(express.json());
@@ -22,39 +25,16 @@ server.use(
   })
 );
 
+// Route handling
 server.use("/api/auth", authRoutes);
-server.use("/api/admin", verifyAdminToken, adminRoutes);
-server.use("/api/user", userRoutes);
+server.use("/api/users", userRoutes);
+server.use("/api/menu", menuRoutes);
+server.use("/api/menu/menu-items", menuItemRoutes);
+server.use("/api/menu/category", categoryRoutes);
+server.use("/api/menu/category", subcategoryRoutes);
 
-type Error = {
-  status?: number;
-  message?: string;
-};
-
-server.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  res
-    .status(error.status || 500)
-    .json({ message: error.message || "internal server error" });
-});
-
-const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
-
+// Start server
+const port = process.env.PORT || 3000;
 server.listen(port, () => {
-  console.log(`listening to port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });
-
-const connectDB = async () => {
-  const uri = process.env.MONGO_URI;
-
-  if (!uri) {
-    throw new Error("MONGODB_URI is not defined in the environment variables");
-  }
-
-  try {
-    await mongoose.connect(uri);
-    console.log("mongoDB connected successfully");
-  } catch (error) {
-    return console.error(error);
-  }
-};
-connectDB();

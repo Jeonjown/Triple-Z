@@ -7,8 +7,6 @@ import useEditUserModal from "../hooks/useEditUserModal";
 
 interface UserCardViewProps {
   table: Table<User>;
-  globalFilter: string | undefined;
-  setGlobalFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const UserCardView = ({ table }: UserCardViewProps) => {

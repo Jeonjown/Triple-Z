@@ -1,30 +1,56 @@
 import { faker } from '@faker-js/faker';
 import * as fs from 'fs';
 
-const generateMenuItems = (count = 100) => {
-    const menuItems = [];
-    const categories = ['Foods', 'Drinks', 'Specials'];
+const generateMenuData = (totalItems = 100) => {
+    const categories = ['Foods', 'Drinks', 'Desserts', 'Specials']; // Main categories
+    const subcategories = ['Hot', 'Cold', 'Combo', 'Snacks']; // Subcategories within each category
+    let totalGeneratedItems = 0;
 
-    for (let i = 0; i < count; i++) {
-        const menuItem = {
-            _id: faker.database.mongodbObjectId(),
-            image: faker.image.food(), // Changed to generate food images
-            itemName: faker.commerce.productName(), // This already works fine for food names
-            description: faker.lorem.paragraph(),
-            price: parseFloat(faker.commerce.price({ min: 1, max: 50, dec: 2 })),
-            category: categories[Math.floor(Math.random() * categories.length)],
-            availability: faker.datatype.boolean(),
-        };
-        menuItems.push(menuItem);
-    }
+    const menu = { categories: [] };
 
-    return menuItems;
+    categories.forEach((category) => {
+        const subcategoriesData = [];
+
+        subcategories.forEach((subcategory) => {
+            const items = [];
+
+            for (let i = 0; i < 5; i++) { // Generate 5 items per subcategory
+                if (totalGeneratedItems >= totalItems) break; // Stop when totalItems is reached
+                totalGeneratedItems++;
+
+                items.push({
+                    id: faker.string.uuid(),
+                    title: faker.commerce.productName(),
+                    image: faker.image.url(),// Generate food image
+                    price: parseFloat(faker.commerce.price({ min: 1, max: 50, dec: 2 })),
+                    size: faker.helpers.arrayElement(['Small', 'Medium', 'Large']),
+                    description: faker.lorem.sentence(),
+                    availability: faker.datatype.boolean(),
+                    createdAt: faker.date.recent(),
+                });
+            }
+
+            if (items.length > 0) {
+                subcategoriesData.push({
+                    subcategory: subcategory,
+                    items,
+                });
+            }
+        });
+
+        menu.categories.push({
+            category,
+            subcategories: subcategoriesData,
+        });
+    });
+
+    return menu;
 };
 
-// Generate 100 menu items
-const menuData = generateMenuItems(100);
+// Generate the menu with 100 items
+const menuData = generateMenuData(100);
 
-// Write to JSON file
-fs.writeFileSync('menuItems.json', JSON.stringify(menuData, null, 2));
+// Write to a JSON file
+fs.writeFileSync('menuData.json', JSON.stringify(menuData, null, 2));
 
-console.log('Menu items generated and saved to menuItems.json');
+console.log('Menu data generated and saved to menuData.json');

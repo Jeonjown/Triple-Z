@@ -1,6 +1,6 @@
-import { NextFunction, Router } from "express";
+import { NextFunction, Router, Response, Request } from "express";
 import passport from "passport";
-import { Response, Request } from "express";
+
 import {
   checkAuth,
   jwtLogin,

@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
+import { userDB } from "../db";
 
+// Define the User schema
 const userSchema = new mongoose.Schema(
   {
     _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
@@ -11,12 +13,12 @@ const userSchema = new mongoose.Schema(
     },
     fullName: { type: String },
     phoneNumber: { type: String },
-    //transactions:
     role: { type: String, enum: ["user", "admin"], default: "user" },
   },
   { timestamps: true }
 );
 
-const User = mongoose.model("User", userSchema);
+// Create the User model using the `userDB` connection
+const User = userDB.model("User", userSchema);
 
 export default User;

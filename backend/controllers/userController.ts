@@ -2,6 +2,18 @@ import { Response, Request, NextFunction } from "express";
 import { createError } from "../utils/createError";
 import User from "../models/userModel";
 
+export const getAllUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const users = await User.find();
+
+    res.status(200).json(users);
+  } catch (error) {}
+};
+
 export const deleteUser = async (
   req: Request,
   res: Response,

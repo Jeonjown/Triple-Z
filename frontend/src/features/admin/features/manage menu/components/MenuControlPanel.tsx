@@ -20,7 +20,7 @@ const MenuControlPanel = ({
   const [view, setView] = useState<string | undefined>("card");
   return (
     <>
-      <div className="sticky top-32 z-10 mb-8 w-5/6 rounded-md border bg-white px-6 py-2 pt-6 shadow-md sm:bg-red-200 md:bg-blue-200 lg:bg-green-200 xl:bg-yellow-200">
+      <div className="sticky top-32 z-10 mb-8 w-5/6 rounded-md border bg-white px-6 py-2 pt-6 shadow-md">
         <div className="relative">
           <input
             value={globalFilter ?? ""}
