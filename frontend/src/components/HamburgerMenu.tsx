@@ -150,6 +150,16 @@ const HamburgerMenu = ({
               </li>
               <li className="py-2">
                 <NavLink
+                  to="/manage-menu"
+                  className={({ isActive }) =>
+                    isActive ? "border-l-4 border-solid border-accent px-2" : ""
+                  }
+                >
+                  Manage Menu
+                </NavLink>
+              </li>
+              <li className="py-2">
+                <NavLink
                   to="/reports"
                   className={({ isActive }) =>
                     isActive ? "border-l-4 border-solid border-accent px-2" : ""

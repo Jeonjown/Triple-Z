@@ -47,8 +47,7 @@ export const addCategory = async (
     // Respond with the updated menu
     res.status(201).json(menu);
   } catch (error) {
-    console.error("Error creating category:", error);
-
+    next(createError(`Error creating category: ${error}`, 500));
     // Use the error handler for any unexpected errors
     next(createError("Error creating category", 500));
   }
@@ -60,12 +59,15 @@ export const getAllCategories = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const menu = await Menu.findOne(); // Get the single menu
+    // Get the menu with category names and their IDs
+    const menu = await Menu.findOne({}, "categories.category categories._id");
+
     if (!menu) {
       return next(createError("Menu not found", 404));
     }
 
-    res.status(200).json(menu.categories); // Return all categories
+    // Return categories with their names and _id
+    res.status(200).json(menu.categories);
   } catch (error) {
     next(createError("Error fetching categories", 400));
   }

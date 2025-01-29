@@ -13,15 +13,29 @@ export const getAllMenuItems = async (
       return next(createError("Menu not found", 404));
     }
 
+    // Flatten and map menu items with category and subcategory details
     const menuItems = menu.categories.flatMap((category) =>
-      category.subcategories.flatMap((subcategory) => subcategory.items)
+      category.subcategories.flatMap((subcategory) =>
+        subcategory.items.map((item) => ({
+          id: item._id,
+          title: item.title,
+          image: item.image,
+          price: item.price,
+          size: item.size,
+          description: item.description,
+          availability: item.availability,
+          category: category.category,
+          subcategory: subcategory.subcategory,
+          createdAt: item.createdAt,
+        }))
+      )
     );
 
     if (menuItems.length === 0) {
       return next(createError("No menu items found", 404));
     }
 
-    res.status(200).json(menuItems); // Send all menu items
+    res.status(200).json(menuItems); // Return flattened menu items with category and subcategory
   } catch (error) {
     next(createError("Error fetching menu items", 500));
   }
@@ -34,7 +48,7 @@ export const addMenuItem = async (
 ): Promise<void> => {
   try {
     const { category, subcategory, item } = req.body;
-
+    console.log(req.body);
     // Validate that category, subcategory, and item are provided
     if (!category || !subcategory || !item) {
       return next(

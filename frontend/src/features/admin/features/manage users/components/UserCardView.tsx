@@ -2,7 +2,7 @@ import { flexRender, Table } from "@tanstack/react-table";
 import DeleteUserModal from "./DeleteUserModal";
 import useDeleteUserModal from "../hooks/useDeleteUserModal";
 import { User } from "../pages/ManageUsers";
-import EditModal from "./UserEditModal";
+import UserEditModal from "./UserEditModal";
 import useEditUserModal from "../hooks/useEditUserModal";
 
 interface UserCardViewProps {
@@ -32,7 +32,7 @@ const UserCardView = ({ table }: UserCardViewProps) => {
   return (
     <>
       {isEditModalOpen && userToEdit && (
-        <EditModal
+        <UserEditModal
           setIsEditModalOpen={setIsEditModalOpen}
           userToEdit={userToEdit}
           setUserToEdit={setUserToEdit}

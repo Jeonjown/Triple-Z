@@ -3,6 +3,8 @@ import { useState } from "react";
 import { MenuItem } from "../pages/ManageMenu";
 import MenuTableView from "./MenuTableView";
 import MenuCardView from "./MenuCardView";
+import CreateMenuItemModal from "./CreateMenuItemModal";
+import useCreateMenuItemModal from "../../hooks/useCreateMenuItemModal";
 
 interface CardViewProps {
   table: Table<MenuItem>;
@@ -17,9 +19,20 @@ const MenuControlPanel = ({
   setGlobalFilter,
   title,
 }: CardViewProps) => {
+  const { handleCreate, isCreateModalOpen, setIsCreateModalOpen } =
+    useCreateMenuItemModal();
+
   const [view, setView] = useState<string | undefined>("card");
+
   return (
     <>
+      {isCreateModalOpen && (
+        <CreateMenuItemModal
+          isCreateModalOpen={isCreateModalOpen}
+          setIsCreateModalOpen={setIsCreateModalOpen}
+        />
+      )}
+
       <div className="sticky top-32 z-10 mb-8 w-5/6 rounded-md border bg-white px-6 py-2 pt-6 shadow-md">
         <div className="relative">
           <input
@@ -194,7 +207,7 @@ const MenuControlPanel = ({
       <div className="mt-4 flex w-5/6 items-center justify-between py-5 text-left font-semibold">
         {title}
         <button
-          // onClick={() => handleAdd(row.original)}
+          onClick={handleCreate}
           className="mr-1 rounded bg-green-500 px-3 py-2 text-white hover:scale-110 hover:opacity-85"
         >
           <svg

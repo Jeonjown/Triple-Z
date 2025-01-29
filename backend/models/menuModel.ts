@@ -2,14 +2,17 @@ import mongoose from "mongoose";
 import { menuDB } from "../db";
 
 // Define the schema for a menu item (e.g., "Americano" or "Latte")
-const menuItemSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  image: { type: String, required: true },
-  price: { type: Number, required: true, min: 0 },
-  size: { type: String, required: true },
-  description: { type: String, required: true },
-  availability: { type: Boolean, required: true },
-});
+const menuItemSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    image: { type: String, required: true },
+    price: { type: Number, required: true, min: 0 },
+    size: { type: String, required: true },
+    description: { type: String, required: true },
+    availability: { type: Boolean, required: true },
+  },
+  { timestamps: true }
+);
 
 // Define the schema for a subcategory within a category (e.g., "Hot Coffees" under "Drinks")
 const menuSubcategorySchema = new mongoose.Schema({

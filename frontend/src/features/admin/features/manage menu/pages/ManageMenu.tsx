@@ -1,5 +1,4 @@
-import { useMemo, useState } from "react";
-import mockMenu from "../../../../../testing/menuData.json";
+import { useState } from "react";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -10,61 +9,35 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 import MenuControlPanel from "../components/MenuControlPanel";
+import useFetchAllMenuItems from "../../hooks/useFetchAllMenuItems";
 
 export interface MenuItem {
-  id: string;
+  _id: string;
   title: string;
   image: string;
   price: number;
   size: string;
   description: string;
   availability: boolean;
-  createdAt: string;
-  category?: string; // Optional category
-  subcategory?: string; // Optional subcategory
-}
-
-interface MenuSubCategory {
-  subcategory: string;
-  items: MenuItem[];
-}
-
-interface MenuCategory {
-  category: string;
-  subcategories: MenuSubCategory[];
-}
-
-interface Menu {
-  categories: MenuCategory[];
+  createdAt?: string;
+  category?: string;
+  subcategory?: string;
 }
 
 const ManageMenu = () => {
   const [title] = useState<string>("Menu Details");
-  const [data] = useState<Menu>(mockMenu);
-
-  // Flattening the menu data
-  const flattenedData = useMemo(() => {
-    return data.categories.flatMap((category) =>
-      category.subcategories.flatMap((subcategory) =>
-        subcategory.items.map((item) => ({
-          ...item,
-          category: category.category,
-          subcategory: subcategory.subcategory,
-        })),
-      ),
-    );
-  }, [data]);
-
-  const columnHelper = createColumnHelper<MenuItem>();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string | undefined>("");
+  const { data } = useFetchAllMenuItems();
 
+  const columnHelper = createColumnHelper<MenuItem>();
   const columns = [
     columnHelper.accessor("createdAt", {
       cell: (info) => info.getValue(),
       header: "Created At",
+      enableHiding: true,
     }),
-    columnHelper.accessor("id", {
+    columnHelper.accessor("_id", {
       cell: (info) => info.getValue(),
       header: "ID",
     }),
@@ -108,7 +81,7 @@ const ManageMenu = () => {
   ];
 
   const table = useReactTable({
-    data: flattenedData,
+    data,
     columns,
     state: {
       sorting,
@@ -126,6 +99,11 @@ const ManageMenu = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  if (!data) {
+    // Optionally handle loading or error state
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center bg-primary py-20 md:w-full">

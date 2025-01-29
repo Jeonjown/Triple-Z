@@ -11,21 +11,30 @@ export const getSubcategories = async (
 ): Promise<void> => {
   try {
     const categoryId = req.params.categoryId;
+
+    // Find the menu with the specific category ID
     const menu = await Menu.findOne({ "categories._id": categoryId });
 
     if (!menu) {
       return next(createError("Category not found", 404)); // Custom error handler
     }
 
+    // Find the category object that matches the categoryId
     const category = menu.categories.find(
       (cat) => cat._id.toString() === categoryId
     );
 
     if (!category) {
-      return next(createError("Subcategory not found", 404));
+      return next(createError("Category not found in menu", 404));
     }
 
-    res.status(200).json(category.subcategories); // Return the subcategories
+    // Map over the subcategories and return only the name and _id
+    const subcategories = category.subcategories.map((subcategory) => ({
+      subcategory: subcategory.subcategory, // Name of the subcategory
+      _id: subcategory._id, // ID of the subcategory
+    }));
+
+    res.status(200).json(subcategories); // Return the mapped subcategories
   } catch (error) {
     next(createError("Error fetching subcategories", 500));
   }

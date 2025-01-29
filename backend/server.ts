@@ -9,6 +9,7 @@ import menuRoutes from "./routes/menuRoutes";
 import categoryRoutes from "./routes/categoryRoutes";
 import menuItemRoutes from "./routes/menuItemRoutes";
 import subcategoryRoutes from "./routes/subcategoryRoutes";
+import imageMenuRoutes from "./routes/imageMenuRoutes";
 
 dotenv.config();
 
@@ -16,8 +17,10 @@ const server = express();
 
 // Middleware setup
 server.use(passport.initialize());
+server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
 server.use(express.json());
+
 server.use(
   cors({
     origin: ["http://localhost:5173", "https://triple-z.vercel.app"],
@@ -30,8 +33,9 @@ server.use("/api/auth", authRoutes);
 server.use("/api/users", userRoutes);
 server.use("/api/menu", menuRoutes);
 server.use("/api/menu/menu-items", menuItemRoutes);
-server.use("/api/menu/category", categoryRoutes);
-server.use("/api/menu/category", subcategoryRoutes);
+server.use("/api/menu/categories", categoryRoutes);
+server.use("/api/menu/categories", subcategoryRoutes);
+server.use("/api/menu/image", imageMenuRoutes);
 
 // Start server
 const port = process.env.PORT || 3000;

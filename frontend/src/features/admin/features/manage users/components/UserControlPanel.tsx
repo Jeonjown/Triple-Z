@@ -194,13 +194,7 @@ const UserControlPanel = ({
       <div className="mt-4 w-5/6 py-5 text-left font-semibold">{title}</div>
       {/* CARD VIEW */}
 
-      {view === "card" && (
-        <UserCardView
-          table={table}
-          setGlobalFilter={setGlobalFilter}
-          globalFilter={globalFilter}
-        />
-      )}
+      {view === "card" && <UserCardView table={table} />}
 
       {/* TABLE VIEW */}
       {view === "table" && <UserTableView table={table} />}
