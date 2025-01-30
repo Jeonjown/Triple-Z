@@ -6,6 +6,7 @@ import InputField from "./InputField";
 import SelectFieldCategories from "./SelectFieldCategories";
 import useFetchAllCategories from "../../hooks/useFetchAllCategories";
 import SelectFieldSubcategories from "./SelectFieldSubcategories";
+import SelectSizeField from "./SelectSizeField";
 
 interface CreateMenuItemModalProps {
   isCreateModalOpen: boolean;
@@ -32,33 +33,57 @@ const CreateMenuItemModal = ({
   const validationSchema = Yup.object({
     image: Yup.string().required("Image is required."),
     title: Yup.string().required("Title is required."),
-    price: Yup.number()
-      .required("Price is required.")
-      .min(0, "Price must not be less than 0")
-      .typeError("Price must be a number."),
     description: Yup.string().required("Description is required."),
     category: Yup.string().required("Category is required."),
     subcategory: Yup.string().required("Subcategory is required."),
+    sizes: Yup.array().of(
+      Yup.object().shape({
+        size: Yup.string().when(
+          "requiresSizeSelection",
+          (requiresSizeSelection, schema) => {
+            return requiresSizeSelection
+              ? schema.required("Size is required.")
+              : schema.notRequired();
+          },
+        ),
+        sizePrice: Yup.number().when(
+          "requiresSizeSelection",
+          (requiresSizeSelection, schema) => {
+            return requiresSizeSelection
+              ? schema.required("sizePrice is required.")
+              : schema.notRequired();
+          },
+        ),
+      }),
+    ),
+    basePrice: Yup.number().when(
+      "requiresSizeSelection",
+      (requiresSizeSelection, schema) => {
+        return !requiresSizeSelection
+          ? schema.required("Base price is required.")
+          : schema.notRequired();
+      },
+    ),
   });
-
   interface FormValues {
+    requiresSizeSelection: boolean;
     image: string;
     title: string;
-    price: string;
-    size: string;
+    basePrice: number;
     description: string;
     category: string;
     subcategory: string;
+    sizes: { size: string; sizePrice: number }[];
   }
-
   const initialValues = {
     image: "",
     title: "",
-    price: "",
-    size: "",
+    basePrice: 0,
     description: "",
     category: "",
     subcategory: "",
+    requiresSizeSelection: isSizeRequired,
+    sizes: [{ size: "", sizePrice: 0 }],
   };
 
   const handleSubmit = (values: FormValues) => {
@@ -86,18 +111,62 @@ const CreateMenuItemModal = ({
 
   // New method for testing if all fields have values
   const testFields = (values: typeof initialValues) => {
-    // Find the keys of the missing fields
-    const missingFields = Object.keys(values).filter(
-      (field) => !values[field as keyof typeof initialValues],
-    );
+    // Log the values for debugging
+    console.log("Form values:", values);
 
+    // Destructure necessary values
+    const { requiresSizeSelection, sizes, basePrice } = values;
+
+    const missingFields: string[] = [];
+
+    // Check for basePrice when size selection is not required
+    if (
+      !requiresSizeSelection &&
+      (basePrice === null || basePrice === undefined)
+    ) {
+      missingFields.push("basePrice");
+    }
+
+    // Check for sizes[0].sizePrice when size selection is required
+    if (
+      requiresSizeSelection &&
+      (sizes[0].sizePrice === null || sizes[0].sizePrice === undefined)
+    ) {
+      missingFields.push("sizes[0].sizePrice");
+    }
+
+    // Check for sizes[0].size when size selection is required
+    if (
+      requiresSizeSelection &&
+      (sizes[0].size.trim() === "" || sizes[0].size === undefined)
+    ) {
+      missingFields.push("sizes[0].size");
+    }
+
+    // Check for missing general fields (image, title, description, etc.)
+    Object.keys(values).forEach((field) => {
+      const value = values[field as keyof typeof initialValues];
+
+      if (Array.isArray(value) && value.length === 0) {
+        missingFields.push(field);
+      }
+
+      if (
+        value === null ||
+        value === undefined ||
+        (typeof value === "string" && value.trim() === "")
+      ) {
+        missingFields.push(field);
+      }
+    });
+
+    // Log the result
     if (missingFields.length > 0) {
       console.log("Missing fields:", missingFields.join(", "));
     } else {
       console.log("All fields have values!");
     }
   };
-  if (!isCreateModalOpen) return null;
 
   if (isPending) {
     return <div>Loading categories...</div>;
@@ -106,6 +175,8 @@ const CreateMenuItemModal = ({
   if (isError) {
     return <div>Error: {error?.message}</div>;
   }
+
+  if (!isCreateModalOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -149,7 +220,7 @@ const CreateMenuItemModal = ({
                 name="image"
               />
 
-              {/* Title, Price, Size Fields */}
+              {/* Title, Price,  Fields */}
               <div className="flex flex-col space-y-4 sm:flex sm:flex-row sm:space-x-4 sm:space-y-0">
                 {/* Title */}
                 <InputField
@@ -159,77 +230,33 @@ const CreateMenuItemModal = ({
                   placeholder="Enter the title"
                 />
                 {/* Price */}
-                <InputField
-                  label="Price"
-                  name="price"
-                  type="number"
-                  placeholder="Enter the price"
-                />
-
-                {/* Size */}
-                <div className="flex-1">
-                  {isSizeRequired && (
-                    <>
-                      <div className="flex items-center space-x-1">
-                        <label
-                          htmlFor="size"
-                          className="mb-1 block text-sm font-medium text-gray-700"
-                        >
-                          Size
-                        </label>
-                        <button className="hover:bg-secondary-dark -mt-2 flex items-center justify-center rounded bg-secondary p-1 text-white focus:outline-none focus:ring-2 focus:ring-secondary">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="h-3 w-3"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-
-                      <Field
-                        as="select"
-                        id="size"
-                        name="size"
-                        className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
-                      >
-                        <option value="">Select Size</option>
-                        <option value="small">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="large">Large</option>
-                      </Field>
-                    </>
-                  )}
-
-                  <div className="mt-auto flex">
-                    <ErrorMessage
-                      name="size"
-                      component="div"
-                      className="text-xs text-red-500"
-                    />
-                    <label className="ml-auto mt-auto flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={isSizeRequired}
-                        onChange={(e) => setIsSizeRequired(e.target.checked)}
-                        className="rounded border-gray-300 text-secondary focus:ring-secondary"
-                      />
-                      <span className="text-xs">Is Size Required?</span>
-                    </label>
-                  </div>
-                </div>
+                {!isSizeRequired && (
+                  <InputField
+                    label="Base price"
+                    name="basePrice"
+                    type="number"
+                    placeholder="Enter the price"
+                  />
+                )}
               </div>
 
-              {/* Category & Subcategory Fields */}
+              {/* Category, Subcategory, Size, Fields */}
               <div className="space-y-4">
+                {/* Size */}
+                {isSizeRequired && <SelectSizeField />}
+
+                <label className="ml-auto mt-auto flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={values.requiresSizeSelection}
+                    onChange={(e) => {
+                      setIsSizeRequired(e.target.checked);
+                      setFieldValue("requiresSizeSelection", e.target.checked);
+                    }}
+                    className="rounded border-gray-300 text-secondary focus:ring-secondary"
+                  />
+                  <span className="text-xs">Is Size Required?</span>
+                </label>
                 <SelectFieldCategories
                   label="Category"
                   name="category"
@@ -285,7 +312,6 @@ const CreateMenuItemModal = ({
                 </button>
                 <button
                   type="submit"
-                  onClick={() => testFields(values)} // Test values here
                   className="hover:bg-secondary-dark rounded-md bg-secondary px-4 py-2 text-white"
                 >
                   Submit

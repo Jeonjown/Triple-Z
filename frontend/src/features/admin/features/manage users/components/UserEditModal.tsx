@@ -5,17 +5,17 @@ import { formatCreatedAt } from "../../../../../utils/dateUtils";
 import useEditUserModal from "../hooks/useEditUserModal";
 import useUpdateUserRole from "../hooks/useUpdateUserRole";
 
-interface EditModalProps {
+interface UserEditModalProps {
   setIsEditModalOpen: (value: boolean) => void;
   setUserToEdit: (value: User) => void;
   userToEdit: User;
 }
 
-const EditModal = ({
+const UserEditModal = ({
   setIsEditModalOpen,
   userToEdit,
   setUserToEdit,
-}: EditModalProps) => {
+}: UserEditModalProps) => {
   const {
     showConfirmation,
     setShowConfirmation,
@@ -209,4 +209,4 @@ const EditModal = ({
   );
 };
 
-export default EditModal;
+export default UserEditModal;

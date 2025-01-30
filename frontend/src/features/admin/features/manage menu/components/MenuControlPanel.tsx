@@ -203,12 +203,12 @@ const MenuControlPanel = ({
           </div>
         </div>
       </div>
-      {/* Title and Button */}
+      {/* Title and Add Button */}
       <div className="mt-4 flex w-5/6 items-center justify-between py-5 text-left font-semibold">
         {title}
         <button
           onClick={handleCreate}
-          className="mr-1 rounded bg-green-500 px-3 py-2 text-white hover:scale-110 hover:opacity-85"
+          className="mr-1 rounded bg-secondary px-3 py-2 text-white hover:scale-110 hover:opacity-85"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

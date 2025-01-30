@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Response, Request } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -10,6 +10,7 @@ import categoryRoutes from "./routes/categoryRoutes";
 import menuItemRoutes from "./routes/menuItemRoutes";
 import subcategoryRoutes from "./routes/subcategoryRoutes";
 import imageMenuRoutes from "./routes/imageMenuRoutes";
+import { ResponseError } from "./utils/createError";
 
 dotenv.config();
 
@@ -36,6 +37,14 @@ server.use("/api/menu/menu-items", menuItemRoutes);
 server.use("/api/menu/categories", categoryRoutes);
 server.use("/api/menu/categories", subcategoryRoutes);
 server.use("/api/menu/image", imageMenuRoutes);
+
+server.use(
+  (err: ResponseError, req: Request, res: Response, next: NextFunction) => {
+    res
+      .status(err.status || 500)
+      .json({ error: err.message || "Internal Server Error" });
+  }
+);
 
 // Start server
 const port = process.env.PORT || 3000;
