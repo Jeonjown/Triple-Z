@@ -1,43 +1,86 @@
-import { useState } from "react";
 import { useCreateCategory } from "../../hooks/useCreateCategory";
-import { Category } from "../api/menu";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { useDeleteCategory } from "../../hooks/useDeleteCategory";
+// import { useEditCategory } from "../../hooks/useEditCategory";
+// import EditConfirmationModal from "./EditConfirmationModal";
+import { useState } from "react";
+import EditConfirmationModal from "./EditConfirmationModal";
+
+export interface SingleCategory {
+  category: string;
+  _id: string;
+}
 
 interface CategoryEditModalProps {
   setIsEditModalOpen: (value: boolean) => void;
   categories: { category: string; _id: string }[];
 }
 
-const CategoryEditModal = ({
+const CategoryModal = ({
   setIsEditModalOpen,
   categories,
 }: CategoryEditModalProps) => {
-  const [isAddCategoryFormOpen, setIsAddCategoryFormOpen] =
+  // Create Category Hook
+  const {
+    handleAddCategory,
+    isAddCategoryFormOpen,
+    setIsAddCategoryFormOpen,
+    itemToAdd,
+    setItemToAdd,
+  } = useCreateCategory();
+
+  // Delete Category Hook
+  const {
+    mutate: deleteCategory,
+    showConfirmation: deleteShowConfirmation,
+    setShowConfirmation: setDeleteShowConfirmation,
+    message: deleteMessage,
+    handleDelete: handleDeleteCategory,
+    deleteTarget,
+  } = useDeleteCategory();
+
+  // Edit Category Hook
+  // const { mutate: editCategory } = useEditCategory();
+
+  const [showEditConfirmation, setShowEditConfirmation] =
     useState<boolean>(false);
-  const [itemToAdd, setItemToAdd] = useState<string>("");
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [inputEditValue, setInputEditValue] = useState("");
+  const [categoryToEdit, setCategoryToEdit] = useState<
+    SingleCategory | undefined
+  >(undefined);
 
-  const { mutate: createCategory } = useCreateCategory();
-  const { mutate: deleteCategory } = useDeleteCategory();
-
-  // const handleDeleteCategory = () => {};
-
-  const handleAddCategory = () => {
-    if (itemToAdd.trim() !== "") {
-      // Check if category is not empty
-      const newCategory: Category = {
-        category: itemToAdd,
-        subcategories: [],
-      };
-      createCategory(newCategory);
-      setIsAddCategoryFormOpen(false);
-      setItemToAdd("");
-    } else {
-      console.error("Category name cannot be empty!");
-    }
+  const handleEditCategory = (category: SingleCategory) => {
+    setEditMode(true);
+    setInputEditValue(category.category);
+    setCategoryToEdit(category);
   };
 
+  const handleSaveEdit = () => {
+    setEditMode(false);
+    setShowEditConfirmation(true);
+  };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+      {deleteShowConfirmation && deleteTarget && (
+        <DeleteConfirmationModal
+          setShowConfirmation={setDeleteShowConfirmation}
+          showConfirmation={deleteShowConfirmation}
+          target={deleteTarget.category} // Display the target category name
+          action={() => deleteCategory(deleteTarget._id)} // Pass the category _id for deletion
+        >
+          {deleteMessage}
+        </DeleteConfirmationModal>
+      )}
+
+      {showEditConfirmation && (
+        <EditConfirmationModal
+          setEditMode={setEditMode}
+          setShowConfirmation={setShowEditConfirmation}
+          categoryToEdit={categoryToEdit}
+        />
+      )}
+
       <div className="relative m-4 max-h-96 w-full max-w-lg overflow-y-auto rounded-lg bg-gray-100 p-6 shadow-lg">
         {/* Close Button */}
         <button
@@ -104,7 +147,7 @@ const CategoryEditModal = ({
               />
               <button
                 type="button"
-                onClick={handleAddCategory} // Trigger handleAddCategory on click
+                onClick={handleAddCategory}
                 className="hover:bg-secondary-dark rounded-r-md bg-secondary px-3 py-3 text-sm text-white transition-all focus:ring-2 focus:ring-secondary"
               >
                 Save
@@ -119,14 +162,44 @@ const CategoryEditModal = ({
             key={category._id}
             className="flex items-center justify-between border-b border-gray-300 py-3"
           >
-            <span className="text-lg font-medium text-gray-700">
-              {category.category}
-            </span>
+            {/* Display category name as text */}
+
+            {editMode && categoryToEdit?._id === category._id ? (
+              <div className="flex w-full">
+                <input
+                  type="text"
+                  value={inputEditValue}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setInputEditValue(e.target.value); // Update inputEditValue
+                    if (categoryToEdit) {
+                      setCategoryToEdit({
+                        ...categoryToEdit, // Spread the existing categoryToEdit object
+                        category: e.target.value, // Update only the category field
+                      });
+                    }
+                  }}
+                  className="w-full rounded-md border p-2"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSaveEdit();
+                  }}
+                  className="ml-2 rounded bg-secondary px-3 text-sm text-white"
+                >
+                  OK
+                </button>
+              </div>
+            ) : (
+              <span className="text-lg font-medium text-gray-700">
+                {category.category}
+              </span>
+            )}
+
             <div className="flex space-x-3">
-              {/* Edit Button */}
-              {/* <button
+              <button
                 type="button"
-                onClick={() => setIsEditModalOpen(true)}
+                onClick={() => handleEditCategory(category)}
                 className="ml-4 rounded bg-secondary p-2 text-white transition-all hover:scale-110"
               >
                 <svg
@@ -143,18 +216,12 @@ const CategoryEditModal = ({
                     d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
                   />
                 </svg>
-              </button> */}
-              {/* Delete Button */}
+              </button>
+
+              {/* Delete button */}
               <button
                 type="button"
-                onClick={() => {
-                  const confirmDelete = window.confirm(
-                    `Are you sure you want to delete "${category.category}"? All related items in this category will also be deleted.`,
-                  );
-                  if (confirmDelete) {
-                    deleteCategory(category._id);
-                  }
-                }}
+                onClick={() => handleDeleteCategory(category)}
                 className="flex items-center justify-center rounded bg-red-500 p-2 text-white transition-all hover:bg-red-600"
               >
                 <svg
@@ -180,4 +247,4 @@ const CategoryEditModal = ({
   );
 };
 
-export default CategoryEditModal;
+export default CategoryModal;

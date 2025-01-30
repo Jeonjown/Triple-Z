@@ -7,7 +7,12 @@ const useFetchAllCategories = () => {
     queryKey: ["categories"],
   });
 
-  return { data, isPending, isError, error };
+  return {
+    data,
+    isPending,
+    isError,
+    error,
+  };
 };
 
 export default useFetchAllCategories;

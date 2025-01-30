@@ -1,7 +1,7 @@
 import { ErrorMessage, Field, useFormikContext } from "formik";
 import React from "react";
-import CategoryEditModal from "./CategoryEditModal";
-import useEditCategoryModal from "../../hooks/useEditCategoryModal";
+import CategoryModal from "./CategoryModal";
+import useCategoryModal from "../../hooks/useCategoryModal";
 
 interface SelectFieldProps {
   label: string;
@@ -18,14 +18,14 @@ const SelectFieldCategories = ({
   setCurrentCategory,
   currentCategory,
 }: SelectFieldProps) => {
-  const { setIsEditModalOpen, isEditModalOpen } = useEditCategoryModal();
+  const { setIsEditModalOpen, isEditModalOpen } = useCategoryModal();
   const { setFieldValue } = useFormikContext();
 
   return (
     <div>
       <div className="flex items-center space-x-1">
         {isEditModalOpen && (
-          <CategoryEditModal
+          <CategoryModal
             setIsEditModalOpen={setIsEditModalOpen}
             categories={data}
           />

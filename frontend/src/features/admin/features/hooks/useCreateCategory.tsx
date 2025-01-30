@@ -1,7 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCategory } from "../manage menu/api/menu";
+import { Category, createCategory } from "../manage menu/api/menu";
+import { useState } from "react";
 
 export const useCreateCategory = () => {
+  const [isAddCategoryFormOpen, setIsAddCategoryFormOpen] =
+    useState<boolean>(false);
+  const [itemToAdd, setItemToAdd] = useState<string>("");
+
   const queryClient = useQueryClient();
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: createCategory,
@@ -10,11 +15,36 @@ export const useCreateCategory = () => {
     },
     onSuccess: (data) => {
       console.log("Category created successfully:", data);
-      queryClient.invalidateQueries({
-        queryKey: ["categories"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
   });
 
-  return { mutate, isPending, isError, error };
+  const handleAddCategory = () => {
+    if (itemToAdd.trim() !== "") {
+      const newCategory: Category = {
+        category: itemToAdd,
+        subcategories: [],
+      };
+      mutate(newCategory, {
+        onSuccess: () => {
+          setIsAddCategoryFormOpen(false);
+          setItemToAdd("");
+        },
+      });
+    } else {
+      console.error("Category name cannot be empty!");
+    }
+  };
+
+  return {
+    mutate,
+    isPending,
+    isError,
+    error,
+    isAddCategoryFormOpen,
+    setIsAddCategoryFormOpen,
+    itemToAdd,
+    setItemToAdd,
+    handleAddCategory,
+  };
 };

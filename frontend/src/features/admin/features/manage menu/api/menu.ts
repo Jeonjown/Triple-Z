@@ -59,9 +59,10 @@ export interface Category {
   subcategories: string[];
 }
 
-export const deleteCategory = async (categoryId: string) => {
+export const createCategory = async (category: Category) => {
+  console.log(category);
   try {
-    const response = await api.delete(`api/menu/categories/${categoryId}`);
+    const response = await api.post("/api/menu/categories", category);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -84,10 +85,23 @@ export const getAllCategories = async () => {
   }
 };
 
-export const createCategory = async (category: Category) => {
-  console.log(category);
+export const editCategory = async (categoryId: string, category: string) => {
   try {
-    const response = await api.post("/api/menu/categories", category);
+    const response = await api.put(`api/menu/categories/${categoryId}`, {
+      category,
+    }); // Send category data
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || "An error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
+export const deleteCategory = async (categoryId: string) => {
+  try {
+    const response = await api.delete(`api/menu/categories/${categoryId}`);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
