@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { SingleCategory } from "./CategoryModal";
-import { useEditCategory } from "../../hooks/useEditCategory";
+import { useEditCategory } from "../hooks/useEditCategory";
 
 interface EditConfirmationModalProps {
   setEditMode: Dispatch<SetStateAction<boolean>>;
@@ -8,7 +8,7 @@ interface EditConfirmationModalProps {
   categoryToEdit: SingleCategory | undefined;
 }
 
-const EditConfirmationModal = ({
+const EditCategoryConfirmationModal = ({
   setShowConfirmation,
   setEditMode,
   categoryToEdit,
@@ -53,4 +53,4 @@ const EditConfirmationModal = ({
   );
 };
 
-export default EditConfirmationModal;
+export default EditCategoryConfirmationModal;

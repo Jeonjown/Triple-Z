@@ -1,8 +1,9 @@
 import { ErrorMessage, Field } from "formik";
-import useFetchAllSubcategories from "../../hooks/useFetchAllSubcategories";
-
+import useFetchAllSubcategories from "../hooks/useFetchAllSubcategories";
+import useSubcategoryModal from "../hooks/useSubcategoryModal";
+import SubcategoryModal from "./SubcategoryModal";
 // Define the interface for each subcategory option
-interface SubcategoryOption {
+export interface SubcategoryOption {
   _id: string;
   subcategory: string;
 }
@@ -10,17 +11,20 @@ interface SubcategoryOption {
 interface SelectFieldProps {
   label: string;
   name: string;
-  currentCategory: string | undefined;
+  currentCategoryId: string | undefined;
+  currentCategoryName: string | undefined;
 }
 
 const SelectFieldSubcategories = ({
   label,
   name,
-  currentCategory,
+  currentCategoryId,
+  currentCategoryName,
 }: SelectFieldProps) => {
   const { data, isError, error } = useFetchAllSubcategories(
-    currentCategory || "",
+    currentCategoryId ?? "",
   );
+  const { isModalOpen, setIsModalOpen } = useSubcategoryModal();
 
   if (isError) {
     return <div>Error: {error?.message}</div>;
@@ -28,6 +32,14 @@ const SelectFieldSubcategories = ({
 
   return (
     <div>
+      {isModalOpen && (
+        <SubcategoryModal
+          setIsModalOpen={setIsModalOpen}
+          currentCategoryId={currentCategoryId}
+          currentCategoryName={currentCategoryName}
+          subcategoryData={data}
+        />
+      )}
       <div className="flex items-center space-x-1">
         <label
           htmlFor={name}
@@ -35,8 +47,11 @@ const SelectFieldSubcategories = ({
         >
           {label}
         </label>
+
+        {/* EDIT ICON */}
         <button
           type="button"
+          onClick={() => setIsModalOpen(true)}
           className="hover:bg-secondary-dark mb-2 flex items-center justify-center rounded bg-secondary p-1 text-white focus:outline-none focus:ring-2 focus:ring-secondary"
         >
           <svg

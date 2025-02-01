@@ -1,74 +1,90 @@
-import DeleteConfirmationModal from "./DeleteConfirmationModal";
-import { useDeleteCategory } from "../hooks/useDeleteCategory";
-import { useEditCategory } from "../hooks/useEditCategory";
-import { useCreateCategory } from "../hooks/useCreateCategory";
-import EditCategoryConfirmationModal from "./EditCategoryConfirmationModal";
+import React from "react";
+import { useEditSubcategory } from "../hooks/useEditSubcategory";
+import EditSubcategoryConfirmationModal from "./EditSubcategoryConfirmationModal";
+import { useCreateSubcategory } from "../hooks/useCreateSubcategory";
+import { useDeleteSubcategory } from "../hooks/useDeleteSubcategory"; // Import the delete hook
+import DeleteConfirmationModal from "./DeleteConfirmationModal"; // Import your modal
 
-export interface SingleCategory {
-  category: string;
+export interface SingleSubcategory {
   _id: string;
+  subcategory: string;
 }
 
-interface CategoryEditModalProps {
-  setIsEditModalOpen: (value: boolean) => void;
-  categories: { category: string; _id: string }[];
+interface SubcategoryModalProps {
+  currentCategoryId: string | undefined;
+  subcategoryData: SingleSubcategory[] | undefined;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  currentCategoryName: string | undefined;
 }
 
-const CategoryModal = ({
-  setIsEditModalOpen,
-  categories,
-}: CategoryEditModalProps) => {
-  // Create Category Hook
+function SubcategoryModal({
+  setIsModalOpen,
+  subcategoryData,
+  currentCategoryId,
+  currentCategoryName,
+}: SubcategoryModalProps): JSX.Element {
+  // ADD SUBCATEGORY
   const {
-    handleAddCategory,
     isAddCategoryFormOpen,
     setIsAddCategoryFormOpen,
-    itemToAdd,
     setItemToAdd,
-  } = useCreateCategory();
+    itemToAdd,
+    handleAddSubCategory,
+  } = useCreateSubcategory();
 
-  // Delete Category Hook
+  // EDIT SUBCATEGORY
   const {
-    mutate: deleteCategory,
-    showConfirmation: deleteShowConfirmation,
-    setShowConfirmation: setDeleteShowConfirmation,
-    message: deleteMessage,
-    handleDelete: handleDeleteCategory,
-    deleteTarget,
-  } = useDeleteCategory();
-
-  // Edit Category Hook
-  const {
-    setEditMode,
-    setInputEditValue,
-    setCategoryToEdit,
-    setShowEditConfirmation,
     inputEditValue,
-    showEditConfirmation,
-    categoryToEdit,
+    setInputEditValue,
+    setSubcategoryToEdit,
+    setEditMode,
     editMode,
+    subcategoryToEdit,
     handleSaveEdit,
-    handleEditCategory,
-  } = useEditCategory();
+    handleEditSubcategory,
+    showEditConfirmation,
+    setShowEditConfirmation,
+  } = useEditSubcategory();
+
+  // DELETE SUBCATEGORY (using the custom hook)
+  const {
+    mutate, // mutation function
+    showConfirmation,
+    setShowConfirmation,
+    deleteTarget,
+    handleDelete,
+  } = useDeleteSubcategory();
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-      {deleteShowConfirmation && deleteTarget && (
+      {/* Delete Confirmation Modal */}
+      {showConfirmation && deleteTarget && (
         <DeleteConfirmationModal
-          setShowConfirmation={setDeleteShowConfirmation}
-          showConfirmation={deleteShowConfirmation}
-          target={deleteTarget.category} // Display the target category name
-          action={() => deleteCategory(deleteTarget._id)} // Pass the category _id for deletion
+          showConfirmation={showConfirmation}
+          setShowConfirmation={setShowConfirmation}
+          target={deleteTarget.subcategory} // Show the subcategory name
+          action={() => {
+            if (currentCategoryId) {
+              // Call mutate with the proper IDs
+              mutate({
+                categoryId: currentCategoryId,
+                subcategoryId: deleteTarget._id,
+              });
+            } else {
+              console.error("Current category is undefined!");
+            }
+          }}
         >
-          {deleteMessage}
+          All related items will also be lost.
         </DeleteConfirmationModal>
       )}
 
       {showEditConfirmation && (
-        <EditCategoryConfirmationModal
+        <EditSubcategoryConfirmationModal
+          setShowEditConfirmation={setShowEditConfirmation}
+          categoryId={currentCategoryId}
           setEditMode={setEditMode}
-          setShowConfirmation={setShowEditConfirmation}
-          categoryToEdit={categoryToEdit}
+          subcategoryToEdit={subcategoryToEdit}
         />
       )}
 
@@ -77,10 +93,9 @@ const CategoryModal = ({
         <div className="sticky top-0 z-20 flex w-full">
           <button
             type="button"
-            onClick={() => setIsEditModalOpen(false)}
+            onClick={() => setIsModalOpen(false)}
             className="ml-auto text-gray-700 hover:text-gray-900"
           >
-            {/* X Icon SVG */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -101,9 +116,9 @@ const CategoryModal = ({
         {/* Header Container */}
         <div className="sticky top-8 mb-4 flex items-center justify-between bg-white pt-4">
           <h2 className="text-2xl font-semibold text-gray-800">
-            Edit Categories
+            Edit Subcategories of {currentCategoryName}
           </h2>
-          {/* ADD BUTTON */}
+
           {!isAddCategoryFormOpen && (
             <button
               type="button"
@@ -135,14 +150,20 @@ const CategoryModal = ({
                 name="title"
                 type="text"
                 id="title"
-                placeholder="Enter the category"
+                placeholder="Enter the subcategory"
                 onChange={(e) => setItemToAdd(e.target.value)}
                 value={itemToAdd}
                 className="w-full rounded-l-md px-3 py-2 text-sm text-gray-800 placeholder-gray-500 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary"
               />
               <button
                 type="button"
-                onClick={handleAddCategory}
+                onClick={() => {
+                  if (currentCategoryId) {
+                    handleAddSubCategory(currentCategoryId);
+                  } else {
+                    console.error("Category ID is undefined!");
+                  }
+                }}
                 className="hover:bg-secondary-dark rounded-r-md bg-secondary px-3 py-3 text-sm text-white transition-all focus:ring-2 focus:ring-secondary"
               >
                 Save
@@ -151,24 +172,24 @@ const CategoryModal = ({
           </div>
         )}
 
-        {/* Categories List */}
-        {categories &&
-          categories.map((category) => (
+        {/* Subcategories List */}
+        {subcategoryData &&
+          subcategoryData.map((subcategory) => (
             <div
-              key={category._id}
+              key={subcategory._id}
               className="flex items-center justify-between border-b border-gray-300 py-3"
             >
-              {editMode && categoryToEdit?._id === category._id ? (
+              {editMode && subcategoryToEdit?._id === subcategory._id ? (
                 <div className="flex w-full">
                   <input
                     type="text"
                     value={inputEditValue}
                     onChange={(e) => {
                       setInputEditValue(e.target.value);
-                      if (categoryToEdit) {
-                        setCategoryToEdit({
-                          ...categoryToEdit,
-                          category: e.target.value,
+                      if (subcategoryToEdit) {
+                        setSubcategoryToEdit({
+                          ...subcategoryToEdit,
+                          subcategory: e.target.value,
                         });
                       }
                     }}
@@ -184,14 +205,14 @@ const CategoryModal = ({
                 </div>
               ) : (
                 <span className="text-lg font-medium text-gray-700">
-                  {category.category}
+                  {subcategory.subcategory}
                 </span>
               )}
 
               <div className="flex space-x-3">
                 <button
                   type="button"
-                  onClick={() => handleEditCategory(category)}
+                  onClick={() => handleEditSubcategory(subcategory)}
                   className="ml-4 rounded bg-secondary p-2 text-white transition-all hover:scale-110"
                 >
                   <svg
@@ -211,7 +232,7 @@ const CategoryModal = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleDeleteCategory(category)}
+                  onClick={() => handleDelete(subcategory)} // Call delete hook handler
                   className="flex items-center justify-center rounded bg-red-500 p-2 text-white transition-all hover:bg-red-600"
                 >
                   <svg
@@ -235,6 +256,6 @@ const CategoryModal = ({
       </div>
     </div>
   );
-};
+}
 
-export default CategoryModal;
+export default SubcategoryModal;

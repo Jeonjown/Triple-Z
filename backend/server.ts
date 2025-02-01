@@ -11,6 +11,7 @@ import menuItemRoutes from "./routes/menuItemRoutes";
 import subcategoryRoutes from "./routes/subcategoryRoutes";
 import imageMenuRoutes from "./routes/imageMenuRoutes";
 import { ResponseError } from "./utils/createError";
+import { verifyAdminToken } from "./middleware/verifyAdminToken";
 
 dotenv.config();
 
@@ -34,8 +35,8 @@ server.use("/api/auth", authRoutes);
 server.use("/api/users", userRoutes);
 server.use("/api/menu", menuRoutes);
 server.use("/api/menu/menu-items", menuItemRoutes);
-server.use("/api/menu/categories", categoryRoutes);
-server.use("/api/menu/categories", subcategoryRoutes);
+server.use("/api/menu/categories", verifyAdminToken, categoryRoutes);
+server.use("/api/menu/categories", verifyAdminToken, subcategoryRoutes);
 server.use("/api/menu/image", imageMenuRoutes);
 
 server.use(

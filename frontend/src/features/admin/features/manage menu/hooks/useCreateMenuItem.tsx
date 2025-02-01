@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createMenuItem } from "../manage menu/api/menu";
+import { createMenuItem } from "../api/menu";
 
 const useCreateMenuItem = () => {
   const { mutate, isPending, isError, error } = useMutation({

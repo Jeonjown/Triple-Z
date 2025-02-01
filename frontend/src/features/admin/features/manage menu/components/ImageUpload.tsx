@@ -11,7 +11,7 @@ const ImageUpload = ({
 }) => {
   return (
     <>
-      <div className="items-center justify-center space-x-4 sm:flex sm:flex-row-reverse">
+      <div className="items-center justify-center sm:flex sm:flex-row-reverse md:space-x-4">
         {imagePreview && (
           <div className="mt-4 flex-1 sm:mt-0 sm:w-1/4">
             <img
@@ -23,7 +23,7 @@ const ImageUpload = ({
         )}
         <label
           htmlFor="image"
-          className="mt-5 flex h-40 w-full flex-1 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 sm:mt-0"
+          className="mt-5 flex w-full flex-1 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 md:h-40"
         >
           <div className="flex flex-1 flex-col items-center justify-center pb-4 pt-4">
             <svg

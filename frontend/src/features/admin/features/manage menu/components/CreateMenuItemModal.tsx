@@ -4,7 +4,7 @@ import { useState } from "react";
 import ImageUpload from "./ImageUpload";
 import InputField from "./InputField";
 import SelectFieldCategories from "./SelectFieldCategories";
-import useFetchAllCategories from "../../hooks/useFetchAllCategories";
+import useFetchAllCategories from "../hooks/useFetchAllCategories";
 import SelectFieldSubcategories from "./SelectFieldSubcategories";
 import SelectSizeField from "./SelectSizeField";
 
@@ -24,9 +24,14 @@ const CreateMenuItemModal = ({
     error,
   } = useFetchAllCategories();
 
-  const [currentCategory, setCurrentCategory] = useState<string | undefined>(
-    "",
-  );
+  // Track both the category ID and category name
+  const [currentCategoryId, setCurrentCategoryId] = useState<
+    string | undefined
+  >("");
+  const [currentCategoryName, setCurrentCategoryName] = useState<
+    string | undefined
+  >("");
+  console.log(currentCategoryName);
   const [isSizeRequired, setIsSizeRequired] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -50,7 +55,7 @@ const CreateMenuItemModal = ({
           "requiresSizeSelection",
           (requiresSizeSelection, schema) => {
             return requiresSizeSelection
-              ? schema.required("sizePrice is required.")
+              ? schema.required("Size price is required.")
               : schema.notRequired();
           },
         ),
@@ -65,6 +70,7 @@ const CreateMenuItemModal = ({
       },
     ),
   });
+
   interface FormValues {
     requiresSizeSelection: boolean;
     image: string;
@@ -75,7 +81,8 @@ const CreateMenuItemModal = ({
     subcategory: string;
     sizes: { size: string; sizePrice: number }[];
   }
-  const initialValues = {
+
+  const initialValues: FormValues = {
     image: "",
     title: "",
     basePrice: 0,
@@ -88,6 +95,7 @@ const CreateMenuItemModal = ({
 
   const handleSubmit = (values: FormValues) => {
     console.log("Form submitted with values:", values);
+    console.log("Selected category name:", currentCategoryName);
     setIsCreateModalOpen(false); // Close the modal
   };
 
@@ -109,63 +117,9 @@ const CreateMenuItemModal = ({
     }
   };
 
-  // New method for testing if all fields have values
-  const testFields = (values: typeof initialValues) => {
-    // Log the values for debugging
+  const testFields = (values: FormValues) => {
     console.log("Form values:", values);
-
-    // Destructure necessary values
-    const { requiresSizeSelection, sizes, basePrice } = values;
-
-    const missingFields: string[] = [];
-
-    // Check for basePrice when size selection is not required
-    if (
-      !requiresSizeSelection &&
-      (basePrice === null || basePrice === undefined)
-    ) {
-      missingFields.push("basePrice");
-    }
-
-    // Check for sizes[0].sizePrice when size selection is required
-    if (
-      requiresSizeSelection &&
-      (sizes[0].sizePrice === null || sizes[0].sizePrice === undefined)
-    ) {
-      missingFields.push("sizes[0].sizePrice");
-    }
-
-    // Check for sizes[0].size when size selection is required
-    if (
-      requiresSizeSelection &&
-      (sizes[0].size.trim() === "" || sizes[0].size === undefined)
-    ) {
-      missingFields.push("sizes[0].size");
-    }
-
-    // Check for missing general fields (image, title, description, etc.)
-    Object.keys(values).forEach((field) => {
-      const value = values[field as keyof typeof initialValues];
-
-      if (Array.isArray(value) && value.length === 0) {
-        missingFields.push(field);
-      }
-
-      if (
-        value === null ||
-        value === undefined ||
-        (typeof value === "string" && value.trim() === "")
-      ) {
-        missingFields.push(field);
-      }
-    });
-
-    // Log the result
-    if (missingFields.length > 0) {
-      console.log("Missing fields:", missingFields.join(", "));
-    } else {
-      console.log("All fields have values!");
-    }
+    window.alert(JSON.stringify(values, null, 2));
   };
 
   if (isPending) {
@@ -207,8 +161,6 @@ const CreateMenuItemModal = ({
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          validateOnChange={true}
-          validateOnBlur={true}
           onSubmit={handleSubmit}
         >
           {({ setFieldValue, values }) => (
@@ -220,16 +172,14 @@ const CreateMenuItemModal = ({
                 name="image"
               />
 
-              {/* Title, Price,  Fields */}
+              {/* Title and Price */}
               <div className="flex flex-col space-y-4 sm:flex sm:flex-row sm:space-x-4 sm:space-y-0">
-                {/* Title */}
                 <InputField
                   label="Title"
                   name="title"
                   type="text"
                   placeholder="Enter the title"
                 />
-                {/* Price */}
                 {!isSizeRequired && (
                   <InputField
                     label="Base price"
@@ -240,11 +190,9 @@ const CreateMenuItemModal = ({
                 )}
               </div>
 
-              {/* Category, Subcategory, Size, Fields */}
+              {/* Category, Subcategory, and Size Fields */}
               <div className="space-y-4">
-                {/* Size */}
                 {isSizeRequired && <SelectSizeField />}
-
                 <label className="ml-auto mt-auto flex items-center space-x-2">
                   <input
                     type="checkbox"
@@ -260,16 +208,19 @@ const CreateMenuItemModal = ({
                 <SelectFieldCategories
                   label="Category"
                   name="category"
-                  setCurrentCategory={setCurrentCategory}
+                  setCurrentCategoryId={setCurrentCategoryId}
+                  setCurrentCategoryName={setCurrentCategoryName}
                   data={categories}
-                  currentCategory={currentCategory}
+                  currentCategoryId={currentCategoryId}
                 />
-
-                <SelectFieldSubcategories
-                  label="Subcategory"
-                  name="subcategory"
-                  currentCategory={currentCategory}
-                />
+                {currentCategoryId && (
+                  <SelectFieldSubcategories
+                    label="Subcategory"
+                    name="subcategory"
+                    currentCategoryId={currentCategoryId}
+                    currentCategoryName={currentCategoryName}
+                  />
+                )}
               </div>
 
               {/* Description */}
@@ -294,7 +245,7 @@ const CreateMenuItemModal = ({
                 />
               </div>
 
-              {/* Test Button */}
+              {/* Buttons */}
               <div className="flex justify-end space-x-4">
                 <button
                   type="button"
@@ -304,8 +255,8 @@ const CreateMenuItemModal = ({
                   Cancel
                 </button>
                 <button
-                  type="button" // Use button type "button" to avoid form submission
-                  onClick={() => testFields(values)} // Test values here
+                  type="button"
+                  onClick={() => testFields(values)}
                   className="hover:bg-secondary-dark rounded-md bg-secondary px-4 py-2 text-white"
                 >
                   Test Fields

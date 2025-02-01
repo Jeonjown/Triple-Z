@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteCategory } from "../manage menu/api/menu";
+import { deleteCategory } from "../api/menu";
 import { useState } from "react";
 
 // Custom hook for deleting a category

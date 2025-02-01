@@ -10,7 +10,7 @@ import { verifyAdminToken } from "../middleware/verifyAdminToken";
 const router = Router();
 
 router.post("/", verifyAdminToken, addMenuItem);
-router.get("/", verifyAdminToken, getAllMenuItems);
+router.get("/", getAllMenuItems);
 router.put("/:id", verifyAdminToken, updateMenuItem);
 router.delete("/:id", verifyAdminToken, deleteMenuItem);
 

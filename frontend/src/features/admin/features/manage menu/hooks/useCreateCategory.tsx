@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Category, createCategory } from "../manage menu/api/menu";
+
 import { useState } from "react";
+import { Category, createCategory } from "../api/menu";
 
 export const useCreateCategory = () => {
   const [isAddCategoryFormOpen, setIsAddCategoryFormOpen] =

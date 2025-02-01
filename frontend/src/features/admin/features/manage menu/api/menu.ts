@@ -125,3 +125,57 @@ export const getAllSubcategories = async (categoryId: string) => {
     throw new Error("An unexpected error occurred");
   }
 };
+
+export const editSubcategory = async (
+  categoryId: string,
+  subcategoryId: string,
+  subcategory: string,
+) => {
+  try {
+    const response = await api.put(
+      `/api/menu/categories/${categoryId}/subcategories/${subcategoryId}`,
+      { subcategoryName: subcategory },
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || "an error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
+export const createSubcategory = async (
+  categoryId: string,
+  subcategory: string,
+) => {
+  try {
+    const response = await api.post(
+      `/api/menu/categories/${categoryId}/subcategories/`,
+      { subcategoryName: subcategory },
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || "an error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
+export const deleteSubcategory = async (
+  categoryId: string,
+  subcategoryId: string,
+) => {
+  try {
+    const response = await api.delete(
+      `/api/menu/categories/${categoryId}/subcategories/${subcategoryId}`,
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || "an error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};

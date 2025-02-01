@@ -6,13 +6,10 @@ export interface CategoryData {
 
 const useCategoryModal = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
 
   return {
     isEditModalOpen,
     setIsEditModalOpen,
-    showConfirmation,
-    setShowConfirmation,
   };
 };
 

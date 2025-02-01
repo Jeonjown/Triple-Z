@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAllCategories } from "../manage menu/api/menu";
+import { getAllCategories } from "../api/menu";
 
 const useFetchAllCategories = () => {
   const { data, isPending, isError, error } = useQuery({

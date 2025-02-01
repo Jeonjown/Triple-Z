@@ -9,7 +9,7 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 import MenuControlPanel from "../components/MenuControlPanel";
-import useFetchAllMenuItems from "../../hooks/useFetchAllMenuItems";
+import useFetchAllMenuItems from "../hooks/useFetchAllMenuItems";
 
 export interface MenuItem {
   _id: string;

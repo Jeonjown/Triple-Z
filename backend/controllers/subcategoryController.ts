@@ -109,6 +109,8 @@ export const deleteSubcategory = async (
     const categoryId = req.params.categoryId;
     const subcategoryId = req.params.subcategoryId;
 
+    console.log(subcategoryId, categoryId);
+
     const menu = await Menu.findOne({ "categories._id": categoryId });
 
     if (!menu) {

@@ -1,22 +1,28 @@
 import { ErrorMessage, Field, useFormikContext } from "formik";
 import React from "react";
 import CategoryModal from "./CategoryModal";
-import useCategoryModal from "../../hooks/useCategoryModal";
+import useCategoryModal from "../hooks/useCategoryModal";
 
 interface SelectFieldProps {
   label: string;
   name: string;
   data: { category: string; _id: string }[];
-  setCurrentCategory: React.Dispatch<React.SetStateAction<string | undefined>>;
-  currentCategory: string | undefined;
+  setCurrentCategoryName: React.Dispatch<
+    React.SetStateAction<string | undefined>
+  >;
+  setCurrentCategoryId: React.Dispatch<
+    React.SetStateAction<string | undefined>
+  >;
+  currentCategoryId: string | undefined;
 }
 
 const SelectFieldCategories = ({
   label,
   name,
   data,
-  setCurrentCategory,
-  currentCategory,
+  setCurrentCategoryId,
+  setCurrentCategoryName,
+  currentCategoryId,
 }: SelectFieldProps) => {
   const { setIsEditModalOpen, isEditModalOpen } = useCategoryModal();
   const { setFieldValue } = useFormikContext();
@@ -63,12 +69,19 @@ const SelectFieldCategories = ({
         as="select"
         id={name}
         name={name}
-        value={currentCategory}
+        value={currentCategoryId}
         className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           const selectedValue = e.target.value;
-          setCurrentCategory(selectedValue); // Update local state
-          setFieldValue(name, selectedValue); // Update Formik state
+          // Find the selected option in your data array
+          const selectedOption = data.find(
+            (option) => option._id === selectedValue,
+          );
+          // Update the category name with the selected option's category value
+          setCurrentCategoryName(selectedOption ? selectedOption.category : "");
+          // Update the ID states and Formik value
+          setCurrentCategoryId(selectedValue);
+          setFieldValue(name, selectedValue);
         }}
       >
         <option value="">Select {label}</option>

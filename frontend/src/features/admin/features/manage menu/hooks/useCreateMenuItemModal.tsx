@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MenuItem } from "../manage menu/pages/ManageMenu";
+import { MenuItem } from "../pages/ManageMenu";
 
 const useCreateMenuItemModal = () => {
   const [itemToAdd, setItemToAdd] = useState<MenuItem | null>(null);

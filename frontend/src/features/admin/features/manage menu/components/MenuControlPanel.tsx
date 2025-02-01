@@ -4,7 +4,7 @@ import { MenuItem } from "../pages/ManageMenu";
 import MenuTableView from "./MenuTableView";
 import MenuCardView from "./MenuCardView";
 import CreateMenuItemModal from "./CreateMenuItemModal";
-import useCreateMenuItemModal from "../../hooks/useCreateMenuItemModal";
+import useCreateMenuItemModal from "../hooks/useCreateMenuItemModal";
 
 interface CardViewProps {
   table: Table<MenuItem>;
