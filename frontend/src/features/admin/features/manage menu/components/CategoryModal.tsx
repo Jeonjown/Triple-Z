@@ -12,11 +12,15 @@ export interface SingleCategory {
 interface CategoryEditModalProps {
   setIsEditModalOpen: (value: boolean) => void;
   categories: { category: string; _id: string }[];
+  setCurrentCategoryId: React.Dispatch<
+    React.SetStateAction<string | undefined>
+  >;
 }
 
 const CategoryModal = ({
   setIsEditModalOpen,
   categories,
+  setCurrentCategoryId,
 }: CategoryEditModalProps) => {
   // Create Category Hook
   const {
@@ -58,7 +62,10 @@ const CategoryModal = ({
           setShowConfirmation={setDeleteShowConfirmation}
           showConfirmation={deleteShowConfirmation}
           target={deleteTarget.category} // Display the target category name
-          action={() => deleteCategory(deleteTarget._id)} // Pass the category _id for deletion
+          action={() => {
+            deleteCategory(deleteTarget._id);
+            setCurrentCategoryId(undefined);
+          }} // Pass the category _id for deletion
         >
           {deleteMessage}
         </DeleteConfirmationModal>

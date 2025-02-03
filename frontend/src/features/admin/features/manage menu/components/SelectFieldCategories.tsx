@@ -32,6 +32,7 @@ const SelectFieldCategories = ({
       <div className="flex items-center space-x-1">
         {isEditModalOpen && (
           <CategoryModal
+            setCurrentCategoryId={setCurrentCategoryId}
             setIsEditModalOpen={setIsEditModalOpen}
             categories={data}
           />

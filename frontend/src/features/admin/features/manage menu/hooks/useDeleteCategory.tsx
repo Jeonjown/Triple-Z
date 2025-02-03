@@ -11,7 +11,6 @@ export const useDeleteCategory = () => {
     category: string;
   } | null>(null); // Store the target category
   const [message] = useState<string>("All  related items  will also be lost.");
-
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: deleteCategory,
     onError: (err) => {
@@ -22,6 +21,12 @@ export const useDeleteCategory = () => {
       queryClient.invalidateQueries({
         queryKey: ["categories"], // Invalidate the categories cache
       });
+
+      if (deleteTarget?._id) {
+        queryClient.invalidateQueries({
+          queryKey: ["subcategories", deleteTarget._id],
+        });
+      }
       setDeleteTarget(null); // Clear the target after successful deletion
     },
   });

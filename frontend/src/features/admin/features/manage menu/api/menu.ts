@@ -112,7 +112,9 @@ export const deleteCategory = async (categoryId: string) => {
 };
 
 // SUBCATEGORIES
-export const getAllSubcategories = async (categoryId: string) => {
+export const getAllSubcategories = async (categoryId: string | null) => {
+  console.log("from subcategories api:", categoryId);
+
   try {
     const response = await api.get(
       `/api/menu/categories/${categoryId}/subcategories`,
@@ -120,7 +122,9 @@ export const getAllSubcategories = async (categoryId: string) => {
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || "an error occurred");
+      throw new Error(
+        error.response?.data?.message || "an error occurred subcategory",
+      );
     }
     throw new Error("An unexpected error occurred");
   }

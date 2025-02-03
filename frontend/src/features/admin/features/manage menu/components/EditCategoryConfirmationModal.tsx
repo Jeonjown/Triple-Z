@@ -18,7 +18,7 @@ const EditCategoryConfirmationModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative w-5/6 max-w-md rounded-lg bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-xl font-semibold">Confirm Update</h2>
-        {/* <p>Are you sure you want to Edit "{categoryName}"?</p>{" "} */}
+        <p>Are you sure you want to Edit "{categoryToEdit?.category}"?</p>{" "}
         {/* Access category from target object */}
         <div className="mt-4 flex justify-between">
           <button

@@ -21,9 +21,13 @@ const SelectFieldSubcategories = ({
   currentCategoryId,
   currentCategoryName,
 }: SelectFieldProps) => {
-  const { data, isError, error } = useFetchAllSubcategories(
-    currentCategoryId ?? "",
-  );
+  // If no categoryId, return empty array of subcategories
+  const {
+    data = [],
+    isError,
+    error,
+  } = useFetchAllSubcategories(currentCategoryId ?? undefined);
+
   const { isModalOpen, setIsModalOpen } = useSubcategoryModal();
 
   if (isError) {
@@ -77,12 +81,15 @@ const SelectFieldSubcategories = ({
         className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
       >
         <option value="">Select {label}</option>
-        {data &&
+        {data.length === 0 ? (
+          <option value="">No subcategories available</option> // Shows when no data is available
+        ) : (
           data.map((option: SubcategoryOption) => (
             <option key={option._id} value={option._id}>
               {option.subcategory}
             </option>
-          ))}
+          ))
+        )}
       </Field>
       <ErrorMessage
         name={name}
