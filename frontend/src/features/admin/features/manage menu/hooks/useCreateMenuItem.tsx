@@ -1,8 +1,9 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createMenuItem, MenuItemData } from "../api/menu";
 
 // Type the mutation hook explicitly
 export const useCreateMenuItem = () => {
+  const queryClient = useQueryClient();
   const { mutate, isPending, isError, error } = useMutation<
     MenuItemData, // The type that is returned on success
     Error,
@@ -14,6 +15,9 @@ export const useCreateMenuItem = () => {
     },
     onSuccess: (data) => {
       console.log("Menu item created successfully:", data);
+      queryClient.invalidateQueries({
+        queryKey: ["menuItems"],
+      });
     },
   });
 
