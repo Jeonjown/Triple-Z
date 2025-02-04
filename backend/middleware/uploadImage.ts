@@ -1,22 +1,33 @@
-// middleware/uploadImage.js (or uploadImage.ts)
-import multer, { FileFilterCallback } from "multer";
+import multer, { StorageEngine } from "multer";
 
-// Memory storage to store files temporarily in memory
-const storage = multer.memoryStorage();
+// Set storage options for multer to use memory storage (files are kept in memory)
+const storage: StorageEngine = multer.memoryStorage();
 
-// Multer configuration
-export const uploadImage = multer({
+// Filter to allow only specific file types (JPG, SVG, and WEBP)
+const fileFilter = (
+  req: Express.Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+): void => {
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+  // Check if file type is allowed
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true); // Accept the file (null means no error)
+  } else {
+    // Create a new error with the message for invalid file types
+    const error = new Error(
+      "Invalid file type. Only JPG, SVG, and WEBP are allowed."
+    );
+    cb(null, false); // Reject the file and pass the error
+  }
+};
+
+// Configure multer with memory storage, file filter, and size limit
+const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Max file size: 5MB
-  fileFilter: (req, file, cb: FileFilterCallback) => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true); // Accept the file
-    } else {
-      const error = new Error(
-        "Invalid file type. Only JPEG, PNG, and WEBP are allowed."
-      );
-      cb(error as any, false); // Reject the file
-    }
-  },
-}).single("image");
+  fileFilter,
+  limits: { fileSize: 10 * 1024 * 1024 }, // Limit file size to 10MB
+});
+
+export default upload;

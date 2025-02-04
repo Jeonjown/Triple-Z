@@ -11,6 +11,7 @@ interface CardViewProps {
   globalFilter: string | undefined;
   title: string;
   setGlobalFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
+  isCreateModalOpen: true;
 }
 
 const MenuControlPanel = ({

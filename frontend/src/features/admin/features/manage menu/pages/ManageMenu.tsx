@@ -12,23 +12,25 @@ import MenuControlPanel from "../components/MenuControlPanel";
 import useFetchAllMenuItems from "../hooks/useFetchAllMenuItems";
 
 export interface MenuItem {
-  _id: string;
+  _id?: string;
   title: string;
   image: string;
-  price: number;
-  size: string;
+  basePrice: number | null;
+  sizes: { size: string; sizePrice: number }[];
+  requiresSizeSelection: boolean;
   description: string;
-  availability: boolean;
-  createdAt?: string;
-  category?: string;
-  subcategory?: string;
+  availability?: boolean;
+  createdAt: string;
+  category: string;
+  subcategory: string;
 }
 
 const ManageMenu = () => {
   const [title] = useState<string>("Menu Details");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string | undefined>("");
-  const { data } = useFetchAllMenuItems();
+
+  const { data, isError, error, isPending } = useFetchAllMenuItems();
 
   const columnHelper = createColumnHelper<MenuItem>();
   const columns = [
@@ -55,11 +57,26 @@ const ManageMenu = () => {
       cell: (info) => info.getValue(),
       header: "Item",
     }),
-
-    columnHelper.accessor("price", {
-      cell: (info) => `$${info.getValue().toFixed(2)}`,
-      header: "Price",
+    columnHelper.accessor("basePrice", {
+      cell: (info) => {
+        const basePrice = info.getValue();
+        return basePrice != null ? `₱${basePrice.toFixed(2)}` : "None";
+      },
+      header: "Base Price",
     }),
+    columnHelper.accessor("sizes", {
+      cell: (info) => {
+        const sizes = info.getValue();
+        return sizes.map((size: { size: string; sizePrice: number }) => (
+          <div key={size.size}>
+            {size.size}: ₱
+            {size.sizePrice != null ? size.sizePrice.toFixed(2) : "None"}
+          </div>
+        ));
+      },
+      header: "Sizes",
+    }),
+
     columnHelper.accessor("category", {
       cell: (info) => info.getValue(),
       header: "Category",
@@ -72,16 +89,10 @@ const ManageMenu = () => {
       cell: (info) => (info.getValue() ? "Available" : "Out of Stock"),
       header: "Availability",
     }),
-    columnHelper.accessor("size", {
-      cell: (info) => info.getValue(),
-      enableResizing: true,
-      size: 200,
-      header: "Size",
-    }),
   ];
 
   const table = useReactTable({
-    data,
+    data: data || [],
     columns,
     state: {
       sorting,
@@ -92,6 +103,7 @@ const ManageMenu = () => {
         pageSize: 10,
       },
     },
+
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
@@ -100,11 +112,6 @@ const ManageMenu = () => {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  if (!data) {
-    // Optionally handle loading or error state
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="flex flex-col items-center justify-center bg-primary py-20 md:w-full">
       <MenuControlPanel
@@ -112,7 +119,10 @@ const ManageMenu = () => {
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
         title={title}
+        isCreateModalOpen={true}
       />
+      {isPending && <p>Loading...</p>}
+      {isError && <p className="text-xl"> {error?.message}</p>}
     </div>
   );
 };

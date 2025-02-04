@@ -1,4 +1,4 @@
-import { NextFunction, Router, Response, Request } from "express";
+import { NextFunction, Router, Response } from "express";
 import {
   updateMenuItem,
   getAllMenuItems,
@@ -6,10 +6,11 @@ import {
   addMenuItem,
 } from "../controllers/menuItemController";
 import { verifyAdminToken } from "../middleware/verifyAdminToken";
+import upload from "../middleware/uploadImage";
 
 const router = Router();
 
-router.post("/", verifyAdminToken, addMenuItem);
+router.post("/", verifyAdminToken, upload.single("image"), addMenuItem);
 router.get("/", getAllMenuItems);
 router.put("/:id", verifyAdminToken, updateMenuItem);
 router.delete("/:id", verifyAdminToken, deleteMenuItem);

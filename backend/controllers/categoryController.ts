@@ -26,9 +26,6 @@ export const addCategory = async (
       _id: new mongoose.Types.ObjectId(), // Generate a unique ObjectId for each subcategory
     }));
 
-    // Log the formatted subcategories
-    console.log("Formatted Subcategories:", formattedSubcategories);
-
     // Create a new category object
     const newCategory = { category, subcategories: formattedSubcategories };
 

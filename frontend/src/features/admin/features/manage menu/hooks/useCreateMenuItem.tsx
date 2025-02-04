@@ -1,9 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
-import { createMenuItem } from "../api/menu";
+import { createMenuItem, MenuItemData } from "../api/menu";
 
-const useCreateMenuItem = () => {
-  const { mutate, isPending, isError, error } = useMutation({
-    mutationFn: createMenuItem,
+// Type the mutation hook explicitly
+export const useCreateMenuItem = () => {
+  const { mutate, isPending, isError, error } = useMutation<
+    MenuItemData, // The type that is returned on success
+    Error,
+    MenuItemData
+  >({
+    mutationFn: (values: MenuItemData) => createMenuItem(values),
     onError: (err) => {
       console.error("Error creating menu item:", err);
     },
@@ -14,5 +19,3 @@ const useCreateMenuItem = () => {
 
   return { mutate, isPending, isError, error };
 };
-
-export default useCreateMenuItem;

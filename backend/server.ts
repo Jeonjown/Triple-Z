@@ -2,6 +2,7 @@ import express, { NextFunction, Response, Request } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+dotenv.config();
 import passport from "./config/passport";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
@@ -9,24 +10,21 @@ import menuRoutes from "./routes/menuRoutes";
 import categoryRoutes from "./routes/categoryRoutes";
 import menuItemRoutes from "./routes/menuItemRoutes";
 import subcategoryRoutes from "./routes/subcategoryRoutes";
-import imageMenuRoutes from "./routes/imageMenuRoutes";
 import { ResponseError } from "./utils/createError";
 import { verifyAdminToken } from "./middleware/verifyAdminToken";
 
-dotenv.config();
-
 const server = express();
-
 // Middleware setup
 server.use(passport.initialize());
-server.use(express.urlencoded({ extended: true }));
+server.use(express.urlencoded({ extended: true, limit: "10mb" }));
 server.use(cookieParser());
-server.use(express.json());
-
+server.use(express.json({ limit: "10mb" }));
 server.use(
   cors({
     origin: ["http://localhost:5173", "https://triple-z.vercel.app"],
-    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE, OPTIONS"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    credentials: true, // This is required for cookies/credentials to be sent
   })
 );
 
@@ -37,7 +35,6 @@ server.use("/api/menu", menuRoutes);
 server.use("/api/menu/menu-items", menuItemRoutes);
 server.use("/api/menu/categories", verifyAdminToken, categoryRoutes);
 server.use("/api/menu/categories", verifyAdminToken, subcategoryRoutes);
-server.use("/api/menu/image", imageMenuRoutes);
 
 server.use(
   (err: ResponseError, req: Request, res: Response, next: NextFunction) => {

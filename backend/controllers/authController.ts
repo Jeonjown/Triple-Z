@@ -154,7 +154,7 @@ export const checkAuth = (
 ) => {
   try {
     const user = req.user;
-    console.log(user);
+
     res.status(200).json({ user });
     return;
   } catch (error) {

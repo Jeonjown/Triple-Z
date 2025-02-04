@@ -49,8 +49,6 @@ passport.use(
 
         // Generate the JWT token
         const token = generateToken(payload.id, payload.username, payload.role);
-        console.log(payload);
-        console.log("inside google config: ", token);
 
         // Return the user and token to passport's `done` callback
         return done(null, { user: existingUser, token });

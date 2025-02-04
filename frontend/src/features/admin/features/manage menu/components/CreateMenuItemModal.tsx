@@ -1,16 +1,29 @@
 import * as Yup from "yup";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { useState } from "react";
-import ImageUpload from "./ImageUpload";
-import InputField from "./InputField";
-import SelectFieldCategories from "./SelectFieldCategories";
-import useFetchAllCategories from "../hooks/useFetchAllCategories";
-import SelectFieldSubcategories from "./SelectFieldSubcategories";
-import SelectSizeField from "./SelectSizeField";
+import ImageUpload from "./ImageUpload"; // Ensure this component handles image preview
+import InputField from "./InputField"; // A custom input field component
+import SelectFieldCategories from "./SelectFieldCategories"; // Custom category selector
+import useFetchAllCategories from "../hooks/useFetchAllCategories"; // Hook for fetching categories
+import SelectFieldSubcategories from "./SelectFieldSubcategories"; // Custom subcategory selector
+import SelectSizeField from "./SelectSizeField"; // Custom component for sizes
+import { useCreateMenuItem } from "../hooks/useCreateMenuItem"; // Hook for creating menu items
+import { MenuItemData } from "../api/menu"; // Assuming you have an API type
 
 interface CreateMenuItemModalProps {
   isCreateModalOpen: boolean;
   setIsCreateModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export interface FormValues {
+  requiresSizeSelection: boolean;
+  image: File | null;
+  title: string;
+  basePrice: number | null;
+  description: string;
+  category: string;
+  subcategory: string;
+  sizes: { size: string; sizePrice: number }[]; // Size options
 }
 
 const CreateMenuItemModal = ({
@@ -23,113 +36,124 @@ const CreateMenuItemModal = ({
     isError,
     error,
   } = useFetchAllCategories();
+  const {
+    mutate,
+    isPending: mutationPending,
+    isError: mutationError,
+    error: mutationErrorMessage,
+  } = useCreateMenuItem();
 
-  // Track both the category ID and category name
   const [currentCategoryId, setCurrentCategoryId] = useState<
     string | undefined
   >("");
   const [currentCategoryName, setCurrentCategoryName] = useState<
     string | undefined
   >("");
-  console.log(currentCategoryName);
-  const [isSizeRequired, setIsSizeRequired] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const validationSchema = Yup.object({
-    image: Yup.string().required("Image is required."),
-    title: Yup.string().required("Title is required."),
-    description: Yup.string().required("Description is required."),
-    category: Yup.string().required("Category is required."),
-    subcategory: Yup.string().required("Subcategory is required."),
-    sizes: Yup.array().of(
-      Yup.object().shape({
-        size: Yup.string().when(
-          "requiresSizeSelection",
-          (requiresSizeSelection, schema) => {
-            return requiresSizeSelection
-              ? schema.required("Size is required.")
-              : schema.notRequired();
-          },
-        ),
-        sizePrice: Yup.number().when(
-          "requiresSizeSelection",
-          (requiresSizeSelection, schema) => {
-            return requiresSizeSelection
-              ? schema.required("Size price is required.")
-              : schema.notRequired();
-          },
-        ),
-      }),
-    ),
-    basePrice: Yup.number().when(
-      "requiresSizeSelection",
-      (requiresSizeSelection, schema) => {
-        return !requiresSizeSelection
-          ? schema.required("Base price is required.")
-          : schema.notRequired();
-      },
-    ),
-  });
+  // Yup validation schema
+  const validationSchema = Yup.object()
+    .shape({
+      image: Yup.mixed().required("Image is required."),
+      title: Yup.string().required("Title is required."),
+      description: Yup.string().required("Description is required."),
+      category: Yup.string().required("Category is required."),
+      subcategory: Yup.string().required("Subcategory is required."),
+      sizes: Yup.array()
+        .of(
+          Yup.object().shape({
+            size: Yup.string().required("Size is required."),
+            sizePrice: Yup.number().required("Size price is required."),
+          }),
+        )
+        .when("requiresSizeSelection", {
+          is: true,
+          then: (schema) =>
+            schema.min(1, "At least one size must be selected."),
+          otherwise: (schema) =>
+            schema.test(
+              "empty-sizes",
+              "",
+              (value) => !value || value.length === 0,
+            ),
+        }),
+      basePrice: Yup.number()
+        .nullable()
+        .when("requiresSizeSelection", {
+          is: false,
+          then: (schema) => schema.required("Base price is required."),
+          otherwise: (schema) => schema.notRequired(),
+        }),
+      requiresSizeSelection: Yup.boolean(),
+    })
+    .test(
+      "price-check",
+      "Either a base price or at least one size price is required.",
+      function (values) {
+        const { requiresSizeSelection, basePrice, sizes } =
+          values as FormValues;
 
-  interface FormValues {
-    requiresSizeSelection: boolean;
-    image: string;
-    title: string;
-    basePrice: number;
-    description: string;
-    category: string;
-    subcategory: string;
-    sizes: { size: string; sizePrice: number }[];
-  }
+        if (!requiresSizeSelection) {
+          // Check that basePrice is neither null nor undefined and greater than 0
+          return basePrice !== null && basePrice > 0;
+        }
+        // If size selection is required, ensure that there are sizes available
+        return sizes && sizes.length > 0;
+      },
+    );
 
   const initialValues: FormValues = {
-    image: "",
+    image: null,
     title: "",
-    basePrice: 0,
+    basePrice: null,
     description: "",
     category: "",
     subcategory: "",
-    requiresSizeSelection: isSizeRequired,
-    sizes: [{ size: "", sizePrice: 0 }],
+    requiresSizeSelection: false,
+    sizes: [],
   };
 
   const handleSubmit = (values: FormValues) => {
-    console.log("Form submitted with values:", values);
-    console.log("Selected category name:", currentCategoryName);
-    setIsCreateModalOpen(false); // Close the modal
+    if (!values.image) {
+      alert("Image is required.");
+      return;
+    }
+
+    const menuItemData: MenuItemData = {
+      category: values.category,
+      subcategory: values.subcategory,
+      item: {
+        title: values.title,
+        basePrice: values.basePrice, // Keep as number or null
+        requiresSizeSelection: values.requiresSizeSelection,
+        description: values.description,
+        sizes: values.requiresSizeSelection ? values.sizes : [],
+      },
+      image: values.image,
+    };
+
+    mutate(menuItemData);
+    setIsCreateModalOpen(false);
+    setImagePreview(null);
   };
 
+  // Handle image change
   const handleImageChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    setFieldValue: (field: string, value: string) => void,
+    setFieldValue: (field: string, value: File | null) => void,
   ) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageData = reader.result as string | null;
-        if (imageData) {
-          setImagePreview(imageData);
-          setFieldValue("image", imageData);
-        }
-      };
-      reader.readAsDataURL(file);
+    if (file && file.type.startsWith("image/")) {
+      setFieldValue("image", file);
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      alert("Please upload a valid image file.");
     }
   };
 
-  const testFields = (values: FormValues) => {
-    console.log("Form values:", values);
-    window.alert(JSON.stringify(values, null, 2));
-  };
-
-  if (isPending) {
-    return <div>Loading categories...</div>;
-  }
-
-  if (isError) {
-    return <div>Error: {error?.message}</div>;
-  }
-
+  if (isPending || mutationPending) return <div>Loading...</div>;
+  if (isError || mutationError)
+    return <div>Error: {error?.message || mutationErrorMessage?.message}</div>;
   if (!isCreateModalOpen) return null;
 
   return (
@@ -154,6 +178,7 @@ const CreateMenuItemModal = ({
             />
           </svg>
         </button>
+
         <h2 className="mb-4 text-xl font-semibold text-gray-800 sm:text-2xl">
           Create Menu Item
         </h2>
@@ -172,15 +197,15 @@ const CreateMenuItemModal = ({
                 name="image"
               />
 
-              {/* Title and Price */}
-              <div className="flex flex-col space-y-4 sm:flex sm:flex-row sm:space-x-4 sm:space-y-0">
+              {/* Form Fields */}
+              <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
                 <InputField
                   label="Title"
                   name="title"
                   type="text"
                   placeholder="Enter the title"
                 />
-                {!isSizeRequired && (
+                {!values.requiresSizeSelection && (
                   <InputField
                     label="Base price"
                     name="basePrice"
@@ -190,21 +215,30 @@ const CreateMenuItemModal = ({
                 )}
               </div>
 
-              {/* Category, Subcategory, and Size Fields */}
               <div className="space-y-4">
-                {isSizeRequired && <SelectSizeField />}
+                {values.requiresSizeSelection && <SelectSizeField />}
                 <label className="ml-auto mt-auto flex items-center space-x-2">
                   <input
                     type="checkbox"
                     checked={values.requiresSizeSelection}
                     onChange={(e) => {
-                      setIsSizeRequired(e.target.checked);
-                      setFieldValue("requiresSizeSelection", e.target.checked);
+                      const isChecked = e.target.checked;
+                      setFieldValue("requiresSizeSelection", isChecked);
+                      if (isChecked) {
+                        setFieldValue("basePrice", null);
+                        if (values.sizes.length === 0)
+                          setFieldValue("sizes", [
+                            { size: "", sizePrice: null },
+                          ]);
+                      } else {
+                        setFieldValue("sizes", []);
+                      }
                     }}
                     className="rounded border-gray-300 text-secondary focus:ring-secondary"
                   />
                   <span className="text-xs">Is Size Required?</span>
                 </label>
+
                 <SelectFieldCategories
                   label="Category"
                   name="category"
@@ -213,6 +247,7 @@ const CreateMenuItemModal = ({
                   data={categories}
                   currentCategoryId={currentCategoryId}
                 />
+
                 {currentCategoryId && (
                   <SelectFieldSubcategories
                     label="Subcategory"
@@ -223,7 +258,7 @@ const CreateMenuItemModal = ({
                 )}
               </div>
 
-              {/* Description */}
+              {/* Description Field */}
               <div>
                 <label
                   htmlFor="description"
@@ -245,7 +280,7 @@ const CreateMenuItemModal = ({
                 />
               </div>
 
-              {/* Buttons */}
+              {/* Action Buttons */}
               <div className="flex justify-end space-x-4">
                 <button
                   type="button"
@@ -253,13 +288,6 @@ const CreateMenuItemModal = ({
                   onClick={() => setIsCreateModalOpen(false)}
                 >
                   Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => testFields(values)}
-                  className="hover:bg-secondary-dark rounded-md bg-secondary px-4 py-2 text-white"
-                >
-                  Test Fields
                 </button>
                 <button
                   type="submit"

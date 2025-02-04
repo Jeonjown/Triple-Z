@@ -43,7 +43,7 @@ const SelectSizeField = () => {
                     className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
                   />
                   <ErrorMessage
-                    name={`sizes[${index}].price`}
+                    name={`sizes[${index}].sizePrice`}
                     component="div"
                     className="text-xs text-red-500"
                   />

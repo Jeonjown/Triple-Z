@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import Menu from "../models/menuModel";
 import { createError } from "../utils/createError";
+import { uploadToGoogleCloud } from "../config/googleCloud";
 
 export const getAllMenuItems = async (
   req: Request,
@@ -13,15 +14,16 @@ export const getAllMenuItems = async (
       return next(createError("Menu not found", 404));
     }
 
-    // Flatten and map menu items with category and subcategory details
+    // Flatten and map menu items, now with basePrice and sizes
     const menuItems = menu.categories.flatMap((category) =>
       category.subcategories.flatMap((subcategory) =>
         subcategory.items.map((item) => ({
-          id: item._id,
+          _id: item._id,
           title: item.title,
           image: item.image,
-          price: item.price,
-          size: item.size,
+          basePrice: item.basePrice, // Added basePrice
+          sizes: item.sizes, // Added sizes
+          requiresSizeSelection: item.requiresSizeSelection, // Added requiresSizeSelection
           description: item.description,
           availability: item.availability,
           category: category.category,
@@ -48,80 +50,78 @@ export const addMenuItem = async (
 ): Promise<void> => {
   try {
     const { category, subcategory, item } = req.body;
-    console.log(req.body);
-    // Validate that category, subcategory, and item are provided
-    if (!category || !subcategory || !item) {
-      return next(
-        createError("Category, subcategory, and item are required", 400)
-      );
+    const imageFile = req.file;
+
+    // Validate uploaded image
+    if (!imageFile) {
+      return next(createError("Image is required", 400));
     }
 
-    // Validate that the item object has the required fields
-    const { title, image, price, size, description, availability } = item;
+    // Destructure fields from the item
+    const { title, basePrice, sizes, requiresSizeSelection, description } =
+      item;
+
+    // Validate required fields
     if (
       !title ||
-      !image ||
-      price === undefined ||
-      !size ||
+      basePrice === undefined ||
+      requiresSizeSelection === undefined ||
       !description ||
-      availability === undefined
+      (requiresSizeSelection === "true" && (!sizes || sizes.length === 0))
     ) {
       return next(
         createError(
-          "Item must include title, image, price, size, description, and availability",
+          "Item must include title, basePrice, sizes, requiresSizeSelection, and description",
           400
         )
       );
     }
 
-    // Fetch the Menu document
-    let menu = await Menu.findOne();
+    // Upload the image to Google Cloud
+    const imageUrl = await uploadToGoogleCloud(imageFile);
 
-    // If Menu doesn't exist, return error
+    // Create a new item object
+    const newItem = { ...item, image: imageUrl };
+
+    // Find the menu
+    let menu = await Menu.findOne();
     if (!menu) {
-      return next(createError("Menu not found", 404)); // Custom error message for "not found"
+      return next(createError("Menu not found", 404));
     }
 
-    // Find the category index
+    // Find existing category
     const categoryIndex = menu.categories.findIndex(
-      (cat) => cat.category === category
+      (cat) => cat._id.toString() === category
     );
 
     if (categoryIndex === -1) {
-      // If category doesn't exist, add a new category
+      // Category not found, create it
       menu.categories.push({
-        category,
-        subcategories: [
-          {
-            subcategory,
-            items: [item],
-          },
-        ],
+        _id: category,
+        subcategories: [{ _id: subcategory, items: [newItem] }],
       });
     } else {
-      // Find the subcategory index within the found category
+      // Category exists, find subcategory
       const subcategoryIndex = menu.categories[
         categoryIndex
-      ].subcategories.findIndex((sub) => sub.subcategory === subcategory);
+      ].subcategories.findIndex((sub) => sub._id.toString() === subcategory);
 
       if (subcategoryIndex === -1) {
-        // If subcategory doesn't exist, add a new subcategory
+        // Subcategory not found, create it
         menu.categories[categoryIndex].subcategories.push({
-          subcategory,
-          items: [item],
+          _id: subcategory,
+          items: [newItem],
         });
       } else {
-        // If subcategory exists, add the item to the existing subcategory
+        // Both category and subcategory exist, add item
         menu.categories[categoryIndex].subcategories[
           subcategoryIndex
-        ].items.push(item);
+        ].items.push(newItem);
       }
     }
 
-    // Save the updated menu
+    // Save to DB
     await menu.save();
-
-    // Respond with the updated menu
     res.status(200).json({ message: "Item added successfully", menu });
   } catch (error) {
     if (error instanceof Error) {
@@ -136,58 +136,63 @@ export const updateMenuItem = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+) => {
   try {
     const itemId = req.params.id;
-
-    // Get the updated data from the request body
-    const { title, image, price, size, description, availability } = req.body;
+    const {
+      title,
+      image,
+      basePrice,
+      sizes,
+      requiresSizeSelection,
+      description,
+      availability,
+    } = req.body;
 
     // Validate that the required fields are provided
     if (
       !title ||
       !image ||
-      price === undefined ||
-      !size ||
+      basePrice === undefined ||
+      !sizes ||
+      requiresSizeSelection === undefined ||
       !description ||
       availability === undefined
     ) {
       return next(
         createError(
-          "Item must include title, image, price, size, description, and availability",
+          "Item must include title, image, basePrice, sizes, requiresSizeSelection, description, and availability",
           400
         )
       );
     }
 
-    // Find and update the item by its ID
     const updatedMenuItem = await Menu.findOneAndUpdate(
       { "categories.subcategories.items._id": itemId },
       {
         $set: {
           "categories.$.subcategories.$[].items.$[item].title": title,
           "categories.$.subcategories.$[].items.$[item].image": image,
-          "categories.$.subcategories.$[].items.$[item].price": price,
-          "categories.$.subcategories.$[].items.$[item].size": size,
+          "categories.$.subcategories.$[].items.$[item].basePrice": basePrice,
+          "categories.$.subcategories.$[].items.$[item].sizes": sizes,
+          "categories.$.subcategories.$[].items.$[item].requiresSizeSelection":
+            requiresSizeSelection,
           "categories.$.subcategories.$[].items.$[item].description":
             description,
           "categories.$.subcategories.$[].items.$[item].availability":
             availability,
         },
       },
-      {
-        new: true, // Return the updated document
-        arrayFilters: [{ "item._id": itemId }],
-      }
+      { new: true, arrayFilters: [{ "item._id": itemId }] }
     );
 
-    // If the item was not found or not updated
     if (!updatedMenuItem) {
       return next(createError("Menu item not found", 404));
     }
 
     res.status(200).json(updatedMenuItem);
-  } catch (error) {
+  } catch (error: unknown) {
+    // Handling unknown error type
     if (error instanceof Error) {
       return next(createError(`Error: ${error.message}`, 500));
     } else {
@@ -200,34 +205,31 @@ export const deleteMenuItem = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+) => {
   try {
     const itemId = req.params.id;
 
-    // Find the menu document by searching for the item ID in nested items
     const updatedMenu = await Menu.findOneAndUpdate(
-      { "categories.subcategories.items._id": itemId }, // Search for the item in subcategories
+      { "categories.subcategories.items._id": itemId },
       {
-        $pull: { "categories.$.subcategories.$[].items": { _id: itemId } }, // Remove the item
+        $pull: { "categories.$.subcategories.$[].items": { _id: itemId } },
       },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
-    // If no menu or item was found
     if (!updatedMenu) {
       return next(createError("Menu item not found", 404));
     }
 
-    // Respond with a success message
     res
       .status(200)
       .json({ message: "Menu item deleted successfully", updatedMenu });
-  } catch (error) {
-    // Use custom error handler for any unexpected errors
+  } catch (error: unknown) {
+    // Handling unknown error type
     if (error instanceof Error) {
-      next(createError(`Error: ${error.message}`, 500));
+      return next(createError(`Error: ${error.message}`, 500));
     } else {
-      next(createError("Unknown error occurred", 500));
+      return next(createError("Unknown error occurred", 500));
     }
   }
 };
