@@ -1,9 +1,39 @@
 import { flexRender, Table } from "@tanstack/react-table";
 import { MenuItem } from "../pages/ManageMenu";
+import { useEditMenuItem } from "../hooks/useEditMenuItem";
+import EditMenuItemModal from "./EditMenuItemModal";
+import { useDeleteMenuItem } from "../hooks/useDeleteMenuItem";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 
 const MenuTableView = ({ table }: { table: Table<MenuItem> }) => {
+  const { editMode, setEditMode, itemToEdit, setItemToEdit, handleEdit } =
+    useEditMenuItem();
+
+  const {
+    handleDelete,
+    menuTitle,
+    showConfirmation,
+    setShowConfirmation,
+    handleConfirmDelete,
+  } = useDeleteMenuItem();
   return (
     <>
+      {editMode && (
+        <EditMenuItemModal
+          setEditMode={setEditMode}
+          itemToEdit={itemToEdit}
+          setItemToEdit={setItemToEdit}
+        />
+      )}
+
+      {/* Delete confirmation modal */}
+      <DeleteConfirmationModal
+        showConfirmation={showConfirmation}
+        setShowConfirmation={setShowConfirmation}
+        action={handleConfirmDelete}
+      >
+        {menuTitle}
+      </DeleteConfirmationModal>
       <div className="mx-auto w-5/6 flex-col rounded-lg">
         <div className="overflow-x-auto rounded-lg bg-white shadow-md">
           <table className="min-w-full table-auto divide-y divide-gray-200">
@@ -99,6 +129,7 @@ const MenuTableView = ({ table }: { table: Table<MenuItem> }) => {
                         strokeWidth={1.5}
                         stroke="currentColor"
                         className="size-5"
+                        onClick={() => handleEdit(row.original)}
                       >
                         <path
                           strokeLinecap="round"
@@ -115,6 +146,7 @@ const MenuTableView = ({ table }: { table: Table<MenuItem> }) => {
                         strokeWidth={1.5}
                         stroke="currentColor"
                         className="size-5"
+                        onClick={() => handleDelete(row.original)}
                       >
                         <path
                           strokeLinecap="round"

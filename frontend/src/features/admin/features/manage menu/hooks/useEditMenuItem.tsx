@@ -1,8 +1,13 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { MenuItemData, editMenuItem } from "../api/menu";
 import { FormValues } from "../components/CreateMenuItemModal";
+import { useState } from "react";
+import { MenuItem } from "../pages/ManageMenu";
 
 export const useEditMenuItem = () => {
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [itemToEdit, setItemToEdit] = useState<MenuItem | null>(null);
+
   const queryClient = useQueryClient();
 
   const { mutate, isPending, isError, error } = useMutation<
@@ -46,5 +51,21 @@ export const useEditMenuItem = () => {
     },
   });
 
-  return { mutate, isPending, isError, error };
+  // Placeholder function for handling edits
+  const handleEdit = (menuItem: MenuItem) => {
+    setEditMode(true);
+    setItemToEdit(menuItem);
+  };
+
+  return {
+    mutate,
+    isPending,
+    isError,
+    error,
+    editMode,
+    setEditMode,
+    itemToEdit,
+    setItemToEdit,
+    handleEdit,
+  };
 };

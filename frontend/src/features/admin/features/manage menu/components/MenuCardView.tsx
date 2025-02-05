@@ -2,8 +2,8 @@ import { flexRender, Table } from "@tanstack/react-table";
 import { MenuItem } from "../pages/ManageMenu";
 import { useDeleteMenuItem } from "../hooks/useDeleteMenuItem";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
-import { useState } from "react";
 import EditMenuItemModal from "./EditMenuItemModal";
+import { useEditMenuItem } from "../hooks/useEditMenuItem";
 
 // Define the type for MenuCardViewProps
 interface MenuCardViewProps {
@@ -14,8 +14,9 @@ interface MenuCardViewProps {
 
 // The MenuCardView component
 const MenuCardView = ({ table }: MenuCardViewProps) => {
-  const [editMode, setEditMode] = useState<boolean>(false);
-  const [itemToEdit, setItemToEdit] = useState<MenuItem | null>(null);
+  const { editMode, setEditMode, itemToEdit, setItemToEdit, handleEdit } =
+    useEditMenuItem();
+
   const {
     handleDelete,
     menuTitle,
@@ -23,12 +24,6 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
     setShowConfirmation,
     handleConfirmDelete,
   } = useDeleteMenuItem();
-
-  // Placeholder function for handling edits
-  const handleEdit = (menuItem: MenuItem) => {
-    setEditMode(true);
-    setItemToEdit(menuItem);
-  };
 
   return (
     <>
