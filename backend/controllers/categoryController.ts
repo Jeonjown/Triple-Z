@@ -1,52 +1,57 @@
 import { Request, Response, NextFunction } from "express";
 import { createError } from "../utils/createError";
-import Menu from "../models/menuModel";
-import mongoose from "mongoose";
+import Subcategory from "../models/subcategoryModel";
+import { Types } from "mongoose";
+import Category from "../models/categoryModel";
+import { Menu } from "../models/menuModel";
 
 export const addCategory = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+) => {
   try {
     const { category, subcategories } = req.body;
 
-    // Validate input
-    if (!category) {
-      return next(createError("Category is required", 400));
-    }
-    if (!subcategories || !Array.isArray(subcategories)) {
+    // Validate inputs
+    if (!category) return next(createError("Category is required", 400));
+    if (!Array.isArray(subcategories)) {
       return next(createError("Subcategories must be an array", 400));
     }
 
-    // Format subcategories to include 'subcategory', 'items', and '_id'
-    const formattedSubcategories = subcategories.map((sub) => ({
-      subcategory: sub, // Subcategory name
-      items: [], // Initialize items as an empty array
-      _id: new mongoose.Types.ObjectId(), // Generate a unique ObjectId for each subcategory
-    }));
+    // Create subcategories
+    const subcategoryDocs = await Promise.all(
+      subcategories.map(async (sub: string) => {
+        const newSubcategory = new Subcategory({ subcategory: sub, items: [] });
+        return await newSubcategory.save();
+      })
+    );
 
-    // Create a new category object
-    const newCategory = { category, subcategories: formattedSubcategories };
+    // Create the category with subcategory references
+    const newCategory = new Category({
+      category,
+      subcategories: subcategoryDocs.map((sub) => sub._id),
+    });
+    await newCategory.save();
 
-    // Find the existing menu
-    const menu = await Menu.findOne();
+    // Find or create the menu
+    let menu = await Menu.findOne();
     if (!menu) {
-      return next(createError("Menu not found", 404));
+      menu = new Menu({ categories: [] }); // Create menu if not exists
     }
 
-    // Add the new category to the menu's categories array
-    menu.categories.push(newCategory);
-
-    // Save the updated menu with the new category
+    // Add the new category to the menu
+    menu.categories.push(newCategory._id as Types.ObjectId);
     await menu.save();
 
-    // Respond with the updated menu
-    res.status(201).json(menu);
+    res.status(201).json({
+      message: "Category added successfully",
+      category: newCategory,
+    });
   } catch (error) {
-    next(createError(`Error creating category: ${error}`, 500));
-    // Use the error handler for any unexpected errors
-    next(createError("Error creating category", 500));
+    next(
+      createError(`Error creating category: ${(error as Error).message}`, 500)
+    );
   }
 };
 
@@ -56,17 +61,23 @@ export const getAllCategories = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Get the menu with category names and their IDs
-    const menu = await Menu.findOne({}, "categories.category categories._id");
+    // Populate 'categories' and select only 'category' name and '_id'
+    const menu = await Menu.findOne({})
+      .populate({
+        path: "categories",
+        select: "category _id", // Fetch only 'category' and '_id'
+      })
+      .select("categories"); // Return only the 'categories' field from the Menu
 
-    if (!menu) {
-      return next(createError("Menu not found", 404));
+    if (!menu || !menu.categories.length) {
+      return next(createError("No categories found", 404));
     }
 
-    // Return categories with their names and _id
     res.status(200).json(menu.categories);
   } catch (error) {
-    next(createError("Error fetching categories", 400));
+    next(
+      createError(`Error fetching categories: ${(error as Error).message}`, 500)
+    );
   }
 };
 
@@ -83,31 +94,25 @@ export const updateCategory = async (
       return next(createError("Category is required", 400));
     }
 
-    // Find the menu (assuming only one menu in your database)
-    const menu = await Menu.findOne();
-    if (!menu) {
-      return next(createError("Menu not found", 404));
-    }
-
-    // Find the category by ID in the categories array
-    const categoryIndex = menu.categories.findIndex(
-      (cat) => cat._id.toString() === categoryId
+    // Update the category directly in the Category collection
+    const updatedCategory = await Category.findByIdAndUpdate(
+      categoryId,
+      { category },
+      { new: true, runValidators: true }
     );
-    if (categoryIndex === -1) {
+
+    if (!updatedCategory) {
       return next(createError("Category not found", 404));
     }
 
-    // Update only the category name, keep subcategories as is
-    menu.categories[categoryIndex].category = category;
-
-    // Save the updated menu
-    await menu.save();
-
-    // Return the updated category with subcategories
-    res.status(200).json(menu.categories[categoryIndex]);
+    res.status(200).json({
+      message: "Category updated successfully",
+      updatedCategory: updatedCategory,
+    });
   } catch (error) {
-    console.error("Error updating category:", error);
-    next(createError("Error updating category", 400));
+    next(
+      createError(`Error updating category: ${(error as Error).message}`, 500)
+    );
   }
 };
 
@@ -119,25 +124,27 @@ export const deleteCategory = async (
   try {
     const categoryId = req.params.id;
 
-    const menu = await Menu.findOne();
-    if (!menu) {
-      return next(createError("Menu not found", 404));
-    }
-
-    // Find the category index to remove it
-    const categoryIndex = menu.categories.findIndex(
-      (cat) => cat._id.toString() === categoryId
-    );
-    if (categoryIndex === -1) {
+    // 1️⃣ Find the category first
+    const category = await Category.findById(categoryId);
+    if (!category) {
       return next(createError("Category not found", 404));
     }
 
-    // Remove the category
-    menu.categories.splice(categoryIndex, 1);
-    await menu.save(); // Save the updated menu
+    // 2️⃣ Delete all related subcategories
+    await Subcategory.deleteMany({ _id: { $in: category.subcategories } });
 
-    res.status(200).json({ message: "Category deleted successfully" });
+    // 3️⃣ Delete the category itself
+    await Category.findByIdAndDelete(categoryId);
+
+    // 4️⃣ Remove the category reference from the menu
+    await Menu.updateOne({}, { $pull: { categories: categoryId } });
+
+    res.status(200).json({
+      message: "Category and its related subcategories deleted successfully",
+    });
   } catch (error) {
-    next(createError("Error deleting category", 400));
+    next(
+      createError(`Error deleting category: ${(error as Error).message}`, 500)
+    );
   }
 };

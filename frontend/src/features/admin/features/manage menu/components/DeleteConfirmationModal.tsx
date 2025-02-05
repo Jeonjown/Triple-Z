@@ -1,7 +1,7 @@
 interface DeleteConfirmationModalProps {
   showConfirmation: boolean;
   setShowConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
-  target: string;
+  target?: string;
   children?: React.ReactNode;
   action: () => void;
 }
@@ -9,7 +9,7 @@ interface DeleteConfirmationModalProps {
 const DeleteConfirmationModal = ({
   showConfirmation,
   setShowConfirmation,
-  target,
+
   children,
   action,
 }: DeleteConfirmationModalProps) => {
@@ -19,8 +19,7 @@ const DeleteConfirmationModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative w-5/6 max-w-md rounded-lg bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-xl font-semibold">Confirm Deletion</h2>
-        <p>Are you sure you want to delete "{target}"?</p>
-        <span>{children}</span>
+        <p>Are you sure you want to delete "{children}"?</p>
 
         <div className="mt-4 flex justify-between">
           <button

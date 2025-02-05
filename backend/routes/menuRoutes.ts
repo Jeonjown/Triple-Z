@@ -1,12 +1,11 @@
 import express from "express";
-import { createMenu, getAllMenu } from "../controllers/menuController"; // Import controller functions
-
+import { clearMenu, getMenu } from "../controllers/menuController";
 const router = express.Router();
 
-// Route to create a menu
-router.post("/", createMenu);
-
 // Route to fetch the menu
-router.get("/", getAllMenu);
+router.get("/", getMenu);
+
+// Reset whole Menu
+router.patch("/clear", clearMenu);
 
 export default router;

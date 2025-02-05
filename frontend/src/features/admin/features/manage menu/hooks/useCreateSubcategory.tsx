@@ -29,6 +29,9 @@ export const useCreateSubcategory = () => {
       queryClient.invalidateQueries({
         queryKey: ["subcategories"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["menuItems"],
+      });
     },
   });
 

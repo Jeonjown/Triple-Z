@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import Menu from "../models/menuModel";
 import { createError } from "../utils/createError";
 import mongoose from "mongoose";
+import { Menu } from "../models/menuModel";
+import Category from "../models/categoryModel";
+import Subcategory from "../models/subcategoryModel";
 
 // Controller to get all subcategories under a specific category
 export const getSubcategories = async (
@@ -10,36 +12,33 @@ export const getSubcategories = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const categoryId = req.params.categoryId;
+    const { categoryId } = req.params;
 
-    // Find the menu with the specific category ID
-    const menu = await Menu.findOne({ "categories._id": categoryId });
-
-    if (!menu) {
-      return next(createError("Category not found", 404)); // Custom error handler
-    }
-
-    // Find the category object that matches the categoryId
-    const category = menu.categories.find(
-      (cat) => cat._id.toString() === categoryId
+    // Fetch the category with populated subcategories
+    const category = await Category.findById(categoryId).populate(
+      "subcategories"
     );
 
     if (!category) {
-      return next(createError("Category not found in menu", 404));
+      return next(createError("Category not found", 404));
     }
 
-    // Map over the subcategories and return only the name and _id
-    const subcategories = category.subcategories.map((subcategory) => ({
-      subcategory: subcategory.subcategory, // Name of the subcategory
-      _id: subcategory._id, // ID of the subcategory
+    // Map to return only subcategory names and IDs
+    const subcategories = category.subcategories.map((sub: any) => ({
+      subcategory: sub.subcategory,
+      _id: sub._id,
     }));
 
-    res.status(200).json(subcategories); // Return the mapped subcategories
+    res.status(200).json(subcategories);
   } catch (error) {
-    next(createError("Error fetching subcategories", 500));
+    next(
+      createError(
+        `Error fetching subcategories: ${(error as Error).message}`,
+        500
+      )
+    );
   }
 };
-
 // Controller to add a new subcategory to a category
 export const addSubcategory = async (
   req: Request,
@@ -47,47 +46,35 @@ export const addSubcategory = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const categoryId = req.params.categoryId;
+    const { categoryId } = req.params;
     const { subcategoryName } = req.body;
 
-    // Validate input
     if (!subcategoryName || typeof subcategoryName !== "string") {
       return next(createError("Invalid subcategory name", 400));
     }
 
-    // Find the menu document
-    const menu = await Menu.findOne({ "categories._id": categoryId });
-
-    if (!menu) {
+    const category = await Category.findById(categoryId);
+    if (!category) {
       return next(createError("Category not found", 404));
     }
 
-    // Find the specific category
-    const category = menu.categories.find(
-      (cat) => cat._id.toString() === categoryId
-    );
-
-    if (!category) {
-      return next(createError("Category not found in menu", 404));
-    }
-
-    // Add the new subcategory while ensuring the field order
-    const newSubcategory = {
+    const newSubcategory = new Subcategory({
       subcategory: subcategoryName,
-      items: [], // Initialize items as an empty array
-    };
+      items: [],
+    });
+    await newSubcategory.save();
 
-    category.subcategories.push(newSubcategory);
+    // Explicitly cast _id as ObjectId
+    category.subcategories.push(
+      new mongoose.Types.ObjectId(newSubcategory._id)
+    );
+    await category.save();
 
-    // Save the updated menu
-    await menu.save();
-
-    res.status(200).json({
+    res.status(201).json({
       message: "Subcategory added successfully",
-      menu,
+      subcategory: newSubcategory,
     });
   } catch (error) {
-    console.error("Error adding subcategory:", error);
     next(
       createError(
         error instanceof Error
@@ -106,36 +93,24 @@ export const deleteSubcategory = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const categoryId = req.params.categoryId;
-    const subcategoryId = req.params.subcategoryId;
+    const { categoryId, subcategoryId } = req.params;
 
-    const menu = await Menu.findOne({ "categories._id": categoryId });
-
-    if (!menu) {
+    // Find the category
+    const category = await Category.findById(categoryId);
+    if (!category) {
       return next(createError("Category not found", 404));
     }
 
-    const category = menu.categories.find(
-      (cat) => cat._id.toString() === categoryId
+    // Remove subcategory reference from category
+    category.subcategories = category.subcategories.filter(
+      (subId) => subId.toString() !== subcategoryId
     );
+    await category.save();
 
-    if (!category) {
-      return next(createError("Subcategory not found", 404));
-    }
+    // Delete the actual subcategory document
+    await Subcategory.findByIdAndDelete(subcategoryId);
 
-    const subcategoryIndex = category.subcategories.findIndex(
-      (sub) => sub._id.toString() === subcategoryId
-    );
-
-    if (subcategoryIndex === -1) {
-      return next(createError("Subcategory not found", 404));
-    }
-
-    category.subcategories.splice(subcategoryIndex, 1); // Remove the subcategory
-
-    await menu.save(); // Save the menu after deletion
-
-    res.status(200).json({ message: "Subcategory deleted successfully", menu });
+    res.status(200).json({ message: "Subcategory deleted successfully" });
   } catch (error) {
     next(createError("Error deleting subcategory", 500));
   }
@@ -148,51 +123,29 @@ export const editSubcategory = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const categoryId = req.params.categoryId;
-    const subcategoryId = req.params.subcategoryId;
-    const { subcategoryName } = req.body; // Expecting a new name for the subcategory
+    const { subcategoryId } = req.params;
+    const { subcategoryName } = req.body;
 
-    if (!subcategoryName) {
-      return next(createError("Subcategory name is required", 400)); // Custom error handler
+    // Validate input
+    if (!subcategoryName || typeof subcategoryName !== "string") {
+      return next(createError("Subcategory name is required", 400));
     }
 
-    // Convert the categoryId and subcategoryId to ObjectId
-    const categoryObjectId = new mongoose.Types.ObjectId(categoryId);
-    const subcategoryObjectId = new mongoose.Types.ObjectId(subcategoryId);
-
-    // Find the menu by category ID
-    const menu = await Menu.findOne({ "categories._id": categoryObjectId });
-
-    if (!menu) {
-      return next(createError("Category not found", 404));
-    }
-
-    // Find the specific category
-    const category = menu.categories.find(
-      (cat) => cat._id.toString() === categoryObjectId.toString()
+    // Update the subcategory
+    const updatedSubcategory = await Subcategory.findByIdAndUpdate(
+      subcategoryId,
+      { subcategory: subcategoryName },
+      { new: true }
     );
 
-    if (!category) {
-      return next(createError("Category not found", 404));
-    }
-
-    // Find the specific subcategory within the category
-    const subcategory = category.subcategories.find(
-      (sub) => sub._id.toString() === subcategoryObjectId.toString()
-    );
-
-    if (!subcategory) {
+    if (!updatedSubcategory) {
       return next(createError("Subcategory not found", 404));
     }
 
-    // Update the subcategory name
-    subcategory.subcategory = subcategoryName;
-
-    // Save the updated menu
-    await menu.save();
-
-    // Respond with a success message
-    res.status(200).json({ message: "Subcategory updated successfully", menu });
+    res.status(200).json({
+      message: "Subcategory updated successfully",
+      subcategory: updatedSubcategory,
+    });
   } catch (error) {
     next(createError("Error updating subcategory", 500));
   }

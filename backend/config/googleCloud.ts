@@ -104,3 +104,26 @@ export const uploadToGoogleCloud = async (
     }
   }
 };
+
+export const deleteFromGoogleCloud = async (
+  publicUrl: string
+): Promise<void> => {
+  try {
+    const bucket = await initializeGoogleStorage();
+
+    // ✅ Extract the file name from the URL
+    const fileName = publicUrl.split("/").pop();
+    if (!fileName) throw new Error("Invalid URL provided");
+
+    const file = bucket.file(fileName);
+
+    await file.delete();
+    console.log(`Successfully deleted: ${fileName}`);
+  } catch (error: any) {
+    if (error.code === 404) {
+      console.warn(`File not found: ${publicUrl}, skipping deletion.`);
+    } else {
+      throw createError(`Error deleting file: ${error.message}`, 500);
+    }
+  }
+};

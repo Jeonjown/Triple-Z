@@ -12,7 +12,7 @@ const router = Router();
 
 router.post("/", verifyAdminToken, upload.single("image"), addMenuItem);
 router.get("/", getAllMenuItems);
-router.put("/:id", verifyAdminToken, updateMenuItem);
+router.put("/:id", verifyAdminToken, upload.single("image"), updateMenuItem);
 router.delete("/:id", verifyAdminToken, deleteMenuItem);
 
 export default router;

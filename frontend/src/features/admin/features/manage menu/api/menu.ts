@@ -9,7 +9,6 @@ const api = axios.create({
 });
 
 // Menu
-
 export const getAllMenu = async () => {
   try {
     const response = await api.get("/api/menu");
@@ -23,43 +22,42 @@ export const getAllMenu = async () => {
 };
 
 // MenuItems
-
-export const getAllMenuItems = async () => {
-  try {
-    const response = await api.get("/api/menu/menu-items");
-    return response.data;
-  } catch (error) {
-    // Ensure proper error handling for Axios errors
-    if (axios.isAxiosError(error)) {
-      // Extract the specific error message from the response if available
-      const errorMessage = error.response?.data?.error || "An error occurred"; // Use 'error' from backend response
-      throw new Error(errorMessage);
-    }
-    // For non-Axios errors, fallback to a generic message
-    throw new Error("An unexpected error occurred");
-  }
-};
-
 interface Size {
   size: string;
   sizePrice: number;
 }
 
 interface Item {
+  _id?: string;
   title: string;
   basePrice: number | null;
   sizes: Size[];
   requiresSizeSelection: boolean;
   description: string;
+  availability?: boolean;
 }
 
 export interface MenuItemData {
+  _id?: string;
   category: string;
   subcategory: string;
   item: Item;
-  image?: File;
+  image: File | string | null;
 }
 
+// MENU ITEMS
+export const getAllMenuItems = async () => {
+  try {
+    const response = await api.get("/api/menu/menu-items");
+    return response.data; // If no items, this will be an empty array
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.error || "An error occurred";
+      throw new Error(errorMessage);
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
 export const createMenuItem = async (menuItemData: MenuItemData) => {
   try {
     const formData = new FormData();
@@ -113,6 +111,93 @@ export const createMenuItem = async (menuItemData: MenuItemData) => {
     throw new Error("An unexpected error occurred");
   }
 };
+export const editMenuItem = async (menuItemData: MenuItemData) => {
+  try {
+    const formData = new FormData();
+
+    // Append category and subcategory to the form
+    formData.append("category", menuItemData.category);
+    formData.append("subcategory", menuItemData.subcategory);
+
+    // Append item fields like title, basePrice, and description
+    formData.append("title", menuItemData.item.title);
+    formData.append("basePrice", menuItemData.item.basePrice?.toString() || "");
+    formData.append(
+      "requiresSizeSelection",
+      menuItemData.item.requiresSizeSelection.toString(),
+    );
+    formData.append("description", menuItemData.item.description || "");
+
+    // Handle availability properly: Ensure it is a boolean, not a string
+    if (menuItemData.item.availability !== undefined) {
+      formData.append(
+        "availability",
+        menuItemData.item.availability.toString(),
+      );
+    }
+
+    // Handle sizes logic based on requiresSizeSelection
+    if (menuItemData.item.requiresSizeSelection) {
+      // Ensure sizes are passed as an array, not a string
+      const sizes = Array.isArray(menuItemData.item.sizes)
+        ? menuItemData.item.sizes
+        : [];
+      sizes.forEach((size, index) => {
+        formData.append(`sizes[${index}][size]`, size.size);
+        formData.append(
+          `sizes[${index}][sizePrice]`,
+          size.sizePrice.toString(),
+        );
+      });
+    } else {
+      // If no size selection is required, omit sizes or pass null
+      formData.append("sizes", "null"); // Or you can omit this line entirely
+    }
+
+    // Handle image field (if it's a file or URL)
+    if (menuItemData.image instanceof File) {
+      formData.append("image", menuItemData.image);
+    } else if (menuItemData.image) {
+      formData.append("image", menuItemData.image);
+    }
+
+    if (!menuItemData._id) {
+      throw new Error("Menu item _id is required for updating.");
+    }
+
+    // Make the PUT request to update the menu item
+    const response = await api.put(
+      `/api/menu/menu-items/${menuItemData._id}`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating menu item:", error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.error ||
+          "An error occurred while updating the item.",
+      );
+    }
+    throw new Error("An unexpected error occurred while updating the item.");
+  }
+};
+
+export const deleteMenuItem = async (menuItemId: string) => {
+  try {
+    api.delete(`/api/menu/menu-items/${menuItemId}`);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || "an error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
 // CATEGORIES
 export interface Category {
   category: string;
@@ -131,7 +216,6 @@ export const createCategory = async (category: Category) => {
     throw new Error("An unexpected error occurred");
   }
 };
-
 export const getAllCategories = async () => {
   try {
     const response = await api.get("/api/menu/categories");
@@ -144,7 +228,6 @@ export const getAllCategories = async () => {
     throw new Error("An unexpected error occurred");
   }
 };
-
 export const editCategory = async (categoryId: string, category: string) => {
   try {
     const response = await api.put(`api/menu/categories/${categoryId}`, {
@@ -158,7 +241,6 @@ export const editCategory = async (categoryId: string, category: string) => {
     throw new Error("An unexpected error occurred");
   }
 };
-
 export const deleteCategory = async (categoryId: string) => {
   try {
     const response = await api.delete(`api/menu/categories/${categoryId}`);

@@ -22,6 +22,10 @@ export const useDeleteCategory = () => {
         queryKey: ["categories"], // Invalidate the categories cache
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ["menuItems"], // Invalidate the categories cache
+      });
+
       if (deleteTarget?._id) {
         queryClient.invalidateQueries({
           queryKey: ["subcategories", deleteTarget._id],

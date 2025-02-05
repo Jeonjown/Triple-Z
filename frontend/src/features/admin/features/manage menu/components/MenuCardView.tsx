@@ -1,27 +1,65 @@
 import { flexRender, Table } from "@tanstack/react-table";
-
 import { MenuItem } from "../pages/ManageMenu";
+import { useDeleteMenuItem } from "../hooks/useDeleteMenuItem";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import { useState } from "react";
+import EditMenuItemModal from "./EditMenuItemModal";
 
+// Define the type for MenuCardViewProps
 interface MenuCardViewProps {
   table: Table<MenuItem>;
   globalFilter: string | undefined;
   setGlobalFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
+// The MenuCardView component
 const MenuCardView = ({ table }: MenuCardViewProps) => {
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [itemToEdit, setItemToEdit] = useState<MenuItem | null>(null);
+  const {
+    handleDelete,
+    menuTitle,
+    showConfirmation,
+    setShowConfirmation,
+    handleConfirmDelete,
+  } = useDeleteMenuItem();
+
+  // Placeholder function for handling edits
+  const handleEdit = (menuItem: MenuItem) => {
+    setEditMode(true);
+    setItemToEdit(menuItem);
+  };
+
   return (
     <>
+      {/* EDIT MODAL */}
+      {editMode && (
+        <EditMenuItemModal
+          setEditMode={setEditMode}
+          itemToEdit={itemToEdit}
+          setItemToEdit={setItemToEdit}
+        />
+      )}
+
+      {/* Delete confirmation modal */}
+      <DeleteConfirmationModal
+        showConfirmation={showConfirmation}
+        setShowConfirmation={setShowConfirmation}
+        action={handleConfirmDelete}
+      >
+        {menuTitle}
+      </DeleteConfirmationModal>
+
+      {/* Grid for displaying menu items as cards */}
       <div className="grid w-5/6 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {/* Data Rows Rendered as Cards */}
+        {/* Render data rows as cards */}
         {table.getRowModel().rows.map((row) => (
-          // CARD
           <div
             key={row.id}
             className="flex min-w-0 flex-col space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-md transition hover:scale-105 hover:border-secondary hover:shadow-xl"
           >
-            {/* Individual Cells as Key-Value Pairs */}
+            {/* Render individual cells */}
             {row.getVisibleCells().map((cell) => {
-              // Find the matching header for this cell
               const header = table
                 .getHeaderGroups()
                 .flatMap((group) => group.headers)
@@ -32,7 +70,6 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
                   key={cell.id}
                   className="flex items-center justify-between text-gray-600"
                 >
-                  {/* Check if header exists */}
                   {header && (
                     <div
                       className="flex items-center hover:scale-110 hover:cursor-pointer hover:opacity-80"
@@ -46,7 +83,6 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
                           )}
                         </span>
                       )}
-
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
@@ -62,6 +98,7 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
                     </div>
                   )}
 
+                  {/* Render cell content */}
                   {cell.column.id === "availability" ? (
                     <span className="truncate text-sm">
                       {cell.getValue() ? "Yes" : "No"}
@@ -73,7 +110,7 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
                       className="h-16 w-16 rounded object-cover"
                     />
                   ) : cell.column.id === "price" ? (
-                    <span className="truncate text-sm">{`₱ ${cell.getValue()}`}</span> // Fixed concatenation syntax
+                    <span className="truncate text-sm">{`₱ ${cell.getValue()}`}</span>
                   ) : (
                     <span className="truncate text-sm">
                       {flexRender(
@@ -85,9 +122,11 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
                 </div>
               );
             })}
+
+            {/* Action buttons (Edit and Delete) */}
             <div className="ml-auto flex gap-2">
               <button
-                // onClick={() => handleEdit(row.original)}
+                onClick={() => handleEdit(row.original)}
                 className="rounded bg-secondary px-3 py-2 text-white hover:opacity-85"
               >
                 <svg
@@ -106,7 +145,7 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
                 </svg>
               </button>
               <button
-                // onClick={() => handleDelete(row.original)}
+                onClick={() => handleDelete(row.original)}
                 className="rounded bg-red-500 px-3 py-2 text-white hover:bg-red-600"
               >
                 <svg

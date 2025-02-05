@@ -8,7 +8,7 @@ import useFetchAllCategories from "../hooks/useFetchAllCategories"; // Hook for 
 import SelectFieldSubcategories from "./SelectFieldSubcategories"; // Custom subcategory selector
 import SelectSizeField from "./SelectSizeField"; // Custom component for sizes
 import { useCreateMenuItem } from "../hooks/useCreateMenuItem"; // Hook for creating menu items
-import { MenuItemData } from "../api/menu"; // Assuming you have an API type
+import { MenuItemData } from "../api/menu";
 
 interface CreateMenuItemModalProps {
   isCreateModalOpen: boolean;
@@ -16,14 +16,16 @@ interface CreateMenuItemModalProps {
 }
 
 export interface FormValues {
+  _id?: string;
   requiresSizeSelection: boolean;
-  image: File | null;
+  image: File | string | null;
   title: string;
   basePrice: number | null;
   description: string;
   category: string;
   subcategory: string;
-  sizes: { size: string; sizePrice: number }[]; // Size options
+  sizes: { size: string; sizePrice: number }[];
+  availability?: boolean;
 }
 
 const CreateMenuItemModal = ({
@@ -124,7 +126,7 @@ const CreateMenuItemModal = ({
       subcategory: values.subcategory,
       item: {
         title: values.title,
-        basePrice: values.basePrice, // Keep as number or null
+        basePrice: values.basePrice,
         requiresSizeSelection: values.requiresSizeSelection,
         description: values.description,
         sizes: values.requiresSizeSelection ? values.sizes : [],

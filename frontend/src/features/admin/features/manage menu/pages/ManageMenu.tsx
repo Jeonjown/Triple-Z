@@ -112,6 +112,15 @@ const ManageMenu = () => {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    // Handle error (404 or other issues)
+    return <div>{error?.message || "Failed to load menu items"}</div>;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center bg-primary py-20 md:w-full">
       <MenuControlPanel
@@ -121,8 +130,7 @@ const ManageMenu = () => {
         title={title}
         isCreateModalOpen={true}
       />
-      {isPending && <p>Loading...</p>}
-      {isError && <p className="text-xl"> {error?.message}</p>}
+      {data?.length === 0 && <div>No menu items found</div>}
     </div>
   );
 };

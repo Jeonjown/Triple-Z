@@ -1,38 +1,52 @@
 import { Request, Response, NextFunction } from "express";
-import Menu from "../models/menuModel";
 import { createError } from "../utils/createError";
+import { Menu } from "../models/menuModel";
+import Category from "../models/categoryModel";
+import MenuItem from "../models/menuItemModel";
+import Subcategory from "../models/subcategoryModel";
 
-// Create a new menu
-export const createMenu = async (
+// clear menu
+export const clearMenu = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { categories } = req.body;
+    const menu = await Menu.findOne();
+    if (!menu) return next(createError("Menu not found", 404));
 
-    // If categories are provided, create the menu with them
-    const newMenu = new Menu({
-      categories,
+    // ✅ Clear categories from the menu
+    menu.categories = [];
+    await menu.save();
+
+    // ✅ Delete all categories, subcategories, and menu items
+    await Category.deleteMany({});
+    await Subcategory.deleteMany({});
+    await MenuItem.deleteMany({});
+
+    res.status(200).json({
+      message:
+        "Menu, categories, subcategories, and items cleared successfully",
     });
-
-    await newMenu.save();
-
-    res.status(201).json(newMenu);
   } catch (error) {
-    console.error("Error creating menu:", error);
-    next(createError("Error creating menu", 500));
+    next(createError(`Error clearing menu: ${(error as Error).message}`, 500));
   }
 };
 
 // Get the menu
-export const getAllMenu = async (
+export const getMenu = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const menu = await Menu.find();
+    const menu = await Menu.findOne().populate({
+      path: "categories",
+      populate: {
+        path: "subcategories",
+        populate: { path: "items" },
+      },
+    });
 
     if (!menu) {
       return next(createError("Menu not found", 404));
@@ -40,7 +54,6 @@ export const getAllMenu = async (
 
     res.status(200).json(menu);
   } catch (error) {
-    console.error("Error fetching menu:", error);
-    next(createError("Error fetching menu", 500));
+    next(createError(`Error fetching menu: ${(error as Error).message}`, 500));
   }
 };
