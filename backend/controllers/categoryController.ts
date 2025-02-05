@@ -69,8 +69,10 @@ export const getAllCategories = async (
       })
       .select("categories"); // Return only the 'categories' field from the Menu
 
-    if (!menu || !menu.categories.length) {
-      return next(createError("No categories found", 404));
+    if (!menu || !menu.categories || menu.categories.length === 0) {
+      // Return an empty array if no categories are found
+      res.status(200).json([]); // Empty array instead of error
+      return;
     }
 
     res.status(200).json(menu.categories);
