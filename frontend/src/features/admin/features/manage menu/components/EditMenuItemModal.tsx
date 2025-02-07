@@ -22,6 +22,7 @@ const validationSchema = Yup.object({
   description: Yup.string().required("Description is required."),
   basePrice: Yup.number()
     .nullable()
+    .min(0, "Base price cannot be negative.")
     .when("requiresSizeSelection", {
       is: false,
       then: (schema) => schema.required("Base price is required."),
@@ -30,7 +31,9 @@ const validationSchema = Yup.object({
   sizes: Yup.array().of(
     Yup.object().shape({
       size: Yup.string().required("Size is required."),
-      sizePrice: Yup.number().required("Size price is required."),
+      sizePrice: Yup.number()
+        .min(0, "Size price cannot be negative.")
+        .required("Size price is required."),
     }),
   ),
 });

@@ -9,6 +9,7 @@ import MenuItem from "../models/menuItemModel";
 import Category from "../models/categoryModel";
 import Subcategory from "../models/subcategoryModel";
 import { Types } from "mongoose";
+import { toTitleCase } from "../utils/toTitleCase";
 
 export const getAllMenuItems = async (
   req: Request,
@@ -123,6 +124,16 @@ export const addMenuItem = async (
           )
         );
       }
+
+      // Convert  to title case
+
+      finalSizes = sizes.map(
+        (sizeObj: { size: string; sizePrice: number }) => ({
+          ...sizeObj,
+          size: toTitleCase(sizeObj.size), // Apply title case to size
+        })
+      );
+
       finalBasePrice = null; // No base price when size selection is required
     } else if (
       requiresSizeSelection === "false" ||
@@ -138,7 +149,7 @@ export const addMenuItem = async (
           )
         );
       }
-      finalBasePrice = parsedBasePrice; // Set base price
+      finalBasePrice = parsedBasePrice;
     } else {
       return next(createError("Invalid value for requiresSizeSelection", 400));
     }
@@ -147,8 +158,9 @@ export const addMenuItem = async (
     const imageUrl = await uploadToGoogleCloud(imageFile);
 
     // ✅ Create MenuItem document
+    const finalTitle = toTitleCase(title);
     const newItem = new MenuItem({
-      title,
+      title: finalTitle,
       basePrice: finalBasePrice,
       sizes: finalSizes,
       requiresSizeSelection,
@@ -217,11 +229,20 @@ export const updateMenuItem = async (
 
     const updateData: { [key: string]: any } = {};
 
+    // Convert title to title case if provided
+    if (title) updateData.title = toTitleCase(title);
+
     // Handle sizes and basePrice
     if (requiresSizeSelection === "false" || requiresSizeSelection === false) {
       updateData.sizes = sizes === "null" ? [] : sizes;
     } else if (sizes && Array.isArray(sizes) && sizes.length > 0) {
-      updateData.sizes = sizes;
+      // Convert sizes to title case
+      updateData.sizes = sizes.map(
+        (sizeObj: { size: string; sizePrice: number }) => ({
+          ...sizeObj,
+          size: toTitleCase(sizeObj.size), // Apply title case to size
+        })
+      );
     }
 
     updateData.basePrice =
@@ -229,7 +250,6 @@ export const updateMenuItem = async (
         ? null
         : basePrice ?? updateData.basePrice;
 
-    if (title) updateData.title = title;
     if (imageUrl) updateData.image = imageUrl;
     if (requiresSizeSelection !== undefined)
       updateData.requiresSizeSelection = requiresSizeSelection;

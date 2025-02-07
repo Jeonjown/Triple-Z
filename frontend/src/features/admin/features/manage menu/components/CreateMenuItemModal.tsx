@@ -68,7 +68,9 @@ const CreateMenuItemModal = ({
         .of(
           Yup.object().shape({
             size: Yup.string().required("Size is required."),
-            sizePrice: Yup.number().required("Size price is required."),
+            sizePrice: Yup.number()
+              .required("Size price is required.")
+              .min(0, "Size price cannot be negative."),
           }),
         )
         .when("requiresSizeSelection", {
@@ -84,6 +86,7 @@ const CreateMenuItemModal = ({
         }),
       basePrice: Yup.number()
         .nullable()
+        .min(0, "Base price cannot be negative.")
         .when("requiresSizeSelection", {
           is: false,
           then: (schema) => schema.required("Base price is required."),
