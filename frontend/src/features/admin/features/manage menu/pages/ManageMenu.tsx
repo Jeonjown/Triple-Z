@@ -21,8 +21,10 @@ export interface MenuItem {
   description: string;
   availability?: boolean;
   createdAt: string;
-  category: string;
-  subcategory: string;
+  categoryId?: string;
+  categoryName: string;
+  subcategoryId: string;
+  subcategoryName: string;
 }
 
 const ManageMenu = () => {
@@ -77,11 +79,11 @@ const ManageMenu = () => {
       header: "Sizes",
     }),
 
-    columnHelper.accessor("category", {
+    columnHelper.accessor("categoryName", {
       cell: (info) => info.getValue(),
       header: "Category",
     }),
-    columnHelper.accessor("subcategory", {
+    columnHelper.accessor("subcategoryName", {
       cell: (info) => info.getValue(),
       header: "Subcategory",
     }),

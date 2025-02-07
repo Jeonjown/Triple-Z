@@ -74,23 +74,25 @@ const SelectFieldCategories = ({
         className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           const selectedValue = e.target.value;
-          // Find the selected option in your data array
+          console.log("Selected category ID:", selectedValue);
           const selectedOption = data.find(
             (option) => option._id === selectedValue,
           );
-          // Update the category name with the selected option's category value
           setCurrentCategoryName(selectedOption ? selectedOption.category : "");
-          // Update the ID states and Formik value
           setCurrentCategoryId(selectedValue);
           setFieldValue(name, selectedValue);
         }}
       >
         <option value="">Select {label}</option>
-        {data.map((option) => (
-          <option key={option._id} value={option._id}>
-            {option.category}
-          </option>
-        ))}
+        {data && Array.isArray(data) && data.length > 0 ? (
+          data.map((option) => (
+            <option key={option._id} value={option._id}>
+              {option.category}
+            </option>
+          ))
+        ) : (
+          <option disabled>No categories available</option>
+        )}
       </Field>
       <ErrorMessage
         name={name}

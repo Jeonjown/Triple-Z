@@ -1,7 +1,8 @@
-import { ErrorMessage, Field } from "formik";
+import { ErrorMessage, Field, useFormikContext } from "formik";
 import useFetchAllSubcategories from "../hooks/useFetchAllSubcategories";
 import useSubcategoryModal from "../hooks/useSubcategoryModal";
 import SubcategoryModal from "./SubcategoryModal";
+
 // Define the interface for each subcategory option
 export interface SubcategoryOption {
   _id: string;
@@ -13,6 +14,10 @@ interface SelectFieldProps {
   name: string;
   currentCategoryId: string | undefined;
   currentCategoryName: string | undefined;
+  currentSubcategoryId: string | undefined;
+  setCurrentSubcategoryId: React.Dispatch<
+    React.SetStateAction<string | undefined>
+  >;
 }
 
 const SelectFieldSubcategories = ({
@@ -20,8 +25,11 @@ const SelectFieldSubcategories = ({
   name,
   currentCategoryId,
   currentCategoryName,
+  currentSubcategoryId,
+  setCurrentSubcategoryId,
 }: SelectFieldProps) => {
-  // If no categoryId, return empty array of subcategories
+  const { setFieldValue } = useFormikContext(); // Added to update Formik state
+  // Fetch subcategories based on the currentCategoryId
   const {
     data = [],
     isError,
@@ -78,11 +86,19 @@ const SelectFieldSubcategories = ({
         as="select"
         id={name}
         name={name}
+        value={currentSubcategoryId} // Controlled by state
         className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+          const selectedSubcategoryId = e.target.value;
+          // Update local state
+          setCurrentSubcategoryId(selectedSubcategoryId);
+          // Update Formik's value
+          setFieldValue(name, selectedSubcategoryId);
+        }}
       >
         <option value="">Select {label}</option>
         {data.length === 0 ? (
-          <option value="">No subcategories available</option> // Shows when no data is available
+          <option value="">No subcategories available</option>
         ) : (
           data.map((option: SubcategoryOption) => (
             <option key={option._id} value={option._id}>
@@ -91,6 +107,7 @@ const SelectFieldSubcategories = ({
           ))
         )}
       </Field>
+
       <ErrorMessage
         name={name}
         component="div"

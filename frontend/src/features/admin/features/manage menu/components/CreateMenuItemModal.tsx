@@ -45,6 +45,9 @@ const CreateMenuItemModal = ({
     error: mutationErrorMessage,
   } = useCreateMenuItem();
 
+  const [currentSubcategoryId, setCurrentSubcategoryId] = useState<
+    string | undefined
+  >("");
   const [currentCategoryId, setCurrentCategoryId] = useState<
     string | undefined
   >("");
@@ -256,6 +259,8 @@ const CreateMenuItemModal = ({
                     name="subcategory"
                     currentCategoryId={currentCategoryId}
                     currentCategoryName={currentCategoryName}
+                    currentSubcategoryId={currentSubcategoryId}
+                    setCurrentSubcategoryId={setCurrentSubcategoryId}
                   />
                 )}
               </div>

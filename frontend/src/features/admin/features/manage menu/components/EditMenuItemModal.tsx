@@ -7,6 +7,9 @@ import ImageUpload from "./ImageUpload";
 import SelectSizeField from "./SelectSizeField";
 import { FormValues } from "./CreateMenuItemModal";
 import { useEditMenuItem } from "../hooks/useEditMenuItem";
+import SelectFieldCategories from "./SelectFieldCategories";
+import SelectFieldSubcategories from "./SelectFieldSubcategories";
+import useFetchAllCategories from "../hooks/useFetchAllCategories";
 
 interface EditMenuItemModalProps {
   setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
@@ -40,7 +43,23 @@ const EditMenuItemModal = ({
   const [imagePreview, setImagePreview] = useState<string | null>(
     itemToEdit?.image || null,
   );
+
+  // Category state management
+  const [currentCategoryId, setCurrentCategoryId] = useState<
+    string | undefined
+  >(itemToEdit?.categoryId);
+  const [currentCategoryName, setCurrentCategoryName] = useState<
+    string | undefined
+  >(itemToEdit?.categoryName);
+
+  // Subcategory state management
+  const [currentSubcategoryId, setCurrentSubcategoryId] = useState<
+    string | undefined
+  >(itemToEdit?.subcategoryId);
+
   const { mutate } = useEditMenuItem();
+  // Fetch categories
+  const { data: categories } = useFetchAllCategories();
 
   const handleSubmit = (values: FormValues) => {
     console.log("Updated values:", values);
@@ -83,8 +102,8 @@ const EditMenuItemModal = ({
             title: itemToEdit?.title || "",
             basePrice: itemToEdit?.basePrice ?? null,
             description: itemToEdit?.description || "",
-            category: itemToEdit?.category || "",
-            subcategory: itemToEdit?.subcategory || "",
+            category: currentCategoryId || "", // use the ID here
+            subcategory: currentSubcategoryId || "", // use the ID here
             requiresSizeSelection: itemToEdit?.requiresSizeSelection || false,
             sizes: itemToEdit?.sizes || [],
             availability: itemToEdit?.availability,
@@ -94,6 +113,7 @@ const EditMenuItemModal = ({
         >
           {({ setFieldValue, values }) => (
             <Form className="space-y-4">
+              {/* Image Upload */}
               <ImageUpload
                 imagePreview={imagePreview}
                 onChange={(e) => {
@@ -145,27 +165,20 @@ const EditMenuItemModal = ({
               </div>
               <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
                 <InputField
-                  label="Item Name"
+                  label="Title"
                   name="title"
                   type="text"
-                  placeholder="Enter item name"
+                  placeholder="Enter the title"
                 />
                 {!values.requiresSizeSelection && (
                   <InputField
-                    label="Base Price"
+                    label="Base price"
                     name="basePrice"
                     type="number"
-                    placeholder="Enter price"
+                    placeholder="Enter the price"
                   />
                 )}
               </div>
-
-              <InputField
-                label="Description"
-                name="description"
-                type="text"
-                placeholder="Enter description"
-              />
 
               {values.requiresSizeSelection && <SelectSizeField />}
 
@@ -189,12 +202,51 @@ const EditMenuItemModal = ({
                 <span className="text-xs">Is Size Required?</span>
               </label>
 
-              <ErrorMessage
-                name="basePrice"
-                component="div"
-                className="text-xs text-red-500"
-              />
+              {/* Category and Subcategory */}
+              <div className="space-y-4">
+                <SelectFieldCategories
+                  label="Category"
+                  name="category"
+                  setCurrentCategoryId={setCurrentCategoryId}
+                  setCurrentCategoryName={setCurrentCategoryName}
+                  data={categories}
+                  currentCategoryId={currentCategoryId}
+                />
+                {currentCategoryId && (
+                  <SelectFieldSubcategories
+                    label="Subcategory"
+                    name="subcategory"
+                    currentCategoryId={currentCategoryId}
+                    currentCategoryName={currentCategoryName} // pass the category name from state
+                    currentSubcategoryId={currentSubcategoryId}
+                    setCurrentSubcategoryId={setCurrentSubcategoryId}
+                  />
+                )}
+              </div>
 
+              {/* Description */}
+              <div>
+                <label
+                  htmlFor="description"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
+                  Description
+                </label>
+                <Field
+                  as="textarea"
+                  id="description"
+                  name="description"
+                  className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
+                  placeholder="Write Description Here"
+                />
+                <ErrorMessage
+                  name="description"
+                  component="div"
+                  className="text-xs text-red-500"
+                />
+              </div>
+
+              {/* Action Buttons */}
               <div className="flex justify-end space-x-4">
                 <button
                   type="button"
@@ -207,7 +259,7 @@ const EditMenuItemModal = ({
                   type="submit"
                   className="hover:bg-secondary-dark rounded-md bg-secondary px-4 py-2 text-white"
                 >
-                  Save Changes
+                  Submit
                 </button>
               </div>
             </Form>

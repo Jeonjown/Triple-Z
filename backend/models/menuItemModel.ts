@@ -1,4 +1,4 @@
-import { Document, Schema } from "mongoose";
+import { Document, Schema, Types } from "mongoose";
 import { menuDB } from "../db";
 
 export interface IMenuItem extends Document {
@@ -11,13 +11,15 @@ export interface IMenuItem extends Document {
   availability: boolean;
   createdAt: Date;
   updatedAt: Date;
+  category: Types.ObjectId;
+  subcategory: Types.ObjectId;
 }
 
 const menuItemSchema = new Schema<IMenuItem>(
   {
     title: { type: String, required: true },
     image: { type: String, required: true },
-    basePrice: { type: Number, min: 0 },
+    basePrice: { type: Number, required: false, min: 0, default: null },
     sizes: [
       {
         size: { type: String, required: true },
@@ -27,6 +29,12 @@ const menuItemSchema = new Schema<IMenuItem>(
     requiresSizeSelection: { type: Boolean, required: true },
     description: { type: String, required: true },
     availability: { type: Boolean, default: true },
+    category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+    subcategory: {
+      type: Schema.Types.ObjectId,
+      ref: "Subcategory",
+      required: true,
+    },
   },
   { timestamps: true }
 );
