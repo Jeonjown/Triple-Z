@@ -13,18 +13,20 @@ const HamburgerIcon = ({ isHamburgerOpen, toggle }: HamburgerIconProps) => {
     <>
       {isHamburgerOpen ? (
         // x icon
-        <IoMdClose
-          size={45}
+        <button
           onClick={() => toggle("isHamburgerOpen")}
           className="z-50 rounded-full p-2 text-icon hover:cursor-pointer hover:bg-muted active:animate-rotateLeftSlowly"
-        />
+        >
+          <IoMdClose size={28} />
+        </button>
       ) : (
         // burger icon
-        <RxHamburgerMenu
-          size={45}
+        <button
           onClick={() => toggle("isHamburgerOpen")}
           className="z-50 rounded-full p-2 text-icon hover:cursor-pointer hover:bg-muted active:animate-rotateRightSlowly sm:hidden"
-        />
+        >
+          <RxHamburgerMenu size={28} />
+        </button>
       )}
     </>
   );
