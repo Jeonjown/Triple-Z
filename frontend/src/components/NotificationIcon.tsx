@@ -11,7 +11,7 @@ import { FaBell } from "react-icons/fa";
 const NotificationIcon = () => {
   return (
     <>
-      <div className="relative ml-auto hidden gap-2 md:flex">
+      <div className="relative ml-auto gap-2 md:flex">
         {/* notification icon */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger>

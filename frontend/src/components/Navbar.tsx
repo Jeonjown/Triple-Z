@@ -37,9 +37,7 @@ const Navbar = () => {
               </Button>
             </>
           )}
-
           {user && <div className="hidden lg:block">{user.username}</div>}
-
           {user && (
             <>
               <NotificationIcon />
