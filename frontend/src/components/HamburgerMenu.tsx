@@ -33,7 +33,7 @@ const HamburgerMenu = ({
           {user && (
             <>
               <p>{user.username}</p>
-              <hr className="mb-6 border-2 border-secondary" />
+              <hr className="mb-6 border-2 border-primary" />
             </>
           )}
 
@@ -41,17 +41,19 @@ const HamburgerMenu = ({
             <NavLink
               to="/about"
               className={({ isActive }) =>
-                isActive ? "border-l-4 border-solid border-accent px-2" : ""
+                isActive
+                  ? "border-l-4 border-solid border-primary px-2"
+                  : "hover:font-bold"
               }
             >
               About
             </NavLink>
           </li>
           <li
-            className="flex items-center py-2"
+            className="flex items-center py-2 hover:cursor-pointer hover:font-bold"
             onClick={() => toggle("isScheduleOpen")}
           >
-            <NavLink to="/events">Events</NavLink>
+            Events
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -71,21 +73,25 @@ const HamburgerMenu = ({
           </li>
           {isScheduleOpen && (
             <>
-              <li className="ml-5 p-1">
+              <li className="ml-5 p-1 hover:font-bold">
                 <NavLink
                   to="/schedule"
                   className={({ isActive }) =>
-                    isActive ? "border-l-4 border-solid border-accent px-2" : ""
+                    isActive
+                      ? "border-l-4 border-solid border-primary px-2"
+                      : ""
                   }
                 >
                   Schedule
                 </NavLink>
               </li>
-              <li className="ml-5 p-1">
+              <li className="ml-5 p-1 hover:font-bold">
                 <NavLink
                   to="/blogs"
                   className={({ isActive }) =>
-                    isActive ? "border-l-4 border-solid border-accent px-2" : ""
+                    isActive
+                      ? "border-l-4 border-solid border-primary px-2"
+                      : ""
                   }
                 >
                   Blogs
@@ -93,46 +99,50 @@ const HamburgerMenu = ({
               </li>
             </>
           )}
-          <li className="py-2">
+          <li className="py-2 hover:font-bold">
             <NavLink
               to="/menu"
               className={({ isActive }) =>
-                isActive ? "border-l-4 border-solid border-accent px-2" : ""
+                isActive ? "border-l-4 border-solid border-primary px-2" : ""
               }
             >
               Menu
             </NavLink>
           </li>
-          <li className="py-2">
+          <li className="py-2 hover:font-bold">
             <NavLink
               to="/contacts"
               className={({ isActive }) =>
-                isActive ? "border-l-4 border-solid border-accent px-2" : ""
+                isActive ? "border-l-4 border-solid border-primary px-2" : ""
               }
             >
               Contacts
             </NavLink>
           </li>
-          <li className="py-2">
-            <NavLink
-              to="/my-account"
-              className={({ isActive }) =>
-                isActive ? "border-l-4 border-solid border-accent px-2" : ""
-              }
-            >
-              Account
-            </NavLink>
-          </li>
 
           {user && user.role === "admin" && (
             <>
+              <li className="py-2">
+                <NavLink
+                  to="/my-account"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "border-l-4 border-solid border-primary px-2"
+                      : ""
+                  }
+                >
+                  Account
+                </NavLink>
+              </li>
               <h3 className="mt-10">ADMIN PANEL</h3>
-              <hr className="mb-6 border-2 border-secondary" />
+              <hr className="mb-6 border-2 border-primary" />
               <li className="py-2">
                 <NavLink
                   to="/admin-dashboard"
                   className={({ isActive }) =>
-                    isActive ? "border-l-4 border-solid border-accent px-2" : ""
+                    isActive
+                      ? "border-l-4 border-solid border-primary px-2"
+                      : ""
                   }
                 >
                   Dashboard
@@ -142,7 +152,9 @@ const HamburgerMenu = ({
                 <NavLink
                   to="/manage-users"
                   className={({ isActive }) =>
-                    isActive ? "border-l-4 border-solid border-accent px-2" : ""
+                    isActive
+                      ? "border-l-4 border-solid border-primary px-2"
+                      : ""
                   }
                 >
                   Manage Users
@@ -152,7 +164,9 @@ const HamburgerMenu = ({
                 <NavLink
                   to="/manage-menu"
                   className={({ isActive }) =>
-                    isActive ? "border-l-4 border-solid border-accent px-2" : ""
+                    isActive
+                      ? "border-l-4 border-solid border-primary px-2"
+                      : ""
                   }
                 >
                   Manage Menu
@@ -172,7 +186,9 @@ const HamburgerMenu = ({
                 <NavLink
                   to="/settings"
                   className={({ isActive }) =>
-                    isActive ? "border-l-4 border-solid border-accent px-2" : ""
+                    isActive
+                      ? "border-l-4 border-solid border-primary px-2"
+                      : ""
                   }
                 >
                   Settings

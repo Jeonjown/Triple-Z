@@ -2,57 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+/* @layer base {
   body {
     font-family: "Raleway", sans-serif;
   }
+} */
 
-  * {
-    box-sizing: border-box;
+@layer base {
+  :root {
+    --background: 21 5% 100%;
+    --foreground: 21 5% 10%;
+    --card: 21 5% 100%;
+    --card-foreground: 21 5% 15%;
+    --popover: 21 5% 100%;
+    --popover-foreground: 21 95% 10%;
+    --primary: 21 39.8% 34.5%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 21 10% 90%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: -17 10% 95%;
+    --muted-foreground: 21 5% 40%;
+    --accent: -17 10% 90%;
+    --accent-foreground: 21 5% 15%;
+    --destructive: 0 50% 50%;
+    --destructive-foreground: 21 5% 100%;
+    --border: 21 20% 82%;
+    --input: 21 20% 50%;
+    --ring: 21 39.8% 34.5%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 21 10% 10%;
+    --foreground: 21 5% 100%;
+    --card: 21 5% 10%;
+    --card-foreground: 21 5% 100%;
+    --popover: 21 10% 5%;
+    --popover-foreground: 21 5% 100%;
+    --primary: 21 39.8% 34.5%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 21 10% 20%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: -17 10% 25%;
+    --muted-foreground: 21 5% 65%;
+    --accent: -17 10% 25%;
+    --accent-foreground: 21 5% 95%;
+    --destructive: 0 50% 50%;
+    --destructive-foreground: 21 5% 100%;
+    --border: 21 20% 50%;
+    --input: 21 20% 50%;
+    --ring: 21 39.8% 34.5%;
+    --radius: 0.5rem;
   }
 }
 
-.react-calendar__navigation__arrow {
-  margin: 5px;
-}
-
-.react-calendar__navigation__prev2-button {
-  margin-left: 40px;
-}
-.react-calendar__navigation__next2-button {
-  margin-right: 40px;
-}
-
-.react-calendar__navigation {
-  display: flex; /* Use flexbox */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  font-size: 1.25rem; /* Adjust the font size of the month */
-}
-
-.react-calendar__tile:focus,
-.react-calendar__tile--active {
-  outline: none;
-  border: none;
-}
-
-/* Optional: Customize the border or background color of selected dates */
-.react-calendar__tile--active {
-  background-color: #7b4d35;
-  color: white;
-}
-
-.react-calendar__month-view__weekdays__weekday abbr {
-  text-decoration: none;
-  text-align: center;
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  padding: 5px 0;
-}
-
-.react-calendar__tile--now {
-  background-color: #7b4d35;
-  opacity: 0.5;
-  color: white;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply text-foreground bg-background;
+  }
 }

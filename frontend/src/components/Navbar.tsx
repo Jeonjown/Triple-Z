@@ -8,6 +8,7 @@ import useToggle from "../hooks/useToggle";
 import { Link } from "react-router-dom";
 import useAuthStore from "../features/auth/stores/useAuthStore";
 import useFetchUserData from "../features/auth/hooks/useFetchUserData";
+import { Button } from "./ui/button";
 
 const Navbar = () => {
   const { user } = useFetchUserData();
@@ -21,20 +22,22 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 z-50 flex min-h-24 w-full items-center border-2 bg-white px-6 font-semibold text-text shadow md:px-6 md:py-6">
+      <nav className="fixed top-0 z-50 flex h-24 w-full items-center bg-white px-6 font-semibold text-text shadow md:px-6 md:py-6">
         <Logo />
         <NavLinks />
+
         <div className="relative ml-auto flex items-center gap-2">
           {!isAuthenticated && (
             <>
-              <button className="mr-1 h-9 whitespace-nowrap px-2 text-[15px] hover:scale-105 hover:cursor-pointer active:scale-110">
+              <Button asChild size={"lg"} variant="ghost">
                 <Link to={"/signup"}>SIGN UP</Link>
-              </button>
-              <button className="mr-1 h-9 whitespace-nowrap border-[1px] border-accent px-6 text-[15px] hover:scale-105 hover:cursor-pointer active:scale-110">
-                <Link to={"/login"}> LOG IN</Link>
-              </button>
+              </Button>
+              <Button asChild size={"lg"} variant={"outline"}>
+                <Link to={"/login"}>LOG IN</Link>
+              </Button>
             </>
           )}
+
           {user && <div className="hidden lg:block">{user.username}</div>}
 
           {user && (
@@ -55,7 +58,6 @@ const Navbar = () => {
       <HamburgerMenu
         isHamburgerOpen={toggleState.isHamburgerOpen}
         isScheduleOpen={toggleState.isScheduleOpen}
-        // isAccountOpen={toggleState.isAccountOpen}
         toggle={toggle}
       />
     </>

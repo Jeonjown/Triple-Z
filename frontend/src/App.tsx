@@ -27,7 +27,7 @@ function App() {
       <Navbar />
       {user && user.role === "admin" && <AdminSidebar />}
 
-      <main className={`${user && user.role === "admin" ? "md:ml-64" : ""} `}>
+      <main className={`mt-28 ${user?.role === "admin" ? "md:ml-64" : ""}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
