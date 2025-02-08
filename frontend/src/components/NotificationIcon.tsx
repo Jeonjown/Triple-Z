@@ -23,7 +23,7 @@ const NotificationIcon = () => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem className="font-thin">
+            <DropdownMenuItem>
               Your notification message goes here!
             </DropdownMenuItem>
           </DropdownMenuContent>

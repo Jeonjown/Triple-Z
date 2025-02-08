@@ -25,7 +25,7 @@ const HamburgerMenu = ({
 
       {/* Hamburger Menu */}
       <div
-        className={`fixed right-0 top-20 z-20 h-full w-3/4 transform overflow-y-scroll bg-white p-5 font-semibold text-text ${
+        className={`bg-gray fixed right-0 top-20 z-50 h-full w-3/4 transform overflow-y-auto bg-white p-5 font-semibold text-text ${
           isHamburgerOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform duration-300 ease-in-out`}
       >
