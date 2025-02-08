@@ -2,11 +2,11 @@ import { Link } from "react-router-dom";
 
 const AdminSidebar = () => {
   return (
-    <div className="fixed top-24 z-10 hidden min-h-screen w-64 border-2 bg-white md:block">
+    <div className="border-gray-0 fixed top-24 z-10 hidden min-h-screen w-64 border bg-white md:block">
       {/* Sidebar */}
       <aside className="flex flex-col font-semibold text-text">
         {/* Logo Section */}
-        <div className="bg-secondary">
+        <div className="bg-primary">
           <div className="flex h-16 items-center justify-center text-xl font-bold text-white">
             Admin Panel
           </div>

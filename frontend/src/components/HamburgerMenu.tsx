@@ -120,23 +120,25 @@ const HamburgerMenu = ({
             </NavLink>
           </li>
 
-          {user && user.role === "admin" && (
+          {user && (
+            <li className="py-2 hover:font-bold">
+              <NavLink
+                to="/my-account"
+                className={({ isActive }) =>
+                  isActive ? "border-l-4 border-solid border-primary px-2" : ""
+                }
+              >
+                Account
+              </NavLink>
+            </li>
+          )}
+
+          {/* {user && user.role === "admin" && (
             <>
-              <li className="py-2">
-                <NavLink
-                  to="/my-account"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "border-l-4 border-solid border-primary px-2"
-                      : ""
-                  }
-                >
-                  Account
-                </NavLink>
-              </li>
               <h3 className="mt-10">ADMIN PANEL</h3>
               <hr className="mb-6 border-2 border-primary" />
-              <li className="py-2">
+
+              <li className="py-2 hover:font-bold">
                 <NavLink
                   to="/admin-dashboard"
                   className={({ isActive }) =>
@@ -148,7 +150,7 @@ const HamburgerMenu = ({
                   Dashboard
                 </NavLink>
               </li>
-              <li className="py-2">
+              <li className="py-2 hover:font-bold">
                 <NavLink
                   to="/manage-users"
                   className={({ isActive }) =>
@@ -160,7 +162,7 @@ const HamburgerMenu = ({
                   Manage Users
                 </NavLink>
               </li>
-              <li className="py-2">
+              <li className="py-2 hover:font-bold">
                 <NavLink
                   to="/manage-menu"
                   className={({ isActive }) =>
@@ -172,7 +174,7 @@ const HamburgerMenu = ({
                   Manage Menu
                 </NavLink>
               </li>
-              <li className="py-2">
+              <li className="py-2 hover:font-bold">
                 <NavLink
                   to="/reports"
                   className={({ isActive }) =>
@@ -182,7 +184,7 @@ const HamburgerMenu = ({
                   Reports
                 </NavLink>
               </li>
-              <li className="py-2">
+              <li className="py-2 hover:font-bold">
                 <NavLink
                   to="/settings"
                   className={({ isActive }) =>
@@ -195,7 +197,7 @@ const HamburgerMenu = ({
                 </NavLink>
               </li>
             </>
-          )}
+          )} */}
 
           <hr className="border-t-3 my-5 border-gray-300" />
 

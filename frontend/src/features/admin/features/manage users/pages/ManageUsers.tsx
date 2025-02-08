@@ -162,7 +162,7 @@ const ManageUsers = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center bg-primary py-20 md:w-full">
+      <div className="flex flex-col items-center justify-center bg-muted pb-20 md:w-full">
         {/* CONTROL PANEL */}
         <UserControlPanel
           table={table}

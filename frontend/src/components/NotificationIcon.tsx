@@ -13,11 +13,12 @@ const NotificationIcon = () => {
     <>
       <div className="relative ml-auto gap-2 md:flex">
         {/* notification icon */}
+
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger>
-            <FaBell size={30} className="text-icon hover:scale-105" />
+            <FaBell size={28} className="text-icon hover:scale-105" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="mr-2">
             <DropdownMenuLabel className="font-bold">
               NOTIFICATION
             </DropdownMenuLabel>

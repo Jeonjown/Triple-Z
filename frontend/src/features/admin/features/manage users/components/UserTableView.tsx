@@ -57,13 +57,13 @@ const UserTableView = ({ table }: { table: Table<User> }) => {
       <div className="mx-auto w-5/6 flex-col rounded-lg">
         <div className="rounded-lg bg-white shadow-md">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-secondary">
+            <thead className="bg-primary">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className={` ${header.column.id === "_id" ? "hidden xl:table-cell" : ""} ${header.column.id === "role" ? "hidden sm:table-cell md:table-cell" : ""} ${header.column.id === "email" ? "hidden lg:table-cell" : ""} ${header.column.id === "username" || header.column.id === "actions" ? "sm:table-cell" : ""} ${(header.column.id === "role" || header.column.id === "email") && "lg:table-cell"} bg-secondary px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white`}
+                      className={` ${header.column.id === "_id" ? "hidden xl:table-cell" : ""} ${header.column.id === "role" ? "hidden sm:table-cell md:table-cell" : ""} ${header.column.id === "email" ? "hidden lg:table-cell" : ""} ${header.column.id === "username" || header.column.id === "actions" ? "sm:table-cell" : ""} ${(header.column.id === "role" || header.column.id === "email") && "lg:table-cell"} bg-primary px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white`}
                     >
                       <div
                         {...{
@@ -94,7 +94,7 @@ const UserTableView = ({ table }: { table: Table<User> }) => {
                       </div>
                     </th>
                   ))}
-                  <th className="bg-secondary px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white">
+                  <th className="bg-primary px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white">
                     Actions
                   </th>
                 </tr>
@@ -104,7 +104,7 @@ const UserTableView = ({ table }: { table: Table<User> }) => {
               {table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="transition hover:scale-105 hover:border-2 hover:bg-gray-200"
+                  className="transition hover:border-2 hover:bg-gray-200"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td
@@ -120,7 +120,7 @@ const UserTableView = ({ table }: { table: Table<User> }) => {
                   <td className="mt-1 flex items-center gap-2 py-4">
                     <button
                       onClick={() => handleEdit(row.original)}
-                      className="rounded bg-secondary px-3 py-2 text-white hover:opacity-85"
+                      className="rounded bg-primary px-3 py-2 text-white hover:opacity-85"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
