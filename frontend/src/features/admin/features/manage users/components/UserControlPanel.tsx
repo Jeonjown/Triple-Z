@@ -13,6 +13,7 @@ import {
   Search,
   Table2,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface CardViewProps {
   table: Table<User>;
@@ -48,21 +49,25 @@ const UserControlPanel = ({
             <div className="mx-4 flex rounded-lg border">
               {/* Card View Icon */}
               <div
-                className={`${view === "card" ? "bg-primary text-white" : "bg-secondary"} rounded-s-lg p-2 transition hover:cursor-pointer hover:opacity-80`}
+                className={`${
+                  view === "card" ? "bg-primary text-white" : "bg-secondary"
+                } rounded-s-lg p-2 transition hover:cursor-pointer hover:opacity-80`}
               >
                 <Layers size={20} onClick={() => setView("card")} />
               </div>
 
               {/* Table View Icon */}
               <div
-                className={`${view === "table" ? "bg-primary text-white" : "bg-secondary"} rounded-r-lg p-2 transition hover:cursor-pointer hover:opacity-80`}
+                className={`${
+                  view === "table" ? "bg-primary text-white" : "bg-secondary"
+                } rounded-r-lg p-2 transition hover:cursor-pointer hover:opacity-80`}
               >
                 <Table2 onClick={() => setView("table")} size={20} />
               </div>
             </div>
             <span className="mr-2">Items per page</span>
             <select
-              className="rounded-md border border-gray-300 p-2 shadow-sm focus:border-secondary focus:ring-secondary"
+              className="rounded-md border border-gray-300 p-2 shadow-sm focus:border-secondary focus:ring-primary"
               value={table.getState().pagination.pageSize}
               onChange={(e) => {
                 table.setPageSize(Number(e.target.value));
@@ -77,20 +82,21 @@ const UserControlPanel = ({
           </div>
 
           <div className="mb-4 ml-4 flex items-center space-x-2">
-            <button
-              className="rounded-md bg-primary p-2 text-white hover:cursor-pointer hover:bg-gray-200 disabled:opacity-50"
+            <Button
+              size={"icon"}
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              <ChevronsLeft size={20} />
-            </button>
-            <button
-              className="rounded-md bg-primary p-2 text-white hover:bg-gray-200 disabled:opacity-50"
+              <ChevronsLeft />
+            </Button>
+            <Button
+              size={"icon"}
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              <ChevronLeft size={20} />
-            </button>
+              <ChevronLeft />
+            </Button>
+
             <span className="flex items-center">
               <input
                 min={1}
@@ -105,20 +111,20 @@ const UserControlPanel = ({
               />
               <span className="ml-1">of {table.getPageCount()}</span>
             </span>
-            <button
-              className="rounded-md bg-primary p-2 text-white hover:bg-gray-200 disabled:opacity-50"
+            <Button
+              size={"icon"}
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              <ChevronRight size={20} />
-            </button>
-            <button
-              className="rounded-md bg-primary p-2 text-white hover:bg-gray-200 disabled:opacity-50"
+              <ChevronRight />
+            </Button>
+            <Button
+              size={"icon"}
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
-              <ChevronsRight size={20} />
-            </button>
+              <ChevronsRight />
+            </Button>
           </div>
         </div>
       </div>

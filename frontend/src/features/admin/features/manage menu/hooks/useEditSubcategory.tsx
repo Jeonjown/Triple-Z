@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { editSubcategory } from "../api/menu";
 import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface Subcategory {
   _id: string;
@@ -35,12 +36,21 @@ export const useEditSubcategory = () => {
       return editSubcategory(categoryId, subcategoryId, subcategoryName);
     },
     onError: (err) => {
-      console.error("Error editing category:", err);
+      console.error("Error editing subcategory:", err);
+      toast({
+        title: "Error editing subcategory",
+        description:
+          "There was an error updating the subcategory. Please try again.",
+        variant: "destructive",
+      });
     },
     onSuccess: (data) => {
-      console.log("Category edited successfully:", data);
-      queryClient.invalidateQueries({
-        queryKey: ["subcategories"],
+      console.log("Subcategory edited successfully:", data);
+      queryClient.invalidateQueries({ queryKey: ["subcategories"] });
+      toast({
+        title: "Subcategory updated",
+        description: "The subcategory has been updated successfully.",
+        variant: "default",
       });
     },
   });
@@ -68,7 +78,6 @@ export const useEditSubcategory = () => {
     setInputEditValue,
     subcategoryToEdit,
     setSubcategoryToEdit,
-
     isPending,
     isError,
     error,

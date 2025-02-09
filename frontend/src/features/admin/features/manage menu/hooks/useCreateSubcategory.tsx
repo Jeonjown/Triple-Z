@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { createSubcategory } from "../api/menu";
+import { toast } from "@/hooks/use-toast";
 
 interface Subcategory {
   categoryId: string;
@@ -15,22 +16,26 @@ export const useCreateSubcategory = () => {
   const queryClient = useQueryClient();
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: ({ categoryId, subcategoryName }: Subcategory) => {
-      console.log("Mutation called with:", {
-        categoryId,
-        subcategoryName,
-      });
+      console.log("Mutation called with:", { categoryId, subcategoryName });
       return createSubcategory(categoryId, subcategoryName);
     },
     onError: (err) => {
-      console.error("Error editing category:", err);
+      console.error("Error creating subcategory:", err);
+      toast({
+        title: "Error creating subcategory",
+        description:
+          "There was an error creating the subcategory. Please try again.",
+        variant: "destructive",
+      });
     },
     onSuccess: (data) => {
-      console.log("Category edited successfully:", data);
-      queryClient.invalidateQueries({
-        queryKey: ["subcategories"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["menuItems"],
+      console.log("Subcategory created successfully:", data);
+      queryClient.invalidateQueries({ queryKey: ["subcategories"] });
+      queryClient.invalidateQueries({ queryKey: ["menuItems"] });
+      toast({
+        title: "Subcategory Created",
+        description: "The subcategory has been successfully created.",
+        variant: "default",
       });
     },
   });
@@ -42,11 +47,20 @@ export const useCreateSubcategory = () => {
         subcategoryName: itemToAdd,
       };
 
-      mutate(newSubcategory);
-      setIsAddCategoryFormOpen(false);
-      setItemToAdd("");
+      mutate(newSubcategory, {
+        onSuccess: () => {
+          setIsAddCategoryFormOpen(false);
+          setItemToAdd("");
+        },
+      });
     } else {
       console.error("Subcategory name cannot be empty!");
+      toast({
+        title: "Empty Subcategory",
+        description: "Please enter a subcategory name before saving.",
+        variant: "destructive",
+      });
+      setIsAddCategoryFormOpen(false);
     }
   };
 

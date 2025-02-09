@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { Field, ErrorMessage, FieldArray, useFormikContext } from "formik";
+import { Delete, Plus } from "lucide-react";
 
 interface SizeField {
   size: string;
@@ -22,12 +24,12 @@ const SelectSizeField = () => {
         render={({ push, remove }) => (
           <div>
             {values.sizes?.map((_, index) => (
-              <div key={index} className="flex space-x-4 py-1">
+              <div key={index} className="animate-fadeIn flex space-x-4 py-1">
                 <div className="flex-1">
                   <Field
                     name={`sizes[${index}].size`}
                     placeholder="Enter Size (e.g., Small)"
-                    className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
+                    className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary sm:p-3"
                   />
                   <ErrorMessage
                     name={`sizes[${index}].size`}
@@ -40,7 +42,7 @@ const SelectSizeField = () => {
                     name={`sizes[${index}].sizePrice`}
                     type="number"
                     placeholder="Enter Price"
-                    className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
+                    className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary sm:p-3"
                   />
                   <ErrorMessage
                     name={`sizes[${index}].sizePrice`}
@@ -48,22 +50,24 @@ const SelectSizeField = () => {
                     className="text-xs text-red-500"
                   />
                 </div>
-                <button
+                <Button
                   type="button"
-                  onClick={() => remove(index)} // Remove size/price pair
-                  className="rounded-md border bg-primary px-2 text-xs text-red-500 hover:bg-gray-200"
+                  variant={"destructive"}
+                  onClick={() => remove(index)}
                 >
-                  Remove
-                </button>
+                  <Delete />
+                </Button>
               </div>
             ))}
-            <button
+            <Button
               type="button"
-              onClick={() => push({ size: "", price: 0 })} // Add new size/price pair
-              className="mt-4 rounded bg-secondary px-2 py-1 text-sm text-white"
+              onClick={() => push({ size: "", price: 0 })}
+              className="mt-1 text-xs"
+              size={"sm"}
             >
               Add Size/Price
-            </button>
+              <Plus />
+            </Button>
           </div>
         )}
       />

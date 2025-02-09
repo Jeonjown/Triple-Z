@@ -1,3 +1,14 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 interface DeleteConfirmationModalProps {
   showConfirmation: boolean;
   setShowConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
@@ -9,37 +20,34 @@ interface DeleteConfirmationModalProps {
 const DeleteConfirmationModal = ({
   showConfirmation,
   setShowConfirmation,
-
+  target,
   children,
   action,
 }: DeleteConfirmationModalProps) => {
-  if (!showConfirmation) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative w-5/6 max-w-md rounded-lg bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-xl font-semibold">Confirm Deletion</h2>
-        <p>Are you sure you want to delete "{children}"?</p>
-
-        <div className="mt-4 flex justify-between">
-          <button
-            className="rounded-md bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
-            onClick={() => setShowConfirmation(false)}
-          >
-            Cancel
-          </button>
-          <button
-            className="rounded bg-red-600 px-4 py-2 text-white hover:opacity-85"
+    <AlertDialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete "{target || children}"? This action
+            cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
             onClick={() => {
               setShowConfirmation(false);
               action();
             }}
+            className="bg-destructive"
           >
             Confirm
-          </button>
-        </div>
-      </div>
-    </div>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

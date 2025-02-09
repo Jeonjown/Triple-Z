@@ -4,15 +4,15 @@ import { useDeleteMenuItem } from "../hooks/useDeleteMenuItem";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import EditMenuItemModal from "./EditMenuItemModal";
 import { useEditMenuItem } from "../hooks/useEditMenuItem";
+import { ArrowUpDown, SquarePen, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// Define the type for MenuCardViewProps
 interface MenuCardViewProps {
   table: Table<MenuItem>;
   globalFilter: string | undefined;
   setGlobalFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-// The MenuCardView component
 const MenuCardView = ({ table }: MenuCardViewProps) => {
   const { editMode, setEditMode, itemToEdit, setItemToEdit, handleEdit } =
     useEditMenuItem();
@@ -27,7 +27,7 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
 
   return (
     <>
-      {/* EDIT MODAL */}
+      {/* Edit Modal */}
       {editMode && (
         <EditMenuItemModal
           setEditMode={setEditMode}
@@ -36,7 +36,7 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
         />
       )}
 
-      {/* Delete confirmation modal */}
+      {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
         showConfirmation={showConfirmation}
         setShowConfirmation={setShowConfirmation}
@@ -45,15 +45,14 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
         {menuTitle}
       </DeleteConfirmationModal>
 
-      {/* Grid for displaying menu items as cards */}
+      {/* Cards Grid */}
       <div className="grid w-5/6 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {/* Render data rows as cards */}
         {table.getRowModel().rows.map((row) => (
           <div
             key={row.id}
             className="flex min-w-0 flex-col space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-md transition hover:scale-105 hover:border-secondary hover:shadow-xl"
           >
-            {/* Render individual cells */}
+            {/* Render each cell as a key-value pair */}
             {row.getVisibleCells().map((cell) => {
               const header = table
                 .getHeaderGroups()
@@ -70,7 +69,7 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
                       className="flex items-center hover:scale-110 hover:cursor-pointer hover:opacity-80"
                       onClick={header.column.getToggleSortingHandler?.()}
                     >
-                      {header.column.columnDef.header && (
+                      {header.column.columnDef.header !== "Actions" && (
                         <span className="text-sm font-medium">
                           {flexRender(
                             header.column.columnDef.header,
@@ -78,86 +77,44 @@ const MenuCardView = ({ table }: MenuCardViewProps) => {
                           )}
                         </span>
                       )}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        className="ml-1 mr-3 size-3"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M2.24 6.8a.75.75 0 0 0 1.06-.04l1.95-2.1v8.59a.75.75 0 0 0 1.5 0V4.66l1.95 2.1a.75.75 0 1 0 1.1-1.02l-3.25-3.5a.75.75 0 0 0-1.1 0L2.2 5.74a.75.75 0 0 0 .04 1.06Zm8 6.4a.75.75 0 0 0-.04 1.06l3.25 3.5a.75.75 0 0 0 1.1 0l3.25-3.5a.75.75 0 1 0-1.1-1.02l-1.95 2.1V6.75a.75.75 0 0 0-1.5 0v8.59l-1.95-2.1a.75.75 0 0 0-1.06-.04Z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                      {header.column.columnDef.header === "Actions" ? (
+                        ""
+                      ) : (
+                        <ArrowUpDown className="ml-1 mr-3 size-3" />
+                      )}
                     </div>
                   )}
-
-                  {/* Render cell content */}
-                  {cell.column.id === "availability" ? (
-                    <span className="truncate text-sm">
-                      {cell.getValue() ? "Yes" : "No"}
-                    </span>
-                  ) : cell.column.id === "image" ? (
-                    <img
-                      src={cell.getValue() as string}
-                      alt="Image"
-                      className="h-16 w-16 rounded object-cover"
-                    />
-                  ) : cell.column.id === "price" ? (
-                    <span className="truncate text-sm">{`₱ ${cell.getValue()}`}</span>
-                  ) : (
-                    <span className="truncate text-sm">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </span>
-                  )}
+                  <span className="truncate text-sm">
+                    {cell.column.id === "availability" ? (
+                      <>{cell.getValue() ? "Yes" : "No"}</>
+                    ) : cell.column.id === "image" ? (
+                      <img
+                        src={cell.getValue() as string}
+                        alt="Image"
+                        className="h-16 w-16 rounded object-cover"
+                      />
+                    ) : cell.column.id === "price" ? (
+                      <>₱ {cell.getValue()}</>
+                    ) : (
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    )}
+                  </span>
                 </div>
               );
             })}
 
-            {/* Action buttons (Edit and Delete) */}
+            {/* Action Buttons */}
             <div className="ml-auto flex gap-2">
-              <button
-                onClick={() => handleEdit(row.original)}
-                className="rounded bg-secondary px-3 py-2 text-white hover:opacity-85"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                  />
-                </svg>
-              </button>
-              <button
+              <Button onClick={() => handleEdit(row.original)} size="icon">
+                <SquarePen size={20} />
+              </Button>
+              <Button
                 onClick={() => handleDelete(row.original)}
-                className="rounded bg-red-500 px-3 py-2 text-white hover:bg-red-600"
+                size="icon"
+                variant="destructive"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                  />
-                </svg>
-              </button>
+                <Trash2 size={20} />
+              </Button>
             </div>
           </div>
         ))}

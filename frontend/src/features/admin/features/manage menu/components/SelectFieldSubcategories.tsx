@@ -2,6 +2,14 @@ import { ErrorMessage, Field, useFormikContext } from "formik";
 import useFetchAllSubcategories from "../hooks/useFetchAllSubcategories";
 import useSubcategoryModal from "../hooks/useSubcategoryModal";
 import SubcategoryModal from "./SubcategoryModal";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { SquarePen } from "lucide-react";
 
 // Define the interface for each subcategory option
 export interface SubcategoryOption {
@@ -61,33 +69,29 @@ const SelectFieldSubcategories = ({
         </label>
 
         {/* EDIT ICON */}
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="hover:bg-secondary-dark mb-2 flex items-center justify-center rounded bg-secondary p-1 text-white focus:outline-none focus:ring-2 focus:ring-secondary"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="h-3 w-3"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-            />
-          </svg>
-        </button>
+        <TooltipProvider delayDuration={100}>
+          <Tooltip>
+            <TooltipTrigger type="button">
+              <Button
+                type="button"
+                className="mb-2 h-2 w-2 p-3"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <SquarePen className="!size-3" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="text-xs">
+              <p>Edit Subcategory</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <Field
         as="select"
         id={name}
         name={name}
         value={currentSubcategoryId} // Controlled by state
-        className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
+        className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary sm:p-3"
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           const selectedSubcategoryId = e.target.value;
           // Update local state

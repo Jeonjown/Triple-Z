@@ -1,4 +1,4 @@
-import { ErrorMessage, Field } from "formik";
+import { ErrorMessage, Field, FieldProps } from "formik";
 
 interface InputFieldProps {
   label: string;
@@ -16,13 +16,19 @@ const InputField = ({ label, name, type, placeholder }: InputFieldProps) => {
       >
         {label}
       </label>
-      <Field
-        type={type}
-        id={name}
-        name={name}
-        className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
-        placeholder={placeholder}
-      />
+      <Field name={name}>
+        {({ field }: FieldProps<Record<string, unknown>>) => (
+          <input
+            {...field}
+            type={type}
+            id={name}
+            placeholder={placeholder}
+            // Ensure the value is always a string (controlled)
+            value={field.value == null ? "" : String(field.value)}
+            className="animate-fadeIn w-full rounded-md border p-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary sm:p-3"
+          />
+        )}
+      </Field>
       <ErrorMessage
         name={name}
         component="div"

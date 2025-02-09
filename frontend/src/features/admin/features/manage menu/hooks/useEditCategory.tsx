@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { editCategory } from "../api/menu";
 import { useState } from "react";
 import { SingleCategory } from "../components/CategoryModal";
+import { toast } from "@/hooks/use-toast";
 
 export const useEditCategory = () => {
   const [showEditConfirmation, setShowEditConfirmation] =
@@ -26,11 +27,20 @@ export const useEditCategory = () => {
     },
     onError: (err) => {
       console.error("Error editing category:", err);
+      toast({
+        title: "Error editing category",
+        description:
+          "There was an error updating the category. Please try again.",
+        variant: "destructive",
+      });
     },
     onSuccess: (data) => {
       console.log("Category edited successfully:", data);
-      queryClient.invalidateQueries({
-        queryKey: ["categories"],
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast({
+        title: "Category updated",
+        description: "Category has been updated successfully.",
+        variant: "default",
       });
     },
   });

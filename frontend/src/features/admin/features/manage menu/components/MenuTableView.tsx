@@ -1,14 +1,52 @@
-import { flexRender, Table } from "@tanstack/react-table";
+import { flexRender, Table as TanstackTable } from "@tanstack/react-table";
 import { MenuItem } from "../pages/ManageMenu";
 import { useEditMenuItem } from "../hooks/useEditMenuItem";
 import EditMenuItemModal from "./EditMenuItemModal";
 import { useDeleteMenuItem } from "../hooks/useDeleteMenuItem";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import { SquarePen, Trash2, ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
-const MenuTableView = ({ table }: { table: Table<MenuItem> }) => {
+interface MenuTableViewProps {
+  table: TanstackTable<MenuItem>;
+}
+
+const getColumnClassNames = (columnId: string, type: "head" | "cell") => {
+  switch (columnId) {
+    case "title":
+      return type === "head" ? "sm:table-cell font-bold" : "sm:table-cell";
+    case "price":
+      return type === "head" ? "sm:table-cell font-bold" : "sm:table-cell";
+    case "availability":
+      return type === "head"
+        ? "hidden lg:table-cell font-bold"
+        : "hidden lg:table-cell";
+    case "image":
+      return type === "head"
+        ? "hidden xl:table-cell font-bold"
+        : "hidden xl:table-cell";
+    default:
+      return "";
+  }
+};
+
+const MenuTableView = ({ table }: MenuTableViewProps) => {
   const { editMode, setEditMode, itemToEdit, setItemToEdit, handleEdit } =
     useEditMenuItem();
-
   const {
     handleDelete,
     menuTitle,
@@ -16,6 +54,7 @@ const MenuTableView = ({ table }: { table: Table<MenuItem> }) => {
     setShowConfirmation,
     handleConfirmDelete,
   } = useDeleteMenuItem();
+
   return (
     <>
       {editMode && (
@@ -26,7 +65,6 @@ const MenuTableView = ({ table }: { table: Table<MenuItem> }) => {
         />
       )}
 
-      {/* Delete confirmation modal */}
       <DeleteConfirmationModal
         showConfirmation={showConfirmation}
         setShowConfirmation={setShowConfirmation}
@@ -34,132 +72,94 @@ const MenuTableView = ({ table }: { table: Table<MenuItem> }) => {
       >
         {menuTitle}
       </DeleteConfirmationModal>
+
       <div className="mx-auto w-5/6 flex-col rounded-lg">
         <div className="overflow-x-auto rounded-lg bg-white shadow-md">
-          <table className="min-w-full table-auto divide-y divide-gray-200">
-            <thead className="bg-secondary">
+          <Table>
+            <TableHeader className="bg-primary">
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    const headerClass = `
-                     max-w-48 truncate whitespace-nowrap px-6 py-3 text-xs font-medium uppercase tracking-wider text-white
-                     bg-secondary
-                      ${header.id === "item" ? "" : ""} 
-                      ${header.id === "price" ? "" : ""}
-                      ${header.id === "availability" || header.id === "category" ? "hidden lg:table-cell" : ""}
-                      ${header.id === "image" || header.id === "_id" ? "hidden xl:table-cell" : ""}
-                    `.trim();
-
-                    return (
-                      <th key={header.id} className={headerClass}>
-                        <div
-                          {...{
-                            className: header.column.getCanSort()
-                              ? "cursor-pointer select-none flex items-center"
-                              : "",
-                            onClick: header.column.getToggleSortingHandler(),
-                          }}
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                          {header.column.columnDef.header && (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                              className="ml-2 size-4"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M2.24 6.8a.75.75 0 0 0 1.06-.04l1.95-2.1v8.59a.75.75 0 0 0 1.5 0V4.66l1.95 2.1a.75.75 0 1 0 1.1-1.02l-3.25-3.5a.75.75 0 0 0-1.1 0L2.2 5.74a.75.75 0 0 0 .04 1.06Zm8 6.4a.75.75 0 0 0-.04 1.06l3.25 3.5a.75.75 0 0 0 1.1 0l3.25-3.5a.75.75 0 1 0-1.1-1.02l-1.95 2.1V6.75a.75.75 0 0 0-1.5 0v8.59l-1.95-2.1a.75.75 0 0 0-1.06-.04Z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                      </th>
-                    );
-                  })}
-                  <th className="bg-secondary px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white">
-                    Actions
-                  </th>
-                </tr>
-              ))}
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id} // Added key for each row
-                  className="transition hover:border-2 hover:bg-gray-200"
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    const { id } = cell.column;
-
-                    const cellClass = `
-                      max-w-48 truncate whitespace-nowrap px-6 py-4 text-sm text-text
-                      ${id === "item" ? "" : ""} 
-                      ${id === "price" ? "" : ""}
-                      ${id === "availability" || id === "category" ? "hidden lg:table-cell" : ""}
-                      ${id === "image" || id === "_id" ? "hidden xl:table-cell" : ""}
-                    `.trim();
-
-                    return (
-                      <td key={cell.id} className={cellClass}>
-                        {cell.column.id === "price" ? (
-                          <span className="truncate text-sm">{`₱ ${cell.getValue()}`}</span>
-                        ) : (
-                          <span className="truncate text-sm">
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </span>
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      className={`${getColumnClassNames(header.column.id, "head")} px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white`}
+                    >
+                      <div
+                        {...{
+                          className: header.column.getCanSort()
+                            ? "cursor-pointer select-none flex items-center"
+                            : "",
+                          onClick: header.column.getToggleSortingHandler(),
+                        }}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
                         )}
-                      </td>
-                    );
-                  })}
-                  <td className="mt-1 flex items-center gap-2 py-4">
-                    <button className="rounded bg-secondary px-3 py-2 text-white hover:opacity-85">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="size-5"
-                        onClick={() => handleEdit(row.original)}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                        />
-                      </svg>
-                    </button>
-                    <button className="rounded bg-red-500 px-3 py-2 text-white hover:bg-red-600">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="size-5"
-                        onClick={() => handleDelete(row.original)}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                        />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
+                        {header.column.getCanSort() && (
+                          <ArrowUpDown className="ml-1 mr-3 size-3" />
+                        )}
+                      </div>
+                    </TableHead>
+                  ))}
+                  <TableHead className="bg-primary px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white">
+                    Actions
+                  </TableHead>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableHeader>
+            <TableBody className="divide-y divide-gray-200 bg-white">
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} className="transition hover:bg-gray-200">
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className={`${getColumnClassNames(cell.column.id, "cell")} whitespace-nowrap px-6 py-4 text-sm text-text`}
+                    >
+                      {cell.column.id === "price" ? (
+                        <span className="truncate text-sm">{`₱ ${cell.getValue()}`}</span>
+                      ) : (
+                        <span className="truncate text-sm">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </span>
+                      )}
+                    </TableCell>
+                  ))}
+                  <TableCell className="mt-1 flex items-center gap-2 py-4">
+                    <Button
+                      onClick={() => handleEdit(row.original)}
+                      size="icon"
+                    >
+                      <SquarePen size={20} />
+                    </Button>
+                    <TooltipProvider delayDuration={100}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>
+                            <Button
+                              onClick={() => handleDelete(row.original)}
+                              size="icon"
+                              variant="destructive"
+                              className="disabled:cursor-not-allowed disabled:bg-secondary"
+                              disabled={row.original._id === undefined}
+                            >
+                              <Trash2 size={20} />
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          <p>You cannot delete this item.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
     </>

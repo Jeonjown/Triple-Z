@@ -74,17 +74,20 @@ const UserEditModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative m-4 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
         {/* Close Button */}
-        <button
+
+        <Button
+          size={"icon"}
+          variant={"ghost"}
           className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
           onClick={() => setIsEditModalOpen(false)}
         >
           <X />
-        </button>
+        </Button>
 
         <h2 className="mb-6 text-xl font-semibold text-gray-800">Edit User</h2>
 
         <div className="space-y-4">
-          {["ID", "Username", "Email"].map((field) => (
+          {["_id", "Username", "Email"].map((field) => (
             <div key={field} className="flex justify-between">
               <label className="text-gray-700">{field}:</label>
               <span className="text-gray-500">

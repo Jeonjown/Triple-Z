@@ -9,6 +9,8 @@ import SelectFieldSubcategories from "./SelectFieldSubcategories"; // Custom sub
 import SelectSizeField from "./SelectSizeField"; // Custom component for sizes
 import { useCreateMenuItem } from "../hooks/useCreateMenuItem"; // Hook for creating menu items
 import { MenuItemData } from "../api/menu";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 interface CreateMenuItemModalProps {
   isCreateModalOpen: boolean;
@@ -167,25 +169,14 @@ const CreateMenuItemModal = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative m-4 max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white p-6 shadow-lg sm:p-8">
-        <button
-          className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+        <Button
+          variant={"ghost"}
+          size={"icon"}
           onClick={() => setIsCreateModalOpen(false)}
+          className="absolute right-4 top-4"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="h-6 w-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+          <X className="!size-7" />
+        </Button>
 
         <h2 className="mb-4 text-xl font-semibold text-gray-800 sm:text-2xl">
           Create Menu Item
@@ -242,7 +233,7 @@ const CreateMenuItemModal = ({
                         setFieldValue("sizes", []);
                       }
                     }}
-                    className="rounded border-gray-300 text-secondary focus:ring-secondary"
+                    className="rounded border-gray-300 text-secondary focus:ring-primary"
                   />
                   <span className="text-xs">Is Size Required?</span>
                 </label>
@@ -280,7 +271,7 @@ const CreateMenuItemModal = ({
                   as="textarea"
                   id="description"
                   name="description"
-                  className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
+                  className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary sm:p-3"
                   placeholder="Write Description Here"
                 />
                 <ErrorMessage
@@ -292,19 +283,14 @@ const CreateMenuItemModal = ({
 
               {/* Action Buttons */}
               <div className="flex justify-end space-x-4">
-                <button
+                <Button
                   type="button"
-                  className="rounded-md bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
                   onClick={() => setIsCreateModalOpen(false)}
+                  variant={"secondary"}
                 >
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="hover:bg-secondary-dark rounded-md bg-secondary px-4 py-2 text-white"
-                >
-                  Submit
-                </button>
+                </Button>
+                <Button type="submit">Submit</Button>
               </div>
             </Form>
           )}

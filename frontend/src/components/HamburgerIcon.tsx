@@ -1,5 +1,6 @@
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoMdClose } from "react-icons/io";
+import { Button } from "./ui/button";
 
 type HamburgerIconProps = {
   isHamburgerOpen: boolean;
@@ -13,20 +14,25 @@ const HamburgerIcon = ({ isHamburgerOpen, toggle }: HamburgerIconProps) => {
     <>
       {isHamburgerOpen ? (
         // x icon
-        <button
+
+        <Button
+          className="z-50 h-10 rounded-full hover:cursor-pointer hover:bg-muted active:animate-rotateLeftSlowly"
           onClick={() => toggle("isHamburgerOpen")}
-          className="z-50 rounded-full p-2 text-icon hover:cursor-pointer hover:bg-muted active:animate-rotateLeftSlowly"
+          size={"icon"}
+          variant={"ghost"}
         >
-          <IoMdClose size={28} />
-        </button>
+          <IoMdClose className="!size-7" />
+        </Button>
       ) : (
         // burger icon
-        <button
+        <Button
           onClick={() => toggle("isHamburgerOpen")}
           className="z-50 rounded-full p-2 text-icon hover:cursor-pointer hover:bg-muted active:animate-rotateRightSlowly sm:hidden"
+          size={"icon"}
+          variant={"ghost"}
         >
-          <RxHamburgerMenu size={28} />
-        </button>
+          <RxHamburgerMenu className="!size-7" />
+        </Button>
       )}
     </>
   );

@@ -10,6 +10,8 @@ import { useEditMenuItem } from "../hooks/useEditMenuItem";
 import SelectFieldCategories from "./SelectFieldCategories";
 import SelectFieldSubcategories from "./SelectFieldSubcategories";
 import useFetchAllCategories from "../hooks/useFetchAllCategories";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface EditMenuItemModalProps {
   setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
@@ -74,25 +76,14 @@ const EditMenuItemModal = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative m-4 max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white p-6 shadow-lg sm:p-8">
-        <button
-          className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+        <Button
+          size={"icon"}
+          variant={"ghost"}
           onClick={() => setEditMode(false)}
+          className="absolute right-4 top-4"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="h-6 w-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+          <X className="!size-7" />
+        </Button>
 
         <h2 className="mb-4 text-xl font-semibold text-gray-800 sm:text-2xl">
           Edit Menu Item
@@ -142,7 +133,7 @@ const EditMenuItemModal = ({
                       type="radio"
                       name="availability"
                       value={true}
-                      className="h-4 w-4 rounded-full border-gray-300 text-secondary focus:ring-secondary"
+                      className="h-4 w-4 rounded-full border-gray-300 text-secondary focus:ring-primary"
                       checked={values.availability === true}
                       onChange={() => setFieldValue("availability", true)}
                     />
@@ -153,7 +144,7 @@ const EditMenuItemModal = ({
                       type="radio"
                       name="availability"
                       value={false}
-                      className="h-4 w-4 rounded-full border-gray-300 text-secondary focus:ring-secondary"
+                      className="h-4 w-4 rounded-full border-gray-300 text-secondary focus:ring-primary"
                       checked={values.availability === false}
                       onChange={() => setFieldValue("availability", false)}
                     />
@@ -200,7 +191,7 @@ const EditMenuItemModal = ({
                       setFieldValue("sizes", []);
                     }
                   }}
-                  className="rounded border-gray-300 text-secondary focus:ring-secondary"
+                  className="rounded border-gray-300 text-secondary focus:ring-primary"
                 />
                 <span className="text-xs">Is Size Required?</span>
               </label>
@@ -239,7 +230,7 @@ const EditMenuItemModal = ({
                   as="textarea"
                   id="description"
                   name="description"
-                  className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring focus:ring-secondary sm:p-3"
+                  className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary sm:p-3"
                   placeholder="Write Description Here"
                 />
                 <ErrorMessage
@@ -251,19 +242,13 @@ const EditMenuItemModal = ({
 
               {/* Action Buttons */}
               <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  className="rounded-md bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
+                <Button
+                  variant={"secondary"}
                   onClick={() => setEditMode(false)}
                 >
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="hover:bg-secondary-dark rounded-md bg-secondary px-4 py-2 text-white"
-                >
-                  Submit
-                </button>
+                </Button>
+                <Button type="submit">Submit</Button>
               </div>
             </Form>
           )}

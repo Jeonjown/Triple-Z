@@ -5,7 +5,6 @@ import useEditUserModal from "../hooks/useEditUserModal";
 import UserEditModal from "./UserEditModal";
 import useAuthStore from "@/features/auth/stores/useAuthStore";
 import { SquarePen, Trash2, ArrowUpDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -13,7 +12,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-// Import your ShadCN table components
 import {
   Table,
   TableHeader,
@@ -27,6 +25,24 @@ import DeleteUserModal from "./DeleteUserModal";
 interface UserTableViewProps {
   table: TanstackTable<User>;
 }
+
+const getColumnClassNames = (columnId: string, type: "head" | "cell") => {
+  switch (columnId) {
+    case "_id":
+      return type === "head" ? "hidden xl:table-cell" : "hidden xl:table-cell";
+    case "role":
+      return type === "head"
+        ? "hidden sm:table-cell md:table-cell"
+        : "hidden sm:table-cell md:table-cell";
+    case "email":
+      return type === "head" ? "hidden lg:table-cell" : "hidden lg:table-cell";
+    case "username":
+    case "actions":
+      return type === "head" ? "sm:table-cell" : "sm:table-cell";
+    default:
+      return "";
+  }
+};
 
 const UserTableView = ({ table }: UserTableViewProps) => {
   const {
@@ -81,7 +97,7 @@ const UserTableView = ({ table }: UserTableViewProps) => {
       )}
 
       <div className="mx-auto w-5/6 flex-col rounded-lg">
-        <div className="rounded-lg bg-white shadow-md">
+        <div className="overflow-x-auto rounded-lg bg-white shadow-md">
           <Table>
             <TableHeader className="bg-primary">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -89,7 +105,7 @@ const UserTableView = ({ table }: UserTableViewProps) => {
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
-                      className={` ${header.column.id === "_id" ? "hidden xl:table-cell" : ""} ${header.column.id === "role" ? "hidden sm:table-cell md:table-cell" : ""} ${header.column.id === "email" ? "hidden lg:table-cell" : ""} ${header.column.id === "username" || header.column.id === "actions" ? "sm:table-cell" : ""} ${(header.column.id === "role" || header.column.id === "email") && "lg:table-cell"} px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white`}
+                      className={`${getColumnClassNames(header.column.id, "head")} px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white`}
                     >
                       <div
                         {...{
@@ -117,14 +133,11 @@ const UserTableView = ({ table }: UserTableViewProps) => {
             </TableHeader>
             <TableBody className="divide-y divide-gray-200 bg-white">
               {table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className="transition hover:border-2 hover:bg-gray-200"
-                >
+                <TableRow key={row.id} className="transition hover:bg-gray-200">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={` ${cell.column.id === "_id" ? "hidden xl:table-cell" : ""} ${cell.column.id === "role" ? "hidden sm:table-cell md:table-cell" : ""} ${cell.column.id === "email" ? "hidden lg:table-cell" : ""} ${cell.column.id === "username" || cell.column.id === "actions" ? "sm:table-cell" : ""} ${(cell.column.id === "role" || cell.column.id === "email") && "lg:table-cell"} whitespace-nowrap px-6 py-4 text-sm text-text`}
+                      className={`${getColumnClassNames(cell.column.id, "cell")} whitespace-nowrap px-6 py-4 text-sm text-text`}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

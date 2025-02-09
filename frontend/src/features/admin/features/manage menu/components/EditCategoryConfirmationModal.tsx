@@ -1,10 +1,20 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Dispatch, SetStateAction } from "react";
 import { SingleCategory } from "./CategoryModal";
 import { useEditCategory } from "../hooks/useEditCategory";
 
 interface EditConfirmationModalProps {
   setEditMode: Dispatch<SetStateAction<boolean>>;
-  setShowConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowConfirmation: Dispatch<SetStateAction<boolean>>;
   categoryToEdit: SingleCategory | undefined;
 }
 
@@ -14,29 +24,39 @@ const EditCategoryConfirmationModal = ({
   categoryToEdit,
 }: EditConfirmationModalProps) => {
   const { mutate: editCategory } = useEditCategory();
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative w-5/6 max-w-md rounded-lg bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-xl font-semibold">Confirm Update</h2>
-        <p>Are you sure you want to Edit "{categoryToEdit?.category}"?</p>{" "}
-        {/* Access category from target object */}
-        <div className="mt-4 flex justify-between">
-          <button
-            className="rounded-md bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
+    <AlertDialog
+      open={true}
+      onOpenChange={(open) => {
+        if (!open) {
+          // When the dialog is closed (by clicking outside, etc.), cancel the edit
+          setShowConfirmation(false);
+          setEditMode(false);
+        }
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Confirm Update</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to edit "{categoryToEdit?.category}"? This
+            action will update the category.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel
             onClick={() => {
-              setShowConfirmation(false); // Close modal
+              setShowConfirmation(false);
               setEditMode(false);
             }}
           >
             Cancel
-          </button>
-          <button
-            className="rounded bg-red-600 px-4 py-2 text-white hover:opacity-85"
+          </AlertDialogCancel>
+          <AlertDialogAction
             onClick={() => {
               setShowConfirmation(false);
               setEditMode(false);
-
-              // Ensure categoryToEdit has _id and category
               if (categoryToEdit?._id && categoryToEdit.category) {
                 editCategory({
                   categoryId: categoryToEdit._id,
@@ -46,10 +66,10 @@ const EditCategoryConfirmationModal = ({
             }}
           >
             Confirm
-          </button>
-        </div>
-      </div>
-    </div>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 
