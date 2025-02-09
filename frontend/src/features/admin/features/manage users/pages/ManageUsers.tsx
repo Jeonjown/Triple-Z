@@ -162,7 +162,7 @@ const ManageUsers = () => {
 
   return (
     <>
-      <div className="mx-auto flex min-h-full w-5/6 flex-col items-center pb-20">
+      <div className="mx-auto flex min-h-full w-full flex-col items-center pb-20">
         {/* CONTROL PANEL */}
         <UserControlPanel
           table={table ?? []}
