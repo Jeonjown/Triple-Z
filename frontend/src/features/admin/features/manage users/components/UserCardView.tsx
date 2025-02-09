@@ -14,6 +14,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import LoadingPage from "@/pages/LoadingPage";
+import ErrorPage from "@/pages/ErrorPage";
 
 interface UserCardViewProps {
   table: Table<User>;
@@ -40,8 +42,20 @@ const UserCardView = ({ table }: UserCardViewProps) => {
   } = useDeleteUserModal();
 
   const { user: currentUser } = useAuthStore();
+
+  if (isPending) {
+    return <LoadingPage />;
+  }
+
+  if (isError && error?.statusCode !== 404) {
+    return (
+      <ErrorPage message={error?.message} statusCode={error?.statusCode} />
+    );
+  }
+
   return (
     <>
+      {/* Modal Overlays */}
       {isEditModalOpen && userToEdit && (
         <UserEditModal
           setIsEditModalOpen={setIsEditModalOpen}
@@ -56,29 +70,18 @@ const UserCardView = ({ table }: UserCardViewProps) => {
           handleCloseModal={handleCloseModal}
         />
       )}
-      {/* Feedback for Deleting a User */}
-      {isPending && (
-        <div className="text-sm text-blue-500">
-          Deleting user, please wait...
-        </div>
-      )}
-      {isError && (
-        <div className="text-sm text-red-700">
-          Error: {error ? error.message : "An unexpected error occurred."}
-        </div>
-      )}
+
+      {/* Main Content – Cards */}
       <div className="grid w-5/6 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {/* Data Rows Rendered as Cards */}
         {table.getRowModel().rows.map((row) => {
           const isSelf = row.original._id === currentUser?._id;
 
           return (
-            // CARD
             <div
               key={row.id}
               className="flex min-w-0 flex-col space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-md transition hover:scale-105 hover:border-secondary hover:shadow-xl"
             >
-              {/* Individual Cells as Key-Value Pairs */}
+              {/* Render each cell as a key-value pair */}
               {row.getVisibleCells().map((cell) => {
                 const header = table
                   .getHeaderGroups()
@@ -122,7 +125,7 @@ const UserCardView = ({ table }: UserCardViewProps) => {
 
               {/* Action Buttons */}
               <div className="ml-auto flex gap-2">
-                <Button onClick={() => handleEdit(row.original)} size={"icon"}>
+                <Button onClick={() => handleEdit(row.original)} size="icon">
                   <SquarePen size={20} />
                 </Button>
                 <TooltipProvider delayDuration={100}>
@@ -131,8 +134,8 @@ const UserCardView = ({ table }: UserCardViewProps) => {
                       <span>
                         <Button
                           onClick={() => handleDelete(row.original)}
-                          size={"icon"}
-                          variant={"destructive"}
+                          size="icon"
+                          variant="destructive"
                           className="disabled:cursor-not-allowed disabled:bg-secondary"
                           disabled={isSelf}
                         >
