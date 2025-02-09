@@ -1,5 +1,6 @@
 // import { useQuery } from "@tanstack/react-query";
 // import { getAllUsers } from "../api/admin";
+
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -11,9 +12,10 @@ import {
 } from "@tanstack/react-table";
 // import mockUsers from "../../../testing/users.json";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import UserControlPanel from "../components/UserControlPanel";
-import { getAllUsers } from "../../../../../api/user";
+import ErrorPage from "@/pages/ErrorPage";
+import LoadingPage from "@/pages/LoadingPage";
+import { useGetAllUsers } from "../hooks/useGetAllUsers";
 
 export interface User {
   _id: string;
@@ -32,10 +34,7 @@ const ManageUsers = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string | undefined>("");
 
-  const { data, isPending, isError, error } = useQuery({
-    queryKey: ["users"],
-    queryFn: getAllUsers,
-  });
+  const { data, isPending, isError, error } = useGetAllUsers();
 
   const columnHelper = createColumnHelper<User>();
 
@@ -133,7 +132,7 @@ const ManageUsers = () => {
   ];
 
   const table = useReactTable({
-    data: data || [],
+    data: data ?? [],
     columns,
     state: {
       sorting,
@@ -141,7 +140,7 @@ const ManageUsers = () => {
     },
     initialState: {
       pagination: {
-        pageSize: 5,
+        pageSize: 10,
       },
     },
     getCoreRowModel: getCoreRowModel(),
@@ -152,20 +151,21 @@ const ManageUsers = () => {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  if (isPending) {
-    return <span>Loading...</span>;
-  }
+  if (isPending) return <LoadingPage />;
 
-  if (isError) {
-    return <span>Error: {error.message}</span>;
+  // Show an error page only if error is NOT about an empty dataset
+  if (isError && error?.statusCode !== 404) {
+    return (
+      <ErrorPage message={error?.message} statusCode={error?.statusCode} />
+    );
   }
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center bg-muted pb-20 md:w-full">
+      <div className="mx-auto flex min-h-full w-5/6 flex-col items-center pb-20">
         {/* CONTROL PANEL */}
         <UserControlPanel
-          table={table}
+          table={table ?? []}
           globalFilter={globalFilter}
           setGlobalFilter={setGlobalFilter}
           title={title}

@@ -25,48 +25,52 @@ function App() {
 
   return (
     <Router>
-      <Navbar />
+      <main className="flex min-h-[200vh] flex-col">
+        <Navbar />
 
-      {isAdmin ? (
-        <AdminSidebarLayout>
-          <Routes>
-            {/* Regular Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/contacts" element={<Contacts />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/blogs" element={<Blogs />} />
-            <Route path="/my-account" element={<MyAccount />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
+        <div className="flex-grow">
+          {isAdmin ? (
+            <AdminSidebarLayout>
+              <Routes>
+                {/* Regular Routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/menu" element={<Menu />} />
+                <Route path="/contacts" element={<Contacts />} />
+                <Route path="/schedule" element={<Schedule />} />
+                <Route path="/blogs" element={<Blogs />} />
+                <Route path="/my-account" element={<MyAccount />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={<Login />} />
 
-            {/* Admin Routes */}
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/manage-users" element={<ManageUsers />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/manage-menu" element={<ManageMenu />} />
-          </Routes>
-        </AdminSidebarLayout>
-      ) : (
-        <Routes>
-          {/* Regular Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/contacts" element={<Contacts />} />
-          <Route path="/schedule" element={<Schedule />} />
-          <Route path="/blogs" element={<Blogs />} />
-          <Route path="/my-account" element={<MyAccount />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-      )}
+                {/* Admin Routes */}
+                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="/manage-users" element={<ManageUsers />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/manage-menu" element={<ManageMenu />} />
+              </Routes>
+            </AdminSidebarLayout>
+          ) : (
+            <Routes>
+              {/* Regular Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/contacts" element={<Contacts />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/blogs" element={<Blogs />} />
+              <Route path="/my-account" element={<MyAccount />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Login />} />
+            </Routes>
+          )}
+        </div>
 
-      <Footer />
+        <Footer />
+      </main>
     </Router>
   );
 }

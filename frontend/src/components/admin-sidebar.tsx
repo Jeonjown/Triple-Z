@@ -59,13 +59,13 @@ export function AppAdminSidebar() {
             <SidebarMenu>
               {items.map(({ title, url, icon: Icon }) => (
                 <SidebarMenuItem key={title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="[&>svg]:size-5">
                     <Link
                       to={url}
                       className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
                     >
-                      <Icon size={35} /> {/* Adjust size here */}
-                      <span className="font-semibold">{title}</span>
+                      <Icon />
+                      <span className="text-base font-semibold">{title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

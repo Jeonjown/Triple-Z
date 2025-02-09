@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import useAuthStore from "../features/auth/stores/useAuthStore";
 import useLogout from "../features/auth/hooks/useLogout";
+import { ChevronRight } from "lucide-react";
 
 type HamburgerMenuProps = {
   isHamburgerOpen: boolean;
@@ -54,22 +55,11 @@ const HamburgerMenu = ({
             onClick={() => toggle("isScheduleOpen")}
           >
             Events
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
+            <ChevronRight
               className={`ml-auto w-7 pl-2 ${
                 isScheduleOpen ? "rotate-90" : ""
               } transition-transform duration-100`}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8.25 4.5l7.5 7.5-7.5 7.5"
-              />
-            </svg>
+            />
           </li>
           {isScheduleOpen && (
             <>

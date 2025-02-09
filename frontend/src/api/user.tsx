@@ -14,9 +14,16 @@ export const getAllUsers = async () => {
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || "an error occurred");
+      throw {
+        statusCode: error.response?.status || 500,
+        message: error.response?.data?.message || "An error occurred",
+      };
     }
-    throw new Error("An unexpected error occurred");
+    // Handle unexpected errors
+    throw {
+      statusCode: 500,
+      message: "An unexpected error occurred",
+    };
   }
 };
 

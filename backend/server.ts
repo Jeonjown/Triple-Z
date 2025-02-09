@@ -22,7 +22,7 @@ server.use(express.json({ limit: "10mb" }));
 server.use(
   cors({
     origin: ["http://localhost:5173", "https://triple-z.vercel.app"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true,
   })

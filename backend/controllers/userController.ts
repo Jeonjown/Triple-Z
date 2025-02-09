@@ -10,8 +10,15 @@ export const getAllUsers = async (
   try {
     const users = await User.find();
 
+    if (!users.length) {
+      res.status(200).json({ message: "No users found." });
+      return;
+    }
+
     res.status(200).json(users);
-  } catch (error) {}
+  } catch (error) {
+    createError("something went wrong.", 500);
+  }
 };
 
 export const deleteUser = async (

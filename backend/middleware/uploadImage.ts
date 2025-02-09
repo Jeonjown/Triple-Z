@@ -17,7 +17,7 @@ const fileFilter = (
   } else {
     // Create a new error with the message for invalid file types
     const error = new Error(
-      "Invalid file type. Only JPG, SVG, and WEBP are allowed."
+      "Invalid file type. Only JPG, PNG, and WEBP are allowed."
     );
     cb(null, false); // Reject the file and pass the error
   }
