@@ -47,7 +47,7 @@ const UserCardView = ({ table }: UserCardViewProps) => {
     return <LoadingPage />;
   }
 
-  if (isError && error?.statusCode !== 404) {
+  if (isError) {
     return (
       <ErrorPage message={error?.message} statusCode={error?.statusCode} />
     );
