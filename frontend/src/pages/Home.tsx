@@ -38,7 +38,7 @@ const Home = () => {
           <img
             src="scratch-mobile.webp"
             alt="event pictures"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 top-[40%] h-full w-full object-cover"
           />
 
           {/* Content */}
@@ -65,7 +65,7 @@ const Home = () => {
           <img
             src="Triple z Pola.webp"
             alt="events image"
-            className="bottom-30 absolute left-1/2 w-[90%] max-w-lg -translate-x-1/2"
+            className="absolute left-1/2 top-[80%] w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2"
           />
         </div>
       </section>
