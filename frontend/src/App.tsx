@@ -27,7 +27,6 @@ function App() {
     <Router>
       <main className="flex min-h-[200vh] flex-col">
         <Navbar />
-
         <div className="flex-grow">
           {isAdmin ? (
             <AdminSidebarLayout>
