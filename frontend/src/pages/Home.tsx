@@ -36,7 +36,7 @@ const Home = () => {
         <div className="relative min-h-screen w-full text-center">
           {/* Background Image */}
           <img
-            src="paper-background-mobile.png"
+            src="scratch-mobile.webp"
             alt="event pictures"
             className="absolute inset-0 h-full w-full object-cover"
           />
@@ -63,7 +63,7 @@ const Home = () => {
 
           {/* Centered Hero Image */}
           <img
-            src="Triple-z-hero-page-pic.png"
+            src="Triple z Pola.webp"
             alt="events image"
             className="bottom-30 absolute left-1/2 w-[90%] max-w-lg -translate-x-1/2"
           />
@@ -71,7 +71,7 @@ const Home = () => {
       </section>
 
       {/* EVENTS */}
-      <section className="relative flex h-screen flex-col items-center">
+      <section className="relative flex flex-col items-center py-20">
         {/* Background Image */}
         <img
           src="BookNow-bg-1.png"
@@ -80,16 +80,16 @@ const Home = () => {
         />
 
         {/* Content Wrapper */}
-        <div className="">
+        <div className="mt-10">
           {/* Image - Left Aligned on larger screens */}
           <img
             src="events-img.png"
             alt="events image"
-            className="mx-auto mt-20 w-64"
+            className="mx-auto w-64 sm:w-80"
           />
 
           {/* Text - Always Centered */}
-          <div className="mx-6 text-center">
+          <div className="mx-auto w-11/12 max-w-3xl text-center">
             <h2 className="mt-10 font-heading text-3xl text-primary">
               BE OUR GUEST
             </h2>
@@ -99,7 +99,7 @@ const Home = () => {
             <p className="mt-5 text-xl">
               You deserve a good time with friends.
             </p>
-            <p className="mt-5 font-semibold">MON-FRI: 4:00 PM - 10:00 pm</p>
+            <p className="mt-5 font-semibold">MON-FRI: 4:00 PM - 10:00 PM</p>
             <Button size={"lg"} className="mt-10">
               Book Now!
             </Button>
@@ -108,7 +108,7 @@ const Home = () => {
       </section>
 
       {/* MENU */}
-      <section className="relative mb-36 w-screen">
+      <section className="relative mt-10 min-h-screen w-full">
         <h2 className="my-4 text-center font-heading text-4xl font-light">
           Our Best Sellers
         </h2>
