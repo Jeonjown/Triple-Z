@@ -124,7 +124,7 @@ const ManageMenu = () => {
   }
 
   return (
-    <div className="mx-auto flex min-h-full w-full flex-col items-center pb-20">
+    <div className="mx-auto flex min-h-full w-full min-w-min flex-col items-center pb-20">
       <MenuControlPanel
         table={table}
         globalFilter={globalFilter}

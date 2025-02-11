@@ -32,7 +32,7 @@ const UserControlPanel = ({
 
   return (
     <>
-      <div className="sticky top-[105px] z-10 mx-auto mb-5 w-5/6 rounded border bg-white px-6 py-2 pt-6 shadow-md">
+      <div className="sticky top-[105px] z-10 mx-auto mb-5 w-5/6 min-w-min rounded border bg-white px-6 py-2 pt-6 shadow-md">
         <div className="relative">
           <input
             value={globalFilter ?? ""}

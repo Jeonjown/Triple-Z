@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { Menu } from "../models/menuModel";
 import Category from "../models/categoryModel";
 import Subcategory from "../models/subcategoryModel";
+import { toTitleCase } from "../utils/toTitleCase";
 
 // Controller to get all subcategories under a specific category
 export const getSubcategories = async (
@@ -49,6 +50,8 @@ export const addSubcategory = async (
     const { categoryId } = req.params;
     const { subcategoryName } = req.body;
 
+    const formattedName = toTitleCase(subcategoryName);
+
     if (!subcategoryName || typeof subcategoryName !== "string") {
       return next(createError("Invalid subcategory name", 400));
     }
@@ -59,7 +62,7 @@ export const addSubcategory = async (
     }
 
     const newSubcategory = new Subcategory({
-      subcategory: subcategoryName,
+      subcategory: formattedName,
       items: [],
     });
     await newSubcategory.save();
@@ -126,6 +129,8 @@ export const editSubcategory = async (
     const { subcategoryId } = req.params;
     const { subcategoryName } = req.body;
 
+    const formattedName = toTitleCase(subcategoryName);
+
     // Validate input
     if (!subcategoryName || typeof subcategoryName !== "string") {
       return next(createError("Subcategory name is required", 400));
@@ -134,7 +139,7 @@ export const editSubcategory = async (
     // Update the subcategory
     const updatedSubcategory = await Subcategory.findByIdAndUpdate(
       subcategoryId,
-      { subcategory: subcategoryName },
+      { subcategory: formattedName },
       { new: true }
     );
 
