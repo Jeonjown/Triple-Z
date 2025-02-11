@@ -99,7 +99,7 @@ const MenuControlPanel = ({
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              <ChevronsLeft className="!size-5" />
+              <ChevronsLeft />
             </Button>
             <Button
               size={"icon"}

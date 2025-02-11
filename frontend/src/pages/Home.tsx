@@ -57,31 +57,27 @@ const Home = () => {
     <>
       {/* HEADER */}
       <section className="relative overflow-hidden">
-        <div className="relative min-h-screen w-full text-center xl:flex xl:items-center">
+        <div className="relative flex min-h-screen w-full flex-col items-center text-center xl:flex-row xl:items-center">
           {/* Background Image for Mobile */}
           <img
-            src="scratch-mobile.webp"
+            src="landing-mobile.webp"
             alt="event background mobile"
-            className="absolute inset-0 top-[45%] h-full w-full object-cover xl:hidden"
+            className="absolute inset-0 h-full w-full object-cover xl:hidden"
           />
+
           {/* Background Image for XL */}
           <img
-            src="scratch-2.webp"
+            src="landing-pc.webp"
             alt="event pictures"
-            className="absolute inset-0 left-[15%] hidden h-screen w-screen object-cover xl:block"
+            className="absolute inset-0 hidden h-full w-full object-cover xl:block"
           />
-          {/* Centered Hero Image */}
-          <img
-            src="Triple z Pola.webp"
-            alt="events image"
-            className="absolute left-1/2 top-[80%] max-w-xs -translate-x-1/2 -translate-y-1/2 sm:max-w-sm md:max-w-md lg:max-w-xl xl:left-[73%] xl:top-[50%] xl:max-w-4xl"
-          />
+
           {/* Content */}
-          <div className="relative px-5 py-10 sm:p-8 lg:mx-auto lg:max-w-prose xl:ml-16 xl:mr-auto xl:-translate-y-10">
-            <h1 className="font-heading text-6xl font-light lg:mt-10 lg:text-8xl xl:mt-0">
+          <div className="relative z-10 px-5 py-10 sm:p-8 lg:max-w-prose xl:ml-20 xl:mr-auto xl:-translate-y-10">
+            <h1 className="font-heading text-5xl font-light sm:text-6xl lg:mt-10 lg:text-7xl xl:mt-0">
               Welcome to Triple Z
             </h1>
-            <h2 className="mt-8 text-lg sm:mt-5 sm:text-xl">
+            <h2 className="mt-6 text-lg sm:mt-5 sm:text-xl">
               Discover the perfect space to celebrate life’s special occasions
               at Triple Z Coffee. Reserve your spot today!
             </h2>
