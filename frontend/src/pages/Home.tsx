@@ -74,10 +74,10 @@ const Home = () => {
           <img
             src="Triple z Pola.webp"
             alt="events image"
-            className="absolute left-1/2 top-[80%] max-w-xs -translate-x-1/2 -translate-y-1/2 sm:max-w-sm md:max-w-md lg:max-w-xl xl:left-[75%] xl:top-[50%] xl:max-w-2xl"
+            className="absolute left-1/2 top-[80%] max-w-xs -translate-x-1/2 -translate-y-1/2 sm:max-w-sm md:max-w-md lg:max-w-xl xl:left-[73%] xl:top-[50%] xl:max-w-4xl"
           />
           {/* Content */}
-          <div className="relative px-5 py-10 sm:p-8 lg:mx-auto lg:max-w-prose xl:ml-16 xl:mr-auto">
+          <div className="relative px-5 py-10 sm:p-8 lg:mx-auto lg:max-w-prose xl:ml-16 xl:mr-auto xl:-translate-y-10">
             <h1 className="font-heading text-6xl font-light lg:mt-10 lg:text-8xl xl:mt-0">
               Welcome to Triple Z
             </h1>
@@ -110,7 +110,7 @@ const Home = () => {
               .slice(0, 6) // Limit items
               .map((menuItem) => (
                 <Link to={"/menu"} key={menuItem._id} className="mt-2 w-full">
-                  <Card className="mx-auto h-full w-full max-w-lg border-none">
+                  <Card className="mx-auto h-full w-full max-w-lg border-none shadow-none">
                     {/* Image Section (Fixed Width) */}
                     <div className="">
                       <img
