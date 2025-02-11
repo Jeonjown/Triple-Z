@@ -57,22 +57,28 @@ const Home = () => {
     <>
       {/* HEADER */}
       <section className="relative overflow-hidden">
-        <div className="relative min-h-[90vh] w-full items-center text-center lg:flex">
-          {/* Background Image */}
+        <div className="relative min-h-screen w-full text-center xl:flex xl:items-center">
+          {/* Background Image for Mobile */}
           <img
             src="scratch-mobile.webp"
             alt="event background mobile"
-            className="absolute inset-0 top-[40%] h-full w-full object-cover lg:hidden"
+            className="absolute inset-0 top-[45%] h-full w-full object-cover xl:hidden"
           />
+          {/* Background Image for XL */}
           <img
             src="scratch-2.webp"
             alt="event pictures"
-            className="absolute inset-0 left-[15%] hidden h-screen w-screen object-cover lg:block"
+            className="absolute inset-0 left-[15%] hidden h-screen w-screen object-cover xl:block"
           />
-
+          {/* Centered Hero Image */}
+          <img
+            src="Triple z Pola.webp"
+            alt="events image"
+            className="absolute left-1/2 top-[80%] max-w-xs -translate-x-1/2 -translate-y-1/2 sm:max-w-sm md:max-w-md lg:max-w-xl xl:left-[75%] xl:top-[50%] xl:max-w-2xl"
+          />
           {/* Content */}
-          <div className="relativepx-5 py-10 sm:p-8 lg:ml-16 lg:mr-auto lg:max-w-prose">
-            <h1 className="font-heading text-6xl font-light lg:text-8xl">
+          <div className="relative px-5 py-10 sm:p-8 lg:mx-auto lg:max-w-prose xl:ml-16 xl:mr-auto">
+            <h1 className="font-heading text-6xl font-light lg:mt-10 lg:text-8xl xl:mt-0">
               Welcome to Triple Z
             </h1>
             <h2 className="mt-8 text-lg sm:mt-5 sm:text-xl">
@@ -89,13 +95,6 @@ const Home = () => {
               Book Now!
             </Button>
           </div>
-
-          {/* Centered Hero Image */}
-          <img
-            src="Triple z Pola.webp"
-            alt="events image"
-            className="absolute left-1/2 top-[80%] w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 lg:left-[70%] lg:top-[50%]"
-          />
         </div>
       </section>
 
@@ -104,7 +103,7 @@ const Home = () => {
         <h2 className="my-4 text-center font-heading text-4xl font-light">
           Featured Products
         </h2>
-        <div className="relative mx-auto grid w-11/12 max-w-5xl grid-cols-1 gap-4 overflow-hidden lg:grid-cols-2">
+        <div className="relative mx-auto grid w-11/12 max-w-5xl grid-cols-1 gap-4 overflow-hidden md:grid-cols-2 lg:grid-cols-3">
           {data &&
             data
               .sort(() => Math.random() - 0.5) // Shuffle items randomly
