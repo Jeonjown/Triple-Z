@@ -111,12 +111,11 @@ const Home = () => {
               .map((menuItem) => (
                 <Link to={"/menu"} key={menuItem._id} className="mt-2 w-full">
                   <Card className="mx-auto h-full w-full max-w-lg border-none shadow-none">
-                    {/* Image Section (Fixed Width) */}
                     <div className="">
                       <img
                         src={menuItem.image || "default-image.png"}
                         alt={menuItem.title}
-                        className="mx-auto w-full"
+                        className="mx-auto h-auto w-auto"
                       />
                     </div>
 
