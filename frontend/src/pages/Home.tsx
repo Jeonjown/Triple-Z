@@ -251,8 +251,8 @@ const Home = () => {
 
           {/* Text Section (right on large, bottom on mobile) */}
           <div className="w-full text-center lg:hidden lg:w-1/2 lg:text-left">
-            <h2 className="font-heading text-3xl text-primary">BE OUR GUEST</h2>
-            <p className="mt-5 font-heading text-5xl">
+            <h2 className="font-heading text-2xl text-primary">BE OUR GUEST</h2>
+            <p className="mt-2 max-w-prose font-heading text-3xl md:text-4xl">
               Reserve Your Spot for an Unforgettable Event Today
             </p>
             <p className="mt-5 text-xl">
