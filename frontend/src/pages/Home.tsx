@@ -101,7 +101,7 @@ const Home = () => {
             <img
               src="Triple-z-image.webp"
               alt="event background mobile"
-              className="hidden w-full max-w-2xl lg:flex"
+              className="hidden w-full max-w-3xl lg:flex"
             />
           </div>
         </div>
