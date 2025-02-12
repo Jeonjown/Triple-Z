@@ -26,6 +26,7 @@ export const getSubcategories = async (
 
     // Map to return only subcategory names and IDs
     const subcategories = category.subcategories.map((sub: any) => ({
+      categoryId: categoryId,
       subcategory: sub.subcategory,
       _id: sub._id,
     }));

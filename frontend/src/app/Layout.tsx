@@ -21,7 +21,7 @@ export default function AdminSidebarLayout({
       <AppAdminSidebar />
       <SidebarTrigger className="fixed top-24 z-50 md:hidden" />
       {/* Main Content */}
-      <div className="mt-24 w-full">{children}</div>
+      <div>{children}</div>
     </SidebarProvider>
   );
 }

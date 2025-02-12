@@ -11,6 +11,50 @@ import Subcategory from "../models/subcategoryModel";
 import { Types } from "mongoose";
 import { toTitleCase } from "../utils/toTitleCase";
 
+export const getItemsBasedOnCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { categoryId, subcategoryId } = req.params;
+
+    // ✅ Fetch items and populate category & subcategory details
+    const items = await MenuItem.find({
+      category: categoryId,
+      subcategory: subcategoryId,
+    })
+      .populate("category", "category") // Only fetch category name
+      .populate("subcategory", "subcategory"); // Only fetch subcategory name
+
+    if (!items.length) {
+      res.status(404).json({ message: "No items found" });
+      return;
+    }
+
+    // ✅ Flatten response
+    const flattenedItems = items.map((item: any) => ({
+      _id: item._id,
+      title: item.title,
+      image: item.image,
+      basePrice: item.basePrice ?? null,
+      sizes: item.sizes || [],
+      requiresSizeSelection: item.requiresSizeSelection,
+      description: item.description,
+      availability: item.availability,
+      categoryId: item.category?._id || null,
+      categoryName: item.category?.category || "Unknown Category",
+      subcategoryId: item.subcategory?._id || null,
+      subcategoryName: item.subcategory?.subcategory || "Unknown Subcategory",
+      createdAt: item.createdAt,
+    }));
+
+    res.json(flattenedItems);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
 export const getAllMenuItems = async (
   req: Request,
   res: Response,

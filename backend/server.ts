@@ -11,7 +11,6 @@ import categoryRoutes from "./routes/categoryRoutes";
 import menuItemRoutes from "./routes/menuItemRoutes";
 import subcategoryRoutes from "./routes/subcategoryRoutes";
 import { ResponseError } from "./utils/createError";
-import { verifyAdminToken } from "./middleware/verifyAdminToken";
 
 const server = express();
 // Middleware setup
@@ -33,8 +32,8 @@ server.use("/api/auth", authRoutes);
 server.use("/api/users", userRoutes);
 server.use("/api/menu", menuRoutes);
 server.use("/api/menu/menu-items", menuItemRoutes);
-server.use("/api/menu/categories", verifyAdminToken, categoryRoutes);
-server.use("/api/menu/categories", verifyAdminToken, subcategoryRoutes);
+server.use("/api/menu/categories", categoryRoutes);
+server.use("/api/menu/categories", subcategoryRoutes);
 
 server.use(
   (err: ResponseError, req: Request, res: Response, next: NextFunction) => {

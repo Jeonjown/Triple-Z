@@ -45,7 +45,41 @@ export interface MenuItemData {
   image: File | string | null;
 }
 
+// MENU
+
+export const getMenu = async () => {
+  try {
+    const response = await api.get("/api/menu");
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.error || "An error occurred";
+      throw new Error(errorMessage);
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
 // MENU ITEMS
+
+export const getItemsBasedOnCategories = async (
+  categoryId: string,
+  subcategoryId: string,
+) => {
+  try {
+    const response = await api.get(
+      `api/menu/menu-items/${categoryId}/${subcategoryId}`,
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.error || "An error occurred";
+      throw new Error(errorMessage);
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
 export const getAllMenuItems = async () => {
   try {
     const response = await api.get("/api/menu/menu-items");

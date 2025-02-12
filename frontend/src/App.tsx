@@ -25,17 +25,22 @@ function App() {
 
   return (
     <Router>
-      <main className="flex min-h-[200vh] flex-col">
+      <main className="mt-24 flex min-h-[200vh] w-full flex-col">
         <Navbar />
         <div className="flex-grow">
           {isAdmin ? (
             <AdminSidebarLayout>
               <Routes>
                 {/* Regular Routes */}
+
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/events" element={<Events />} />
                 <Route path="/menu" element={<Menu />} />
+                <Route
+                  path="/menu/:categoryId/:subcategoryId"
+                  element={<Menu />}
+                />
                 <Route path="/contacts" element={<Contacts />} />
                 <Route path="/schedule" element={<Schedule />} />
                 <Route path="/blogs" element={<Blogs />} />
@@ -58,6 +63,11 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/events" element={<Events />} />
               <Route path="/menu" element={<Menu />} />
+              <Route
+                path="/menu/:categoryId/:subcategoryId"
+                element={<Menu />}
+              />
+
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/schedule" element={<Schedule />} />
               <Route path="/blogs" element={<Blogs />} />

@@ -13,7 +13,7 @@ const router = Router();
 router.post("/", verifyAdminToken, addCategory);
 
 //GET
-router.get("/", verifyAdminToken, getAllCategories);
+router.get("/", getAllCategories);
 
 //PUT
 router.put("/:id", verifyAdminToken, updateCategory);
