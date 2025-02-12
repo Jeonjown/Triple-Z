@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { useFetchMenu } from "@/features/admin/features/manage menu/hooks/useFetchMenu";
 import { Link } from "react-router-dom";
+import LoadingPage from "@/pages/LoadingPage";
 
 const MenuSidebar = () => {
-  const { data } = useFetchMenu();
+  const { data, isPending } = useFetchMenu();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  if (isPending) {
+    return <LoadingPage />;
+  }
 
   return (
     <>
