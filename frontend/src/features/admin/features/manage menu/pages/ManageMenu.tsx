@@ -16,7 +16,7 @@ export interface MenuItem {
   title: string;
   image: string;
   basePrice: number | null;
-  sizes: { size: string; sizePrice: number }[];
+  sizes: { _id: string; size: string; sizePrice: number }[];
   requiresSizeSelection: boolean;
   description: string;
   availability?: boolean;
@@ -69,8 +69,8 @@ const ManageMenu = () => {
     columnHelper.accessor("sizes", {
       cell: (info) => {
         const sizes = info.getValue();
-        return sizes.map((size: { size: string; sizePrice: number }) => (
-          <div key={size.size}>
+        return sizes.map((size) => (
+          <div key={size._id}>
             {size.size}: ₱
             {size.sizePrice != null ? size.sizePrice.toFixed(2) : "None"}
           </div>

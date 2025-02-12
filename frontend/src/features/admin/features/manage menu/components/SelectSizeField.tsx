@@ -1,15 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Field, ErrorMessage, FieldArray, useFormikContext } from "formik";
 import { Delete, Plus } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
+import { useDisableNumberInputScroll } from "../hooks/useDisableNumberInputScroll";
 
 interface SizeField {
+  _id: string;
   size: string;
   sizePrice: number;
 }
 
 const SelectSizeField = () => {
   const { values } = useFormikContext<{ sizes: SizeField[] }>();
-
+  console.log("Sizes array:", values.sizes);
+  useDisableNumberInputScroll();
   return (
     <>
       <label
@@ -23,8 +27,11 @@ const SelectSizeField = () => {
         name="sizes"
         render={({ push, remove }) => (
           <div>
-            {values.sizes?.map((_, index) => (
-              <div key={index} className="flex animate-fadeIn space-x-4 py-1">
+            {values.sizes?.map((size, index) => (
+              <div
+                key={size._id}
+                className="flex animate-fadeIn space-x-4 py-1"
+              >
                 <div className="flex-1">
                   <Field
                     name={`sizes[${index}].size`}
@@ -61,7 +68,7 @@ const SelectSizeField = () => {
             ))}
             <Button
               type="button"
-              onClick={() => push({ size: "", sizePrice: 0 })}
+              onClick={() => push({ _id: uuidv4(), size: "", sizePrice: 0 })}
               className="mt-1 text-xs"
               size={"sm"}
             >

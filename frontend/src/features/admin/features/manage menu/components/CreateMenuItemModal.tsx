@@ -11,6 +11,7 @@ import { useCreateMenuItem } from "../hooks/useCreateMenuItem"; // Hook for crea
 import { MenuItemData } from "../api/menu";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import useDisableNumberInputScroll from "../hooks/useDisableNumberInputScroll";
 
 interface CreateMenuItemModalProps {
   isCreateModalOpen: boolean;
@@ -57,7 +58,7 @@ const CreateMenuItemModal = ({
     string | undefined
   >("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
+  useDisableNumberInputScroll();
   // Yup validation schema
   const validationSchema = Yup.object()
     .shape({
@@ -215,7 +216,21 @@ const CreateMenuItemModal = ({
               </div>
 
               <div className="space-y-4">
-                {values.requiresSizeSelection && <SelectSizeField />}
+                {/* Size selection with custom error rendering */}
+                {values.requiresSizeSelection && (
+                  <>
+                    <SelectSizeField />
+                    <ErrorMessage name="sizes">
+                      {(errorMsg) => (
+                        <div className="text-xs text-red-500">
+                          {typeof errorMsg === "string"
+                            ? errorMsg
+                            : JSON.stringify(errorMsg)}
+                        </div>
+                      )}
+                    </ErrorMessage>
+                  </>
+                )}
                 <label className="ml-auto mt-auto flex items-center space-x-2">
                   <input
                     type="checkbox"

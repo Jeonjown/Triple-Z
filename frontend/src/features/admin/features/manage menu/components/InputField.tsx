@@ -1,4 +1,5 @@
 import { ErrorMessage, Field, FieldProps } from "formik";
+import { useDisableNumberInputScroll } from "../hooks/useDisableNumberInputScroll";
 
 interface InputFieldProps {
   label: string;
@@ -8,6 +9,7 @@ interface InputFieldProps {
 }
 
 const InputField = ({ label, name, type, placeholder }: InputFieldProps) => {
+  useDisableNumberInputScroll();
   return (
     <div className="flex-1">
       <label
@@ -25,7 +27,7 @@ const InputField = ({ label, name, type, placeholder }: InputFieldProps) => {
             placeholder={placeholder}
             // Ensure the value is always a string (controlled)
             value={field.value == null ? "" : String(field.value)}
-            className="animate-fadeIn w-full rounded-md border p-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary sm:p-3"
+            className="w-full animate-fadeIn rounded-md border p-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary sm:p-3"
           />
         )}
       </Field>
