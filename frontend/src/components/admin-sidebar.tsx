@@ -35,7 +35,7 @@ export function AppAdminSidebar() {
   const { open, isMobile, toggleSidebar } = useSidebar();
   return (
     <Sidebar variant="floating" collapsible="icon" className="mt-24">
-      <SidebarTrigger className="absolute -right-6 hidden md:flex" />
+      <SidebarTrigger className="absolute -right-7 hidden md:flex" />
 
       <SidebarHeader className="mt-5">
         {open && (

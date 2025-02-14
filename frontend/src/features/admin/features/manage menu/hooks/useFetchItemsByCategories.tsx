@@ -5,11 +5,17 @@ import { getItemsBasedOnCategories } from "../api/menu";
 interface MenuItem {
   _id: string;
   title: string;
+  image?: string;
+  basePrice?: number | null;
+  sizes?: { _id: string; size: string; sizePrice: number }[];
+  requiresSizeSelection: boolean;
   description: string;
-  price: number;
-  category: string;
-  subcategory: string;
-  image: string;
+  availability?: boolean;
+  createdAt: string;
+  categoryId?: string;
+  categoryName?: string;
+  subcategoryId?: string;
+  subcategoryName?: string;
 }
 
 export const useFetchItemsByCategories = (

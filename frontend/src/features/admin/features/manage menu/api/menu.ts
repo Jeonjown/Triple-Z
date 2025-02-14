@@ -47,6 +47,19 @@ export interface MenuItemData {
 
 // MENU
 
+export const getMenuItem = async (menuItemId: string) => {
+  try {
+    const response = await api.get(`/api/menu/menu-items/${menuItemId}`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.error || "An error occurred";
+      throw new Error(errorMessage);
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
 export const getMenu = async () => {
   try {
     const response = await api.get("/api/menu");
@@ -68,7 +81,7 @@ export const getItemsBasedOnCategories = async (
 ) => {
   try {
     const response = await api.get(
-      `api/menu/menu-items/${categoryId}/${subcategoryId}`,
+      `api/menu/menu-items/categories/${categoryId}/subcategories/${subcategoryId}`,
     );
     return response.data;
   } catch (error) {

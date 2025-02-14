@@ -6,7 +6,7 @@ import LoadingPage from "@/pages/LoadingPage";
 const MenuSidebar = () => {
   const { data, isPending } = useFetchMenu();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+  console.log(data);
   if (isPending) {
     return <LoadingPage />;
   }
@@ -14,7 +14,7 @@ const MenuSidebar = () => {
   return (
     <>
       {/* Dropdown Button for Small Screens */}
-      <div className="fixed left-0 top-24 z-10 w-full bg-white p-3 shadow-md sm:hidden">
+      <div className="fixed left-0 top-24 z-10 w-full bg-white p-3 shadow-md md:hidden">
         <button
           className="w-full rounded-md bg-primary p-2 text-white"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -30,7 +30,7 @@ const MenuSidebar = () => {
                 {category.subcategories.map((subcategory) => (
                   <Link
                     key={subcategory._id}
-                    to={`/menu/${category._id}/${subcategory._id}`}
+                    to={`/menu/categories/${category._id}/subcategories/${subcategory._id}`}
                     className="block p-1 hover:font-bold"
                     onClick={() => setIsDropdownOpen(false)} // Close dropdown on selection
                   >
@@ -45,16 +45,20 @@ const MenuSidebar = () => {
 
       {/* Sidebar for Medium Screens and Up */}
       <div className="border-gray-0 fixed top-24 mt-2 hidden min-h-screen w-64 rounded-lg border bg-white md:block">
-        <aside className="flex flex-col font-semibold text-primary">
+        <aside className="flex flex-col">
           {data?.categories.map((category) => (
-            <ul key={category._id} className="p-7">
-              <div className="my-2 font-heading text-4xl font-bold">
-                {category.category}
-              </div>
+            <ul key={category._id} className="mt-4 px-7 text-primary">
+              <div className="my-2 text-xl font-bold">{category.category}</div>
+
               {category.subcategories.map((subcategory) => (
-                <ul key={subcategory._id} className="mt-1 hover:font-bold">
-                  <Link to={`/menu/${category._id}/${subcategory._id}`}>
-                    <li className="">{subcategory.subcategory}</li>
+                <ul
+                  key={subcategory._id}
+                  className="mt-1 font-semibold text-text hover:font-bold"
+                >
+                  <Link
+                    to={`/menu/categories/${category._id}/subcategories/${subcategory._id}`}
+                  >
+                    <li className="ml-1">{subcategory.subcategory}</li>
                   </Link>
                 </ul>
               ))}

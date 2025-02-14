@@ -1,7 +1,8 @@
-import { useFetchItemsByCategories } from "@/features/admin/features/manage menu/hooks/useFetchItemsByCategories";
 import { Link, useParams } from "react-router-dom";
-import { Card, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardHeader, CardTitle } from "../../../../../components/ui/card";
 import useAuthStore from "@/features/auth/stores/useAuthStore";
+import { useFetchItemsByCategories } from "../hooks/useFetchItemsByCategories";
+import LoadingPage from "@/pages/LoadingPage";
 
 const MenuPage = () => {
   // TEMP: Replace with actual categoryId and subcategoryId from state or URL
@@ -16,21 +17,25 @@ const MenuPage = () => {
 
   const { user } = useAuthStore();
 
-  if (isPending) return <p>Loading...</p>;
+  if (isPending) return <LoadingPage />;
   if (isError) return <p>Error: {error?.message}</p>;
 
   return (
     <div
-      className={`mt-20 pb-20 md:ml-64 ${user?.role === "admin" ? "xl:ml-80" : ""}`}
+      className={`mt-20 pb-20 md:ml-64 md:mt-0 ${user?.role === "admin" ? "xl:ml-80" : ""}`}
     >
       <div className="relative my-8 min-h-screen w-full">
-        <h2 className="my-5 text-center font-heading text-4xl font-bold">
+        <h2 className="my-5 text-center font-heading text-4xl font-bold text-primary">
           {data.length > 0 ? data[0].subcategoryName : "Menu"}
         </h2>
         <div className="relative mx-auto grid w-11/12 max-w-5xl grid-cols-1 gap-4 overflow-hidden md:grid-cols-2 lg:grid-cols-3">
           {data &&
             data.map((menuItem) => (
-              <Link to={"/menu"} key={menuItem._id} className="mt-2 w-full">
+              <Link
+                to={`/menu/${menuItem._id}`}
+                key={menuItem._id}
+                className="mt-2 w-full"
+              >
                 <Card className="mx-auto h-full w-full max-w-lg border-none shadow-none">
                   <div className="">
                     <img
@@ -43,7 +48,7 @@ const MenuPage = () => {
                   {/* Content Section (3x Flex) */}
                   <div className="">
                     <CardHeader className="p-0">
-                      <CardTitle className="mt-1 text-center font-heading text-xl font-bold text-primary">
+                      <CardTitle className="mt-1 text-center text-xl font-bold text-primary">
                         {menuItem.title}
                       </CardTitle>
                     </CardHeader>
@@ -57,12 +62,17 @@ const MenuPage = () => {
                       </div>
                     ) : (
                       <div className="flex justify-center space-x-2">
-                        {menuItem.sizes?.map((size, index) => (
-                          <div key={index} className="text-center">
-                            <span className="block text-xs">{size.size}</span>
-                            <span className="text-xs">₱{size.sizePrice}</span>
-                          </div>
-                        ))}
+                        {menuItem.sizes?.map(
+                          (
+                            size: { size: string; sizePrice: number },
+                            index: number,
+                          ) => (
+                            <div key={index} className="text-center">
+                              <span className="block text-xs">{size.size}</span>
+                              <span className="text-xs">₱{size.sizePrice}</span>
+                            </div>
+                          ),
+                        )}
                       </div>
                     )}
                   </div>

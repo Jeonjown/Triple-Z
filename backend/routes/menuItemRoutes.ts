@@ -5,6 +5,7 @@ import {
   deleteMenuItem,
   addMenuItem,
   getItemsBasedOnCategories,
+  getItem,
 } from "../controllers/menuItemController";
 import { verifyAdminToken } from "../middleware/verifyAdminToken";
 import upload from "../middleware/uploadImage";
@@ -12,7 +13,12 @@ import upload from "../middleware/uploadImage";
 const router = Router();
 
 router.post("/", verifyAdminToken, upload.single("image"), addMenuItem);
-router.get("/:categoryId/:subcategoryId", getItemsBasedOnCategories);
+router.get(
+  "/categories/:categoryId/subcategories/:subcategoryId",
+  getItemsBasedOnCategories
+);
+
+router.get("/:id", getItem);
 router.get("/", getAllMenuItems);
 router.put("/:id", verifyAdminToken, upload.single("image"), updateMenuItem);
 router.delete("/:id", verifyAdminToken, deleteMenuItem);

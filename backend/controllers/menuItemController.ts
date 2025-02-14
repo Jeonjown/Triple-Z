@@ -11,6 +11,35 @@ import Subcategory from "../models/subcategoryModel";
 import { Types } from "mongoose";
 import { toTitleCase } from "../utils/toTitleCase";
 
+export const getItem = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+
+    // ✅ Validate ObjectId
+    if (!Types.ObjectId.isValid(id)) {
+      return next(createError("Invalid item ID", 400));
+    }
+
+    // ✅ Find item by its ID only
+    const item = await MenuItem.findById(id)
+      .populate("category", "category") // Fetch category name only
+      .populate("subcategory", "subcategory"); // Fetch subcategory name only
+
+    if (!item) {
+      return next(createError("Item not found", 404));
+    }
+
+    res.status(200).json(item);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getItemsBasedOnCategories = async (
   req: Request,
   res: Response,
@@ -24,8 +53,8 @@ export const getItemsBasedOnCategories = async (
       category: categoryId,
       subcategory: subcategoryId,
     })
-      .populate("category", "category") // Only fetch category name
-      .populate("subcategory", "subcategory"); // Only fetch subcategory name
+      .populate("category", "category") // Only get category name
+      .populate("subcategory", "subcategory"); // Only get subcategory name
 
     if (!items.length) {
       res.status(404).json({ message: "No items found" });

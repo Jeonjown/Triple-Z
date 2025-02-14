@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useFetchMenu } from "@/features/admin/features/manage menu/hooks/useFetchMenu";
 import { useNavigate, useParams } from "react-router-dom";
-import MenuSidebar from "@/components/MenuSidebar";
-import MenuPage from "@/components/MenuPage";
+import MenuPage from "@/features/admin/features/manage menu/pages/MenuPage";
+import MenuSidebar from "../components/MenuSidebar";
 
 const Menu = () => {
   const { data } = useFetchMenu();
@@ -13,12 +13,14 @@ const Menu = () => {
   }>();
 
   useEffect(() => {
-    if (!categoryId && !subcategoryId && data?.categories?.length > 0) {
+    if (!categoryId && !subcategoryId && data?.categories?.length) {
       const firstCategory = data.categories[0];
-      const firstSubcategory = firstCategory.subcategories[0];
 
-      if (firstCategory && firstSubcategory) {
-        navigate(`/menu/${firstCategory._id}/${firstSubcategory._id}`);
+      if (firstCategory?.subcategories?.length) {
+        const firstSubcategory = firstCategory.subcategories[0];
+        navigate(
+          `/menu/categories/${firstCategory._id}/subcategories/${firstSubcategory._id}`,
+        );
       }
     }
   }, [data, categoryId, subcategoryId, navigate]);

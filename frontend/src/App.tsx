@@ -3,7 +3,6 @@ import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import About from "./pages/About";
 import Events from "./pages/Events";
-import Menu from "./pages/Menu";
 import Contacts from "./pages/Contacts";
 import Schedule from "./features/scheduling/pages/Schedule";
 import Blogs from "./pages/Blogs";
@@ -18,6 +17,9 @@ import Reports from "./features/admin/pages/Reports";
 import ManageUsers from "./features/admin/features/manage users/pages/ManageUsers";
 import ManageMenu from "./features/admin/features/manage menu/pages/ManageMenu";
 import AdminSidebarLayout from "./app/Layout";
+import Menu from "./features/admin/features/manage menu/pages/Menu";
+import ScrollToTop from "./components/ScrollToTop";
+import MenuItem from "./features/admin/features/manage menu/components/MenuItem";
 
 function App() {
   const { user } = useAuthStore();
@@ -25,6 +27,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <main className="mt-24 flex min-h-[200vh] w-full flex-col">
         <Navbar />
         <div className="flex-grow">
@@ -38,9 +41,10 @@ function App() {
                 <Route path="/events" element={<Events />} />
                 <Route path="/menu" element={<Menu />} />
                 <Route
-                  path="/menu/:categoryId/:subcategoryId"
+                  path="/menu/categories/:categoryId/subcategories/:subcategoryId"
                   element={<Menu />}
                 />
+                <Route path="/menu/:menuItemId" element={<MenuItem />} />
                 <Route path="/contacts" element={<Contacts />} />
                 <Route path="/schedule" element={<Schedule />} />
                 <Route path="/blogs" element={<Blogs />} />
@@ -64,10 +68,10 @@ function App() {
               <Route path="/events" element={<Events />} />
               <Route path="/menu" element={<Menu />} />
               <Route
-                path="/menu/:categoryId/:subcategoryId"
+                path="/menu/categories/:categoryId/subcategories/:subcategoryId"
                 element={<Menu />}
               />
-
+              <Route path="/menu/:menuItemId" element={<MenuItem />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/schedule" element={<Schedule />} />
               <Route path="/blogs" element={<Blogs />} />

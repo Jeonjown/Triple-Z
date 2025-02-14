@@ -2,16 +2,23 @@ import { useQuery } from "@tanstack/react-query";
 import { getMenu } from "../api/menu";
 import { CustomError } from "types";
 
-interface Menu {
+interface Subcategory {
   _id: string;
-  name: string;
-  description?: string;
-  price: number;
-  categoryId: string;
+  subcategory: string;
+}
+
+interface Category {
+  _id: string;
+  category: string;
+  subcategories: Subcategory[];
+}
+
+interface MenuData {
+  categories: Category[];
 }
 
 export const useFetchMenu = () => {
-  const { data, isPending, isError, error } = useQuery<Menu[], CustomError>({
+  const { data, isPending, isError, error } = useQuery<MenuData, CustomError>({
     queryFn: getMenu,
     queryKey: ["menu"],
     retry: 1,
