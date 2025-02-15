@@ -12,6 +12,7 @@ import {
 import { RiShoppingBag3Fill } from "react-icons/ri";
 import { useCartStore } from "../stores/useCartStore";
 import useScrollBehavior from "@/components/use-scroll-behavior";
+import { useState } from "react";
 
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart } = useCartStore();
@@ -105,6 +106,3 @@ const Cart = () => {
 };
 
 export default Cart;
-function useState(arg0: boolean): [any, any] {
-  throw new Error("Function not implemented.");
-}
