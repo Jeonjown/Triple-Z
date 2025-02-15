@@ -9,7 +9,6 @@ import { Link } from "react-router-dom";
 import useAuthStore from "../features/auth/stores/useAuthStore";
 import useFetchUserData from "../features/auth/hooks/useFetchUserData";
 import { Button } from "./ui/button";
-import { RiShoppingBag3Fill } from "react-icons/ri";
 
 const Navbar = () => {
   const { user } = useFetchUserData();
@@ -43,7 +42,6 @@ const Navbar = () => {
 
           {user && (
             <>
-              <RiShoppingBag3Fill className="!size-8 hover:scale-105 hover:cursor-pointer" />
               <NotificationIcon />
               <ProfileIcon />
             </>

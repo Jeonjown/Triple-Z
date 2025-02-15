@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle } from "../../../../../components/ui/card";
 import useAuthStore from "@/features/auth/stores/useAuthStore";
 import { useFetchItemsByCategories } from "../hooks/useFetchItemsByCategories";
 import LoadingPage from "@/pages/LoadingPage";
+import Cart from "../components/Cart";
 
 const MenuPage = () => {
   // TEMP: Replace with actual categoryId and subcategoryId from state or URL
@@ -81,6 +82,7 @@ const MenuPage = () => {
             ))}
         </div>
       </div>
+      <Cart />
     </div>
   );
 };

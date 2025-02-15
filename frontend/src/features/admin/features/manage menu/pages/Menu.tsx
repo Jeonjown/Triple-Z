@@ -3,6 +3,7 @@ import { useFetchMenu } from "@/features/admin/features/manage menu/hooks/useFet
 import { useNavigate, useParams } from "react-router-dom";
 import MenuPage from "@/features/admin/features/manage menu/pages/MenuPage";
 import MenuSidebar from "../components/MenuSidebar";
+import Cart from "../components/Cart";
 
 const Menu = () => {
   const { data } = useFetchMenu();
@@ -30,6 +31,7 @@ const Menu = () => {
       <div className="">
         <MenuSidebar />
         <MenuPage />
+        <Cart />
       </div>
     </>
   );

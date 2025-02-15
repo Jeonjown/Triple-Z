@@ -6,7 +6,7 @@ import LoadingPage from "@/pages/LoadingPage";
 const MenuSidebar = () => {
   const { data, isPending } = useFetchMenu();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  console.log(data);
+
   if (isPending) {
     return <LoadingPage />;
   }
