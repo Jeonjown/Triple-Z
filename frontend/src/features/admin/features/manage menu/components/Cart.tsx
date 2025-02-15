@@ -11,17 +11,19 @@ import {
 } from "@/components/ui/drawer";
 import { RiShoppingBag3Fill } from "react-icons/ri";
 import { useCartStore } from "../stores/useCartStore";
+import useScrollBehavior from "@/components/use-scroll-behavior";
 
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart } = useCartStore();
-
+  const [open, setOpen] = useState(false);
+  useScrollBehavior(open);
   // Compute total price
   const totalPrice = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
   return (
-    <Drawer modal={true}>
+    <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger>
         <div className="fixed bottom-10 right-10">
           <RiShoppingBag3Fill className="size-12 rounded-full bg-secondary p-2 text-primary hover:scale-105 hover:cursor-pointer" />
@@ -36,7 +38,6 @@ const Cart = () => {
         <DrawerHeader className="mx-auto">
           <DrawerTitle className="text-center">Orders</DrawerTitle>
         </DrawerHeader>
-
         <div className="flex-grow overflow-y-auto p-4 lg:px-40">
           {cart.length === 0 ? (
             <p className="text-center">Your cart is empty.</p>
@@ -104,3 +105,6 @@ const Cart = () => {
 };
 
 export default Cart;
+function useState(arg0: boolean): [any, any] {
+  throw new Error("Function not implemented.");
+}
