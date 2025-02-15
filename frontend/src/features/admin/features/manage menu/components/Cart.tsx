@@ -15,6 +15,11 @@ import { useCartStore } from "../stores/useCartStore";
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart } = useCartStore();
 
+  // Compute total price
+  const totalPrice = cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
   return (
     <Drawer modal={true}>
       <DrawerTrigger>
@@ -81,12 +86,17 @@ const Cart = () => {
         </div>
 
         <DrawerFooter className="border-t bg-white p-4">
-          <Button>Checkout</Button>
-          <DrawerClose>
-            <Button variant="outline" size={"lg"}>
-              Close
-            </Button>
-          </DrawerClose>
+          <div className="text-center font-bold">
+            Total: ₱{totalPrice.toFixed(2)}
+          </div>
+          <div className="flex w-full flex-col items-center gap-2">
+            <Button className="w-full max-w-sm">Checkout</Button>
+            <DrawerClose className="w-full max-w-sm">
+              <Button variant={"outline"} className="w-full">
+                Close
+              </Button>
+            </DrawerClose>
+          </div>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
