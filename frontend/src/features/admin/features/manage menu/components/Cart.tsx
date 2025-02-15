@@ -11,20 +11,17 @@ import {
 } from "@/components/ui/drawer";
 import { RiShoppingBag3Fill } from "react-icons/ri";
 import { useCartStore } from "../stores/useCartStore";
-import useScrollBehavior from "@/components/use-scroll-behavior";
-import { useState } from "react";
 
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart } = useCartStore();
-  const [open, setOpen] = useState(false);
-  useScrollBehavior(open);
+
   // Compute total price
   const totalPrice = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer>
       <DrawerTrigger>
         <div className="fixed bottom-10 right-10">
           <RiShoppingBag3Fill className="size-12 rounded-full bg-secondary p-2 text-primary hover:scale-105 hover:cursor-pointer" />
