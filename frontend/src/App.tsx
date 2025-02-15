@@ -20,6 +20,7 @@ import AdminSidebarLayout from "./app/Layout";
 import Menu from "./features/admin/features/manage menu/pages/Menu";
 import ScrollToTop from "./components/ScrollToTop";
 import MenuItem from "./features/admin/features/manage menu/components/MenuItem";
+import { Toaster } from "./components/ui/toaster";
 
 function App() {
   const { user } = useAuthStore();
@@ -29,6 +30,7 @@ function App() {
     <Router>
       <ScrollToTop />
       <main className="mt-24 flex min-h-[200vh] w-full flex-col">
+        <Toaster />
         <Navbar />
         <div className="flex-grow">
           {isAdmin ? (
