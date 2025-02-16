@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/drawer";
 import { RiShoppingBag3Fill } from "react-icons/ri";
 import { useCartStore } from "../stores/useCartStore";
+import { Link } from "react-router-dom";
 
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart } = useCartStore();
@@ -89,7 +90,9 @@ const Cart = () => {
             Total: ₱{totalPrice.toFixed(2)}
           </div>
           <div className="flex w-full flex-col items-center gap-2">
-            <Button className="w-full max-w-sm">Checkout</Button>
+            <Button asChild className="w-full max-w-sm">
+              <Link to={"/menu/order-checkout"}>Checkout</Link>
+            </Button>
             <DrawerClose className="w-full max-w-sm">
               <Button variant={"outline"} className="w-full">
                 Close

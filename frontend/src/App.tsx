@@ -21,6 +21,7 @@ import Menu from "./features/admin/features/manage menu/pages/Menu";
 import ScrollToTop from "./components/ScrollToTop";
 import MenuItem from "./features/admin/features/manage menu/components/MenuItem";
 import { Toaster } from "./components/ui/toaster";
+import OrderCheckout from "./features/admin/features/manage menu/pages/OrderCheckout";
 
 function App() {
   const { user } = useAuthStore();
@@ -47,6 +48,10 @@ function App() {
                   element={<Menu />}
                 />
                 <Route path="/menu/:menuItemId" element={<MenuItem />} />
+                <Route
+                  path="/menu/order-checkout"
+                  element={<OrderCheckout />}
+                />
                 <Route path="/contacts" element={<Contacts />} />
                 <Route path="/schedule" element={<Schedule />} />
                 <Route path="/blogs" element={<Blogs />} />
@@ -73,6 +78,7 @@ function App() {
                 path="/menu/categories/:categoryId/subcategories/:subcategoryId"
                 element={<Menu />}
               />
+              <Route path="/menu/order-checkout" element={<OrderCheckout />} />
               <Route path="/menu/:menuItemId" element={<MenuItem />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/schedule" element={<Schedule />} />

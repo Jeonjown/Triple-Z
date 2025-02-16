@@ -72,7 +72,7 @@ const MenuItem = () => {
     }
 
     const itemToAdd = {
-      id: `${menuItem._id}-${selectedSize?.size || "default"}`,
+      id: `${selectedSize?._id || `${menuItem._id}`}`,
       title: menuItem.title,
       price,
       quantity,

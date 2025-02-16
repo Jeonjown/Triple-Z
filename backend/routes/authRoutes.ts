@@ -11,7 +11,6 @@ import { validateUsername } from "../middleware/validateUsername";
 import { validateEmail } from "../middleware/validateEmail";
 import { validatePassword } from "../middleware/validatePassword";
 import { verifyToken } from "../middleware/verifyToken";
-import { createError } from "../utils/createError";
 
 const router = Router();
 
@@ -30,13 +29,14 @@ router.post("/jwt-login", validateEmail, validatePassword, jwtLogin);
 
 //GOOGLE AUTH
 router.get("/google", (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate("google", { scope: ["email", "profile"] })(
-    req,
-    res,
-    next
-  );
+  const redirectUri = req.query.redirect_uri as string; // Get redirect URI
+  console.log("Google Auth Initiated - Redirect URI:", redirectUri);
+  req.query.redirect_uri = redirectUri;
+  passport.authenticate("google", {
+    scope: ["email", "profile"],
+    state: redirectUri, // ✅ Save redirectUri in state
+  })(req, res, next);
 });
-
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
@@ -50,10 +50,15 @@ router.get(
         sameSite: "none",
         maxAge: 259200000,
       });
+    } // ✅ Close the if block properly
 
-      res.redirect(`${process.env.FRONTEND_URL}`);
+    const redirectUri = req.query.state as string; // ✅ This is now correctly outside `if (token)`
+
+    // ✅ Redirect only to order-checkout if it was the intended destination
+    if (redirectUri?.includes("/order-checkout")) {
+      res.redirect(redirectUri);
     } else {
-      createError("Failed to retrieve token", 400);
+      res.redirect(process.env.FRONTEND_URL || "/");
     }
   }
 );
