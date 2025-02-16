@@ -54,8 +54,11 @@ router.get(
 
     const redirectUri = req.query.state as string; // ✅ This is now correctly outside `if (token)`
 
-    // ✅ Redirect only to order-checkout if it was the intended destination
-    if (redirectUri?.includes("/order-checkout")) {
+    // ✅ Redirect only  if it was the intended destination
+    if (
+      redirectUri?.includes("/order-checkout") ||
+      redirectUri?.includes("/schedule")
+    ) {
       res.redirect(redirectUri);
     } else {
       res.redirect(process.env.FRONTEND_URL || "/");

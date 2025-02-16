@@ -20,7 +20,7 @@ const ProfileIcon = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>
-              <Link to={"/my-account"}>My Account</Link>
+              <Link to={"/profile"}>My Account</Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={logoutUser}>Logout</DropdownMenuItem>
           </DropdownMenuContent>

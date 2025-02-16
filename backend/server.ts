@@ -12,6 +12,8 @@ import menuItemRoutes from "./routes/menuItemRoutes";
 import subcategoryRoutes from "./routes/subcategoryRoutes";
 import { ResponseError } from "./utils/createError";
 
+import eventReservationRoutes from "./routes/eventReservationRoutes";
+
 const server = express();
 // Middleware setup
 server.use(passport.initialize());
@@ -27,6 +29,12 @@ server.use(
   })
 );
 
+// Start server
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
 // Route handling
 server.use("/api/auth", authRoutes);
 server.use("/api/users", userRoutes);
@@ -34,6 +42,7 @@ server.use("/api/menu", menuRoutes);
 server.use("/api/menu/menu-items", menuItemRoutes);
 server.use("/api/menu/categories", categoryRoutes);
 server.use("/api/menu/categories", subcategoryRoutes);
+server.use("/api/menu/events/reservations", eventReservationRoutes);
 
 server.use(
   (err: ResponseError, req: Request, res: Response, next: NextFunction) => {
@@ -42,9 +51,3 @@ server.use(
       .json({ error: err.message || "Internal Server Error" });
   }
 );
-
-// Start server
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});

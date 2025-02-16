@@ -17,7 +17,7 @@ const MultiStepForm = () => {
       .matches(/^[0-9]{11}$/, "Phone Number must be exactly 11 digits")
       .required("Phone Number is required"),
     partySize: Yup.number()
-      .min(12, "Party size must be at least 12")
+      .min(24, "Party size must be at least 24")
       .required("Party Size is required"),
     date: Yup.date()
       .min(new Date(), "Date cannot be in the past")
@@ -39,7 +39,7 @@ const MultiStepForm = () => {
   const initialValues = {
     fullName: "",
     phoneNumber: "",
-    partySize: 12,
+    partySize: 0,
     date: "",
     startTime: "",
     endTime: "",
@@ -62,7 +62,7 @@ const MultiStepForm = () => {
     >
       {({ values, touched, errors, submitForm }) => (
         <div className="mt-15 ml:64 flex w-auto items-center justify-center py-20">
-          <Form className="flex w-5/6 max-w-screen-sm flex-col px-12 py-8 md:mx-10 md:py-14 md:shadow-aesthetic">
+          <Form className="md:shadow-aesthetic flex w-5/6 max-w-screen-sm flex-col px-12 py-8 md:mx-10 md:py-14">
             {currentStep !== 4 && (
               <>
                 <h2 className="mb text-center font-heading text-2xl">

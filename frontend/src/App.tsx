@@ -6,7 +6,7 @@ import Events from "./pages/Events";
 import Contacts from "./pages/Contacts";
 import Schedule from "./features/scheduling/pages/Schedule";
 import Blogs from "./pages/Blogs";
-import MyAccount from "./pages/MyAccount";
+
 import Footer from "./components/Footer";
 import Signup from "./features/auth/pages/Signup";
 import Login from "./features/auth/pages/Login";
@@ -22,6 +22,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import MenuItem from "./features/admin/features/manage menu/components/MenuItem";
 import { Toaster } from "./components/ui/toaster";
 import OrderCheckout from "./features/admin/features/manage menu/pages/OrderCheckout";
+import Profile from "./pages/Profile";
 
 function App() {
   const { user } = useAuthStore();
@@ -55,7 +56,7 @@ function App() {
                 <Route path="/contacts" element={<Contacts />} />
                 <Route path="/schedule" element={<Schedule />} />
                 <Route path="/blogs" element={<Blogs />} />
-                <Route path="/my-account" element={<MyAccount />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
 
@@ -83,7 +84,7 @@ function App() {
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/schedule" element={<Schedule />} />
               <Route path="/blogs" element={<Blogs />} />
-              <Route path="/my-account" element={<MyAccount />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
             </Routes>

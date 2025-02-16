@@ -3,20 +3,15 @@ import useAuthStore from "../../auth/stores/useAuthStore";
 import MultiStepForm from "../components/MultiStepForm";
 
 const Schedule = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
+
+  if (!user) {
+    return <Login text="Please login first" destination="/schedule" />;
+  }
 
   return (
     <>
-      {isAuthenticated ? (
-        <>
-          <MultiStepForm />
-        </>
-      ) : (
-        <div>
-          <h1>Login First: </h1>
-          <Login />
-        </div>
-      )}
+      <MultiStepForm />
     </>
   );
 };

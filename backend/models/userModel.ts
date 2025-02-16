@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create the User model using the `userDB` connection
+// Register the User model with the userDB connection
 const User = userDB.model("User", userSchema);
 
 export default User;

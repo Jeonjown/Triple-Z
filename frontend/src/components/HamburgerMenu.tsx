@@ -113,7 +113,7 @@ const HamburgerMenu = ({
           {user && (
             <li className="py-2 hover:font-bold">
               <NavLink
-                to="/my-account"
+                to="/profile"
                 className={({ isActive }) =>
                   isActive ? "border-l-4 border-solid border-primary px-2" : ""
                 }

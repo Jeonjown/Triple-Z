@@ -26,7 +26,7 @@ const Step4 = () => {
         You can view or modify your reservation in
       </p>
 
-      <Link to={"/my-account"} replace>
+      <Link to={"profile"} replace>
         <p className="text-center font-semibold underline">My Account.</p>
       </Link>
 
