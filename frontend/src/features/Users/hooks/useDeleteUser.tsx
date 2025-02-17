@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteUser } from "../../../../../api/user";
 import { CustomError } from "types";
 import { toast } from "@/hooks/use-toast";
+import { deleteUser } from "@/api/user";
 
 // Define the expected variables type for the deleteUser function.
 interface DeleteUserVariables {

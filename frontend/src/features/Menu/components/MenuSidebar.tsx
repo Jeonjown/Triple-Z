@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFetchMenu } from "@/features/admin/features/manage menu/hooks/useFetchMenu";
+import { useFetchMenu } from "@/features/Menu/hooks/useFetchMenu";
 import { Link } from "react-router-dom";
 import LoadingPage from "@/pages/LoadingPage";
 

@@ -4,25 +4,26 @@ import Navbar from "./components/Navbar";
 import About from "./pages/About";
 import Events from "./pages/Events";
 import Contacts from "./pages/Contacts";
-import Schedule from "./features/scheduling/pages/Schedule";
+import Schedule from "./features/Events/pages/Schedule";
 import Blogs from "./pages/Blogs";
 
 import Footer from "./components/Footer";
-import Signup from "./features/auth/pages/Signup";
-import Login from "./features/auth/pages/Login";
-import useAuthStore from "./features/auth/stores/useAuthStore";
-import AdminDashboard from "./features/admin/pages/AdminDashboard";
-import Settings from "./features/admin/pages/Settings";
-import Reports from "./features/admin/pages/Reports";
-import ManageUsers from "./features/admin/features/manage users/pages/ManageUsers";
-import ManageMenu from "./features/admin/features/manage menu/pages/ManageMenu";
+import Signup from "./features/Auth/pages/Signup";
+import Login from "./features/Auth/pages/Login";
+import useAuthStore from "./features/Auth/stores/useAuthStore";
+import AdminDashboard from "./features/Admin/pages/AdminDashboard";
+import Settings from "./features/Admin/pages/Settings";
+import Reports from "./features/Admin/pages/Reports";
+
+import ManageMenu from "./features/Menu/pages/ManageMenu";
 import AdminSidebarLayout from "./app/Layout";
-import Menu from "./features/admin/features/manage menu/pages/Menu";
+import Menu from "./features/Menu/pages/Menu";
 import ScrollToTop from "./components/ScrollToTop";
-import MenuItem from "./features/admin/features/manage menu/components/MenuItem";
 import { Toaster } from "./components/ui/toaster";
-import OrderCheckout from "./features/admin/features/manage menu/pages/OrderCheckout";
+import OrderCheckout from "./features/Menu/pages/OrderCheckout";
 import Profile from "./pages/Profile";
+import MenuItem from "./features/Menu/components/MenuItem";
+import ManageUsers from "./features/Users/pages/ManageUsers";
 
 function App() {
   const { user } = useAuthStore();

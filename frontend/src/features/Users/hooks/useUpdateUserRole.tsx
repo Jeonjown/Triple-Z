@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateUserRole } from "../../../../../api/user";
+
 import { User } from "../pages/ManageUsers"; // Adjust import path as needed
 import { useToast } from "@/hooks/use-toast";
+import { updateUserRole } from "@/api/user";
 
 // Define types for the parameters
 interface UseUpdateUserRoleProps {

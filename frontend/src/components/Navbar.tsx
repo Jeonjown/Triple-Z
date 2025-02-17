@@ -6,8 +6,8 @@ import HamburgerIcon from "./HamburgerIcon";
 import HamburgerMenu from "./HamburgerMenu";
 import useToggle from "../hooks/useToggle";
 import { Link } from "react-router-dom";
-import useAuthStore from "../features/auth/stores/useAuthStore";
-import useFetchUserData from "../features/auth/hooks/useFetchUserData";
+import useAuthStore from "../features/Auth/stores/useAuthStore";
+import useFetchUserData from "../features/Auth/hooks/useFetchUserData";
 import { Button } from "./ui/button";
 
 const Navbar = () => {

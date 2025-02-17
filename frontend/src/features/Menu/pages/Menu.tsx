@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { useFetchMenu } from "@/features/admin/features/manage menu/hooks/useFetchMenu";
+import { useFetchMenu } from "@/features/Menu/hooks/useFetchMenu";
 import { useNavigate, useParams } from "react-router-dom";
-import MenuPage from "@/features/admin/features/manage menu/pages/MenuPage";
+import MenuPage from "@/features/Menu/pages/MenuPage";
 import MenuSidebar from "../components/MenuSidebar";
 import Cart from "../components/Cart";
 

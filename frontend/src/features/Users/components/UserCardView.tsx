@@ -5,7 +5,7 @@ import { User } from "../pages/ManageUsers";
 import UserEditModal from "./UserEditModal";
 import useEditUserModal from "../hooks/useEditUserModal";
 import { ArrowUpDown, SquarePen, Trash2 } from "lucide-react";
-import useAuthStore from "@/features/auth/stores/useAuthStore";
+import useAuthStore from "@/features/Auth/stores/useAuthStore";
 
 import {
   Tooltip,

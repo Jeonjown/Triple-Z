@@ -1,6 +1,5 @@
 import { User } from "../pages/ManageUsers";
-import useAuthStore from "../../../../auth/stores/useAuthStore";
-import { formatCreatedAt } from "../../../../../utils/dateUtils";
+
 import { Button } from "@/components/ui/button";
 import useEditUserModal from "../hooks/useEditUserModal";
 import useUpdateUserRole from "../hooks/useUpdateUserRole";
@@ -22,6 +21,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import useAuthStore from "@/features/Auth/stores/useAuthStore";
+import { formatCreatedAt } from "@/utils/dateUtils";
 
 interface UserEditModalProps {
   setIsEditModalOpen: (value: boolean) => void;

@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
-import useAuthStore from "../features/auth/stores/useAuthStore";
-import useLogout from "../features/auth/hooks/useLogout";
+import useAuthStore from "../features/Auth/stores/useAuthStore";
+import useLogout from "../features/Auth/hooks/useLogout";
 import { ChevronRight } from "lucide-react";
 
 type HamburgerMenuProps = {

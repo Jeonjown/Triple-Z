@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import useFetchAllMenuItems from "@/features/admin/features/manage menu/hooks/useFetchAllMenuItems";
+import useFetchAllMenuItems from "@/features/Menu/hooks/useFetchAllMenuItems";
 import { Link } from "react-router-dom";
 import LoadingPage from "./LoadingPage";
 import ErrorPage from "./ErrorPage";

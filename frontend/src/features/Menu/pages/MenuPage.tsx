@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
-import { Card, CardHeader, CardTitle } from "../../../../../components/ui/card";
-import useAuthStore from "@/features/auth/stores/useAuthStore";
+import { Card, CardHeader, CardTitle } from "../../../components/ui/card";
+import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { useFetchItemsByCategories } from "../hooks/useFetchItemsByCategories";
 import LoadingPage from "@/pages/LoadingPage";
 import Cart from "../components/Cart";

@@ -3,7 +3,7 @@ import { User } from "../pages/ManageUsers";
 import useDeleteUserModal from "../hooks/useDeleteUserModal";
 import useEditUserModal from "../hooks/useEditUserModal";
 import UserEditModal from "./UserEditModal";
-import useAuthStore from "@/features/auth/stores/useAuthStore";
+import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { SquarePen, Trash2, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {

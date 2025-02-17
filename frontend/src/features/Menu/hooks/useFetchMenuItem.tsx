@@ -1,6 +1,6 @@
-import { getMenuItem } from "@/features/admin/features/manage menu/api/menu";
 import { useQuery } from "@tanstack/react-query";
 import { CustomError } from "types";
+import { getMenuItem } from "../api/menu";
 
 export interface MenuItem {
   _id: string;

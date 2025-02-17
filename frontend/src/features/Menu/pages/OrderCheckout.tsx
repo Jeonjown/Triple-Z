@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "../stores/useCartStore";
-import useAuthStore from "@/features/auth/stores/useAuthStore";
-import Login from "../../../../auth/pages/Login";
+import useAuthStore from "@/features/Auth/stores/useAuthStore";
+import Login from "../../Auth/pages/Login";
 
 const OrderCheckout = () => {
   const { user } = useAuthStore();
