@@ -3,7 +3,6 @@ import AdminSidebarLayout from "./app/Layout";
 import Navbar from "./components/Navbar";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "./components/ui/toaster";
-import AdminDashboard from "./features/Admin/pages/AdminDashboard";
 import Reports from "./features/Admin/pages/Reports";
 import Login from "./features/Auth/pages/Login";
 import Signup from "./features/Auth/pages/Signup";
@@ -23,6 +22,7 @@ import Menu from "./features/Menu/pages/Menu";
 import Home from "./pages/Home";
 import Settings from "./features/Admin/pages/Settings";
 import Footer from "./components/Footer";
+import AdminDashboard from "./features/Admin/pages/AdminDashboard";
 
 function App() {
   const { user } = useAuthStore();
