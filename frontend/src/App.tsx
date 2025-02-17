@@ -1,31 +1,28 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Navbar from "./components/Navbar";
-import About from "./pages/About";
-
-import Contacts from "./pages/Contacts";
-import Schedule from "./features/Events/pages/Schedule";
-import Blogs from "./pages/Blogs";
-
-import Footer from "./components/Footer";
-import Login from "./features/Auth/pages/Login";
-import useAuthStore from "./features/Auth/stores/useAuthStore";
-import AdminDashboard from "./features/Admin/pages/AdminDashboard";
-import Settings from "./features/Admin/pages/Settings";
-import Reports from "./features/Admin/pages/Reports";
-
-import ManageMenu from "./features/Menu/pages/ManageMenu";
 import AdminSidebarLayout from "./app/Layout";
-import Menu from "./features/Menu/pages/Menu";
+import Navbar from "./components/Navbar";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "./components/ui/toaster";
-import OrderCheckout from "./features/Menu/pages/OrderCheckout";
-import Profile from "./pages/Profile";
-import MenuItem from "./features/Menu/components/MenuItem";
-import ManageUsers from "./features/Users/pages/ManageUsers";
-import GroupForm from "./features/Events/pages/GroupForm";
-import EventForm from "./features/Events/pages/EventForm";
+import AdminDashboard from "./features/Admin/pages/AdminDashboard";
+import Reports from "./features/Admin/pages/Reports";
+import Login from "./features/Auth/pages/Login";
 import Signup from "./features/Auth/pages/Signup";
+import useAuthStore from "./features/Auth/stores/useAuthStore";
+import EventForm from "./features/Events/pages/EventForm";
+import GroupForm from "./features/Events/pages/GroupForm";
+import Schedule from "./features/Events/pages/Schedule";
+import MenuItem from "./features/Menu/components/MenuItem";
+import ManageMenu from "./features/Menu/pages/ManageMenu";
+import OrderCheckout from "./features/Menu/pages/OrderCheckout";
+import ManageUsers from "./features/Users/pages/ManageUsers";
+import About from "./pages/About";
+import Blogs from "./pages/Blogs";
+import Contacts from "./pages/Contacts";
+import Profile from "./pages/Profile";
+import Menu from "./features/Menu/pages/Menu";
+import Home from "./pages/Home";
+import Settings from "./features/Admin/pages/Settings";
+import Footer from "./components/Footer";
 
 function App() {
   const { user } = useAuthStore();
