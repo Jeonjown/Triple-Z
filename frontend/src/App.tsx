@@ -8,7 +8,6 @@ import Schedule from "./features/Events/pages/Schedule";
 import Blogs from "./pages/Blogs";
 
 import Footer from "./components/Footer";
-import Signup from "./features/Auth/pages/Signup";
 import Login from "./features/Auth/pages/Login";
 import useAuthStore from "./features/Auth/stores/useAuthStore";
 import AdminDashboard from "./features/Admin/pages/AdminDashboard";
@@ -26,6 +25,7 @@ import MenuItem from "./features/Menu/components/MenuItem";
 import ManageUsers from "./features/Users/pages/ManageUsers";
 import GroupForm from "./features/Events/pages/GroupForm";
 import EventForm from "./features/Events/pages/EventForm";
+import Signup from "./features/Auth/pages/Signup";
 
 function App() {
   const { user } = useAuthStore();
