@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { RadioGroup } from "@radix-ui/react-radio-group";
 import Login from "../../Auth/pages/Login";
 import useAuthStore from "../../Auth/stores/useAuthStore";
@@ -10,9 +11,20 @@ import GroupForm from "./GroupForm";
 
 const Schedule = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate(); // Initialize navigate function
 
   // Initialize state with an empty string or a default value
   const [selectedOption, setSelectedOption] = useState<string>("");
+
+  // Handle navigation when the option changes
+  const handleSelection = (value: string) => {
+    setSelectedOption(value);
+    if (value === "Events") {
+      navigate("/schedule/event-form"); // Navigate to /events
+    } else if (value === "Groups") {
+      navigate("/schedule/group-form"); // Navigate to /groups
+    }
+  };
 
   if (!user) {
     return <Login text="Please login first" destination="/schedule" />;
@@ -24,8 +36,8 @@ const Schedule = () => {
         <h2 className="font-heading text-2xl">Choose Event Type</h2>
         <RadioGroup
           defaultValue="option-one"
-          onValueChange={setSelectedOption}
-          className="mt-2 flex items-center space-x-2"
+          onValueChange={handleSelection} // Call handleSelection when value changes
+          className="mt-2 flex items-center space-x-4"
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="Groups" id="Groups" />
@@ -39,11 +51,12 @@ const Schedule = () => {
         </RadioGroup>
       </div>
 
-      {selectedOption && selectedOption === "Events" ? (
+      {/* Conditionally render forms */}
+      {selectedOption === "Events" ? (
         <EventForm />
-      ) : (
+      ) : selectedOption === "Groups" ? (
         <GroupForm />
-      )}
+      ) : null}
     </>
   );
 };

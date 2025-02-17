@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import About from "./pages/About";
-import Events from "./pages/Events";
+
 import Contacts from "./pages/Contacts";
 import Schedule from "./features/Events/pages/Schedule";
 import Blogs from "./pages/Blogs";
@@ -24,6 +24,8 @@ import OrderCheckout from "./features/Menu/pages/OrderCheckout";
 import Profile from "./pages/Profile";
 import MenuItem from "./features/Menu/components/MenuItem";
 import ManageUsers from "./features/Users/pages/ManageUsers";
+import GroupForm from "./features/Events/pages/GroupForm";
+import EventForm from "./features/Events/pages/EventForm";
 
 function App() {
   const { user } = useAuthStore();
@@ -43,7 +45,9 @@ function App() {
 
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/events" element={<Events />} />
+                <Route path="/schedule" element={<Schedule />} />
+                <Route path="/schedule/event-form" element={<EventForm />} />
+                <Route path="/schedule/group-form" element={<GroupForm />} />
                 <Route path="/menu" element={<Menu />} />
                 <Route
                   path="/menu/categories/:categoryId/subcategories/:subcategoryId"
@@ -55,7 +59,6 @@ function App() {
                   element={<OrderCheckout />}
                 />
                 <Route path="/contacts" element={<Contacts />} />
-                <Route path="/schedule" element={<Schedule />} />
                 <Route path="/blogs" element={<Blogs />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/signup" element={<Signup />} />
@@ -74,7 +77,9 @@ function App() {
               {/* Regular Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
-              <Route path="/events" element={<Events />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/schedule/event-form" element={<EventForm />} />
+              <Route path="/schedule/group-form" element={<GroupForm />} />
               <Route path="/menu" element={<Menu />} />
               <Route
                 path="/menu/categories/:categoryId/subcategories/:subcategoryId"
@@ -83,7 +88,6 @@ function App() {
               <Route path="/menu/order-checkout" element={<OrderCheckout />} />
               <Route path="/menu/:menuItemId" element={<MenuItem />} />
               <Route path="/contacts" element={<Contacts />} />
-              <Route path="/schedule" element={<Schedule />} />
               <Route path="/blogs" element={<Blogs />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/signup" element={<Signup />} />
