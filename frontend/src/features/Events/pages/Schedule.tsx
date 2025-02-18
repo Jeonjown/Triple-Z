@@ -11,6 +11,7 @@ import GroupForm from "./GroupForm";
 
 const Schedule = () => {
   const { user } = useAuthStore();
+
   const navigate = useNavigate(); // Initialize navigate function
 
   // Initialize state with an empty string or a default value
@@ -20,9 +21,9 @@ const Schedule = () => {
   const handleSelection = (value: string) => {
     setSelectedOption(value);
     if (value === "Events") {
-      navigate("/schedule/event-form"); // Navigate to /events
+      navigate(`/schedule/event-form/${user?._id}`); // Pass userId in the URL
     } else if (value === "Groups") {
-      navigate("/schedule/group-form"); // Navigate to /groups
+      navigate(`/schedule/group-form/${user?._id}`); // Pass userId in the URL
     }
   };
 

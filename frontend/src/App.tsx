@@ -43,7 +43,10 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/schedule" element={<Schedule />} />
-                <Route path="/schedule/event-form" element={<EventForm />} />
+                <Route
+                  path="/schedule/event-form/:userId"
+                  element={<EventForm />}
+                />
                 <Route path="/schedule/group-form" element={<GroupForm />} />
                 <Route path="/menu" element={<Menu />} />
                 <Route
@@ -75,7 +78,10 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/schedule" element={<Schedule />} />
-              <Route path="/schedule/event-form" element={<EventForm />} />
+              <Route
+                path="/schedule/event-form/:userId"
+                element={<EventForm />}
+              />
               <Route path="/schedule/group-form" element={<GroupForm />} />
               <Route path="/menu" element={<Menu />} />
               <Route

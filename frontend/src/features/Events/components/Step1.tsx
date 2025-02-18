@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { EventFormValues } from "../pages/EventForm";
 import { useFormContext } from "react-hook-form";
 import ScrollToTop from "@/components/ScrollToTop";
+import HourlyTimePicker from "./HourlyTimePicker";
+import EventCalendar from "./EventCalendar";
 
 type Step1Props = {
   nextStep: () => void;
@@ -9,15 +11,22 @@ type Step1Props = {
 
 const Step1 = ({ nextStep }: Step1Props) => {
   const {
+    setValue,
     register,
     formState: { errors },
     trigger,
+    watch, // Watch to monitor form values
   } = useFormContext<EventFormValues>(); // Use the hook here
+
+  // Watch to get the startTime and endTime values
+  const startTime = watch("startTime");
+  const endTime = watch("endTime");
+
   // Trigger validation for Step1 fields.
   const handleNextStep = async () => {
     const valid = await trigger([
       "fullName",
-      "phoneNumber",
+      "contactNumber",
       "partySize",
       "date",
       "startTime",
@@ -32,7 +41,9 @@ const Step1 = ({ nextStep }: Step1Props) => {
   return (
     <>
       <ScrollToTop />
+
       <div className="mt-10">
+        <EventCalendar />
         <label htmlFor="fullName" className="block">
           Full Name
         </label>
@@ -48,26 +59,24 @@ const Step1 = ({ nextStep }: Step1Props) => {
           <div className="text-xs text-red-700">{errors.fullName.message}</div>
         )}
       </div>
-
       <div>
-        <label htmlFor="phoneNumber" className="block">
-          Phone Number
+        <label htmlFor="contactNumber" className="block">
+          Contact Number
         </label>
         <input
           type="text"
-          id="phoneNumber"
-          {...register("phoneNumber")}
+          id="contactNumber"
+          {...register("contactNumber")}
           className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
-            errors.phoneNumber ? "border-red-500" : ""
+            errors.contactNumber ? "border-red-500" : ""
           }`}
         />
-        {errors.phoneNumber && (
+        {errors.contactNumber && (
           <div className="text-xs text-red-700">
-            {errors.phoneNumber.message}
+            {errors.contactNumber.message}
           </div>
         )}
       </div>
-
       <div>
         <label htmlFor="partySize" className="block">
           Party Size
@@ -85,7 +94,6 @@ const Step1 = ({ nextStep }: Step1Props) => {
           <div className="text-xs text-red-700">{errors.partySize.message}</div>
         )}
       </div>
-
       <div>
         <label htmlFor="date" className="block">
           Date
@@ -101,46 +109,42 @@ const Step1 = ({ nextStep }: Step1Props) => {
           <div className="text-xs text-red-700">{errors.date.message}</div>
         )}
       </div>
-
-      <div>
-        <label htmlFor="startTime" className="block">
-          Start Time
-        </label>
-        <input
-          type="time"
-          {...register("startTime")}
-          className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
-            errors.startTime ? "border-red-500" : ""
-          }`}
-        />
-        {errors.startTime && (
-          <div className="text-xs text-red-700">{errors.startTime.message}</div>
-        )}
+      <div className="flex gap-4">
+        <div className="flex-1">
+          <label htmlFor="startTime">Start Time</label>
+          <HourlyTimePicker
+            value={startTime} // Pass startTime to this picker
+            onChange={(time) => {
+              setValue("startTime", time);
+            }}
+          />
+          {errors.startTime && (
+            <div className="text-xs text-red-700">
+              {errors.startTime.message}
+            </div>
+          )}
+        </div>
+        <div className="flex-1">
+          <label htmlFor="endTime">End Time</label>
+          <HourlyTimePicker
+            value={endTime} // Pass endTime to this picker
+            onChange={(time) => {
+              setValue("endTime", time);
+            }}
+          />
+          {errors.endTime && (
+            <div className="text-xs text-red-700">{errors.endTime.message}</div>
+          )}
+        </div>
       </div>
-
       <div>
-        <label htmlFor="endTime" className="block">
-          End Time
-        </label>
-        <input
-          type="time"
-          {...register("endTime")}
-          className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
-            errors.endTime ? "border-red-500" : ""
-          }`}
-        />
-        {errors.endTime && (
-          <div className="text-xs text-red-700">{errors.endTime.message}</div>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="eventType" className="block">
+        <label htmlFor="eventType" className="mt-4 block">
           Event Type
         </label>
         <input
           type="text"
           id="eventType"
+          placeholder="Ex. Birthday, Party "
           {...register("eventType")}
           className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
             errors.eventType ? "border-red-500" : ""
@@ -150,7 +154,6 @@ const Step1 = ({ nextStep }: Step1Props) => {
           <div className="text-xs text-red-700">{errors.eventType.message}</div>
         )}
       </div>
-
       <Button type="button" onClick={handleNextStep}>
         Next
       </Button>

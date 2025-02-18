@@ -5,6 +5,8 @@ import { Minus, Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useCallback, useEffect } from "react";
+import { useFormContext } from "react-hook-form";
+import { EventFormValues } from "../pages/EventForm";
 
 type CartItem = {
   _id: string;
@@ -36,6 +38,7 @@ const Step2 = ({
   nextStep,
 }: Step2Props) => {
   const { data } = useFetchAllMenuItems();
+  const { setValue } = useFormContext<EventFormValues>();
 
   // Update the cart whenever selected items or quantities change
   const updateCart = useCallback(() => {
@@ -62,20 +65,19 @@ const Step2 = ({
     setSelectedPackageIds(updatedSelection);
 
     if (!quantityMap[value]) {
-      setQuantityMap({ ...quantityMap, [value]: 1 });
+      setQuantityMap((prev) => ({ ...prev, [value]: 1 }));
     }
 
-    updateCart();
+    updateCart(); // Ensure cart is updated
   };
 
-  // Handle quantity change
   const handleQuantityChange = (id: string, increment: boolean) => {
     const updatedQuantity = increment
       ? (quantityMap[id] || 1) + 1
       : Math.max(1, (quantityMap[id] || 1) - 1);
 
-    setQuantityMap({ ...quantityMap, [id]: updatedQuantity });
-    updateCart();
+    setQuantityMap((prev) => ({ ...prev, [id]: updatedQuantity }));
+    updateCart(); // Ensure cart is updated after quantity change
   };
 
   // Get overall total from the cart
@@ -98,13 +100,17 @@ const Step2 = ({
       ));
 
   useEffect(() => {
-    updateCart();
-  }, [updateCart]);
+    updateCart(); // Update the cart based on selectedPackageIds and quantityMap
+  }, [selectedPackageIds, quantityMap, updateCart]);
+
+  useEffect(() => {
+    setValue("cart", cart); // Update form state with the cart
+  }, [cart, setValue]); // This effect will trigger only when cart changes
 
   return (
     <>
       <ScrollToTop />
-      <div className="mb-2 mt-5">Package</div>
+      <div className="mb-2 mt-5 font-semibold">Packages</div>
       <div className="space-y-2">{renderMenuItems("Event Meals")}</div>
       <div className="mb-2 mt-5 font-semibold">Additionals</div>
       <div className="space-y-2">{renderMenuItems("Event Additionals")}</div>
@@ -121,7 +127,7 @@ const Step2 = ({
             <div className="flex flex-col justify-between">
               <div className="text-xl font-semibold">{item.title}</div>
               <div className="mt-2 text-sm font-medium text-gray-800">
-                Price: ${item.totalPrice.toFixed(2)}
+                Price: ₱{item.totalPrice.toFixed(2)}
               </div>
               <div className="mt-2 flex items-center gap-2">
                 <Button
@@ -141,7 +147,7 @@ const Step2 = ({
                 </Button>
               </div>
               <div className="mt-2 text-base font-semibold text-gray-800">
-                Total Price: ${item.totalPrice.toFixed(2)}
+                Total Price: ₱{item.totalPrice.toFixed(2)}
               </div>
             </div>
           </div>
@@ -149,7 +155,7 @@ const Step2 = ({
       </div>
 
       <div className="mt-4 text-lg font-semibold text-primary">
-        Overall Total: ${getOverallTotal().toFixed(2)}
+        Overall Total: ₱{getOverallTotal().toFixed(2)}
       </div>
 
       <label className="mb-2 mt-5">Notes</label>
@@ -158,10 +164,10 @@ const Step2 = ({
         className="block w-full rounded-md border p-10 focus:outline-none"
       />
       <div className="mt-5 flex gap-4">
-        <Button type="button" onClick={prevStep}>
+        <Button type="button" onClick={prevStep} className="w-full">
           Previous
         </Button>
-        <Button type="button" onClick={nextStep}>
+        <Button type="button" onClick={nextStep} className="w-full">
           Next
         </Button>
       </div>

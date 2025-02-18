@@ -2,27 +2,60 @@ import { Request, Response, NextFunction } from "express";
 import { EventReservation } from "../models/eventReservationModel";
 import { createError } from "../utils/createError";
 import User from "../models/userModel";
+import { isReservationDateValid } from "../utils/isReservationValid";
 
-// Create a new event reservation
+//  createReservation
 export const createReservation = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
-    const { userId } = req.params; // Capture the userId from the route parameter
+    const { userId } = req.params; // Assuming the ownerId is in the request params
+    console.log(req.body);
+    if (!userId) {
+      return next(createError("OwnerId is required in URL params", 400));
+    }
+
     const {
       date,
       fullName,
       contactNumber,
       startTime,
       endTime,
-      guests,
+      partySize,
       eventType,
       status,
     } = req.body;
 
-    // Check if the user exists in the userDB
+    if (
+      !date ||
+      !fullName ||
+      !contactNumber ||
+      !startTime ||
+      !endTime ||
+      partySize === undefined ||
+      !eventType ||
+      !status
+    ) {
+      return next(createError("Missing required fields", 400));
+    }
+
+    // Catch the specific error from isReservationDateValid
+    try {
+      const isValid = await isReservationDateValid(date);
+      if (!isValid) {
+        return next(
+          createError("Events Reservations accommodated are 2 per month", 400)
+        );
+      }
+    } catch (error: any) {
+      return next(
+        createError(error.message || "Failed to validate reservation date", 400)
+      );
+    }
+
+    // Fetch the user
     const user = await User.findById(userId);
     if (!user) {
       return next(
@@ -30,32 +63,44 @@ export const createReservation = async (
       );
     }
 
-    // Create a new reservation using the updated model fields
+    // Create the reservation
     const newReservation = new EventReservation({
-      user: userId,
+      user: user._id,
       date,
       fullName,
       contactNumber,
       startTime,
       endTime,
-      guests,
+      partySize,
       eventType,
       status,
     });
 
     // Save the reservation
     await newReservation.save();
+
+    // Populate the 'user' field with username and email after saving the reservation
+    const populatedReservation = await EventReservation.findById(
+      newReservation._id
+    ).populate("user", "username email", User);
+
     res.status(201).json({
       message: "Reservation created successfully!",
-      reservation: newReservation,
+      reservation: populatedReservation,
     });
-    return;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return next(createError("Failed to create reservation.", 500));
+
+    // Handle MongoDB duplicate key error
+    if (error.code === 11000) {
+      return next(
+        createError("A reservation with this email already exists.", 400)
+      );
+    }
+
+    next(createError("Failed to create reservation.", 500));
   }
 };
-
 // Controller to get all reservations
 export const getReservations = async (
   req: Request,
@@ -63,7 +108,7 @@ export const getReservations = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Populate the 'user' field using the User model from the correct connection
+    // Populate the 'user' field with username and email
     const reservations = await EventReservation.find().populate(
       "user",
       "username email",
@@ -74,10 +119,9 @@ export const getReservations = async (
       message: "Reservations fetched successfully!",
       reservations,
     });
-    return;
   } catch (error) {
     console.error(error);
-    return next(createError("Failed to fetch reservations.", 500));
+    next(createError("Failed to fetch reservations.", 500));
   }
 };
 
@@ -88,10 +132,10 @@ export const updateReservationStatus = async (
   next: NextFunction
 ) => {
   try {
-    const { reservationId } = req.params; // Get reservation ID from URL params
-    const { status } = req.body; // Get new status from request body
+    const { reservationId } = req.params;
+    const { status } = req.body;
 
-    // Validate status against the updated enum
+    // Validate status against the allowed enum values
     if (!["pending", "confirmed", "completed", "canceled"].includes(status)) {
       return next(
         createError(
@@ -116,10 +160,9 @@ export const updateReservationStatus = async (
       message: "Reservation status updated successfully!",
       reservation: updatedReservation,
     });
-    return;
   } catch (error) {
     console.error(error);
-    return next(createError("Failed to update reservation status.", 500));
+    next(createError("Failed to update reservation status.", 500));
   }
 };
 
@@ -145,9 +188,8 @@ export const deleteReservation = async (
       message: "Reservation deleted successfully!",
       reservation: deletedReservation,
     });
-    return;
   } catch (error) {
     console.error(error);
-    return next(createError("Failed to delete reservation.", 500));
+    next(createError("Failed to delete reservation.", 500));
   }
 };

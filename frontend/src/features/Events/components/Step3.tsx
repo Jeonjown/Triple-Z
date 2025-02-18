@@ -16,10 +16,11 @@ type Step3Props = {
   nextStep: () => void;
   prevStep: () => void;
   methods: UseFormReturn<EventFormValues>;
-  cart: CartItem[]; // Specify the type of cart
+  cart: CartItem[];
 };
 
 const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
+  const eventFee = 3000;
   const { watch, handleSubmit } = methods;
   const formValues = watch();
 
@@ -82,7 +83,8 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
 
   // Calculate the total price of all items in the cart
   const calculateTotalPrice = () => {
-    return cart.reduce((total, item) => total + item.totalPrice, 0);
+    const cartTotal = cart.reduce((total, item) => total + item.totalPrice, 0);
+    return cartTotal + eventFee;
   };
 
   return (
@@ -92,7 +94,7 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         <div className="text-text">Full Name:</div>
         <div className="font-semibold">{formValues.fullName}</div>
         <div className="text-text">Phone Number:</div>
-        <div className="font-semibold">{formValues.phoneNumber}</div>
+        <div className="font-semibold">{formValues.contactNumber}</div>
         <div className="text-text">Event Type:</div>
         <div className="font-semibold">{formValues.eventType}</div>
         <div className="text-text">Party Size:</div>
@@ -107,18 +109,20 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
           <span>{militaryToStandard(formValues.endTime)}</span>
         </div>
         <div className="text-text">Preorder List:</div>
-        <div>{renderCartItems()}</div>
+        <div className="font-semibold text-text">{renderCartItems()}</div>
+        <span className="text-text">Event Fee:</span>
+        <div className="font-semibold">₱{eventFee}</div>
 
         {/* Display the total price of the cart */}
         <div className="mt-4 font-semibold">
-          Total Price: ${calculateTotalPrice().toFixed(2)}
+          Total Price: ₱{calculateTotalPrice().toFixed(2)}
         </div>
       </div>
       <div className="mt-5 flex gap-4">
-        <Button type="button" onClick={prevStep}>
+        <Button type="button" onClick={prevStep} className="w-full">
           Previous
         </Button>
-        <Button type="button" onClick={handleCheckout}>
+        <Button type="button" onClick={handleCheckout} className="w-full">
           Checkout
         </Button>
       </div>
