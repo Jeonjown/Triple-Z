@@ -1,6 +1,57 @@
+import useAuthStore from "@/features/Auth/stores/useAuthStore";
+import useGetReservations from "@/features/Events/hooks/useGetReservations";
 import { CircleUserRound } from "lucide-react";
 
+// Define interfaces for explicit types
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+}
+
+interface CartItem {
+  _id: string;
+  title: string;
+  quantity: number;
+  totalPrice: number;
+  image: string;
+}
+
+interface Reservation {
+  _id: string;
+  userId: User;
+  fullName: string;
+  contactNumber: string;
+  partySize: number;
+  date: string;
+  startTime: string;
+  endTime: string;
+  eventType: string;
+  cart: CartItem[];
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+interface ReservationData {
+  reservations: Reservation[];
+}
+
 const Profile = () => {
+  const { user } = useAuthStore();
+  // Cast hook data to our ReservationData type
+  const { data } = useGetReservations() as { data?: ReservationData };
+
+  // Extract the logged-in user's ID
+  const userId: string | undefined = user?._id;
+
+  // Filter reservations to include only those for the current user
+  const userReservations: Reservation[] =
+    data?.reservations.filter(
+      (reservation: Reservation) => reservation.userId._id === userId,
+    ) || [];
+
   return (
     <div className="mx-auto min-h-screen w-full max-w-3xl md:border">
       {/* Header Section */}
@@ -10,8 +61,8 @@ const Profile = () => {
       <div className="px-5">
         <div className="relative flex flex-col items-center">
           {/* Profile Image */}
-          <CircleUserRound className="absolute -top-10 size-20 rounded-full bg-white p-1 shadow-md" />
-          <h3 className="mt-12 text-lg font-semibold">Malaking Kid (Kid)</h3>
+          <CircleUserRound className="absolute -top-10 h-20 w-20 rounded-full bg-white p-1 shadow-md" />
+          <h3 className="mt-12 text-lg font-semibold">{user?.username}</h3>
         </div>
       </div>
 
@@ -26,51 +77,46 @@ const Profile = () => {
         </ul>
       </div>
 
-      {/* Schedule and Pre-ordered Menu */}
-      <div className="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
-        {/* Schedule Details */}
-        <div>
-          <h2 className="text-lg font-semibold">Schedule Details</h2>
-          <div className="mt-3 space-y-3 text-sm">
-            <div>
-              <span className="text-gray-500">Date</span>
-              <p className="flex items-center gap-2 font-semibold">
-                📅 15 November 2024 at 1:00 PM
+      {/* User Reservations */}
+      <div className="p-5">
+        <h3 className="text-lg font-semibold">Your Reservations</h3>
+        {userReservations.length > 0 ? (
+          userReservations.map((reservation: Reservation) => (
+            <div key={reservation._id} className="my-4 rounded border p-3">
+              <p>
+                <strong>Date:</strong>{" "}
+                {new Date(reservation.date).toLocaleDateString()}
               </p>
-            </div>
-            <div>
-              <span className="text-gray-500">Event Type</span>
-              <p className="font-semibold">Christmas Party</p>
-            </div>
-            <div>
-              <span className="text-gray-500">Party Size</span>
-              <p className="font-semibold">22 packs</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Pre-ordered Menu */}
-        <div>
-          <h3 className="text-md font-semibold">Pre-ordered Menu</h3>
-          <div className="mt-3 space-y-3">
-            <div className="rounded-lg bg-gray-100 p-3">
-              <p className="flex justify-between font-semibold">
-                <span>Merienda Budgetarian</span> <span>₱2700.00</span>
+              <p>
+                <strong>Event:</strong> {reservation.eventType}
               </p>
-              <p className="text-sm text-gray-600">
-                18 Shawarma
-                <br />
-                18 16oz Lava Drink or Soda Blast
+              <p>
+                <strong>Party Size:</strong> {reservation.partySize}
               </p>
-            </div>
-            <div className="rounded-lg bg-gray-100 p-3">
-              <p className="flex justify-between font-semibold">
-                <span>Additionals</span> <span>₱1260.00</span>
+              <p>
+                <strong>Status:</strong> {reservation.status}
               </p>
-              <p className="text-sm text-gray-600">18 Shawarma</p>
+              {/* Map over the cart items */}
+              {reservation.cart.map((item: CartItem) => (
+                <div key={item._id} className="my-2 flex items-center">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="h-12 w-12 rounded object-cover"
+                  />
+                  <div className="ml-4">
+                    <p className="font-semibold">{item.title}</p>
+                    <p>
+                      {item.quantity} x ₱{item.totalPrice}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        </div>
+          ))
+        ) : (
+          <p>No reservations found.</p>
+        )}
       </div>
     </div>
   );

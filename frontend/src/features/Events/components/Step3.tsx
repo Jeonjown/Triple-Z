@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
 import { EventFormValues } from "../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
+import { useCreateReservations } from "../hooks/useCreateReservations";
 
 interface CartItem {
   _id: string;
@@ -20,11 +21,13 @@ type Step3Props = {
 };
 
 const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
+  const { mutate } = useCreateReservations();
+
   const eventFee = 3000;
-  const { watch, handleSubmit } = methods;
+  const { watch, handleSubmit, reset } = methods;
   const formValues = watch();
 
-  // Formats the date in MM-DD-YYYY format
+  // Format the date in MM-DD-YYYY format
   const formatDate = (date: Date) => {
     const d = new Date(date);
     const month = d.getMonth() + 1;
@@ -37,27 +40,30 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   const militaryToStandard = (militaryTime: string | undefined): string => {
     if (!militaryTime) return "";
     const parts = militaryTime.split(":");
-    if (parts.length < 2) return militaryTime;
     let hour: number = parseInt(parts[0], 10);
     const minute = parts[1];
     const ampm: string = hour >= 12 ? "PM" : "AM";
     hour = hour % 12;
-    hour = hour ? hour : 12;
+    hour = hour ? hour : 12; // 12:00 AM/PM case
     return `${hour}:${minute} ${ampm}`;
   };
 
   // Handles form submission
   const onSubmit = (data: EventFormValues) => {
-    console.log("Form submitted with data:", data);
+    // Call mutate to submit the data
+    console.log(data);
+    mutate(data);
   };
 
-  // Handles checkout action (moving to the next step)
+  // Handles checkout action (submitting the form and moving to the next step)
   const handleCheckout = () => {
-    nextStep();
-    handleSubmit(onSubmit)();
+    console.log("submitted step 3");
+    handleSubmit(onSubmit)(); // Triggers the mutation
+    nextStep(); // Move to next step
+    reset(); // Reset the form after submission
   };
 
-  // Renders the preorder cart items
+  // Renders the cart items in the preorder list
   const renderCartItems = () => {
     if (cart.length === 0) {
       return <div>No items in your cart.</div>;
@@ -122,7 +128,7 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         <Button type="button" onClick={prevStep} className="w-full">
           Previous
         </Button>
-        <Button type="button" onClick={handleCheckout} className="w-full">
+        <Button type="submit" onClick={handleCheckout} className="w-full">
           Checkout
         </Button>
       </div>

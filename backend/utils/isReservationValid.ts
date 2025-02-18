@@ -2,7 +2,7 @@ import { EventReservation } from "../models/eventReservationModel";
 
 export const isReservationDateValid = async (
   date: Date | string
-): Promise<boolean> => {
+): Promise<{ isValid: boolean; message?: string }> => {
   const reservationDate = new Date(date);
   const now = new Date();
 
@@ -12,7 +12,10 @@ export const isReservationDateValid = async (
 
   // Check if the provided reservation date is on or after the minimum valid date
   if (reservationDate < minValidDate) {
-    throw new Error("Reservations must be made at least 14 days in advance.");
+    return {
+      isValid: false,
+      message: "Reservations must be made at least 14 days in advance.",
+    };
   }
 
   // Calculate the start and end of the month for this reservation date
@@ -38,7 +41,10 @@ export const isReservationDateValid = async (
 
   // Ensure the total reservations in the month are fewer than 2
   if (reservationsCount >= 2) {
-    throw new Error("Only 2 reservations are allowed per month.");
+    return {
+      isValid: false,
+      message: "Only 2 reservations are allowed per month.",
+    };
   }
 
   // Check if there are any existing reservations on the exact same date
@@ -48,8 +54,8 @@ export const isReservationDateValid = async (
 
   // If there's already a reservation on the exact same date, it's considered an overlap
   if (existingReservation) {
-    throw new Error("This date has already been reserved.");
+    return { isValid: false, message: "This date has already been reserved." };
   }
 
-  return true;
+  return { isValid: true };
 };

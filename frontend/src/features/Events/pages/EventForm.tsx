@@ -6,7 +6,6 @@ import Step2 from "../components/Step2";
 import Step1 from "../components/Step1";
 import Step4 from "../components/Step4";
 import Step3 from "../components/Step3";
-import useAuthStore from "@/features/Auth/stores/useAuthStore";
 
 type CartItem = {
   _id: string;
@@ -18,7 +17,6 @@ type CartItem = {
 
 // Define the Zod schema for your form values
 const reservationSchema = z.object({
-  userId: z.string().nonempty("You must be logged in."),
   fullName: z.string().nonempty("Full Name is required."),
   contactNumber: z.string().nonempty("Contact is required"),
   partySize: z.preprocess(
@@ -53,8 +51,7 @@ const reservationSchema = z.object({
 // Infer the form data type from the schema
 export type EventFormValues = z.infer<typeof reservationSchema>;
 
-const MultiStepForm = () => {
-  const { user } = useAuthStore();
+const EventForm = () => {
   const [selectedPackageIds, setSelectedPackageIds] = useState<string[]>([]);
   const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -65,14 +62,13 @@ const MultiStepForm = () => {
   const methods = useForm<EventFormValues>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
-      userId: user?._id,
-      fullName: "",
-      contactNumber: "",
+      fullName: "sdfsadf",
+      contactNumber: "12341234213",
       partySize: 24,
       date: new Date().toISOString().split("T")[0], // Initial date as today's date
-      startTime: "",
-      endTime: "",
-      eventType: "",
+      startTime: "11:00 AM",
+      endTime: "11:00 AM",
+      eventType: "ewrtfwetet",
       cart: [],
     },
   });
@@ -80,7 +76,7 @@ const MultiStepForm = () => {
   const { reset } = methods;
 
   const onSubmit = (data: EventFormValues) => {
-    console.log("Form Submitted:", data);
+    console.log("Form Submitted from main:", data);
     reset();
     nextStep();
   };
@@ -177,4 +173,4 @@ const MultiStepForm = () => {
   );
 };
 
-export default MultiStepForm;
+export default EventForm;

@@ -31,10 +31,14 @@ export interface Reservation {
   __v: number;
 }
 
-export const createReservation = async (eventFormValues: EventFormValues) => {
+export const createReservation = async (
+  eventFormValues: EventFormValues,
+  userId: string,
+) => {
   try {
+    console.log("from request:", eventFormValues);
     const response = await api.post(
-      "/api/menu/events/reservations",
+      `/api/menu/events/reservations/${userId}`,
       eventFormValues,
     );
     return response.data;

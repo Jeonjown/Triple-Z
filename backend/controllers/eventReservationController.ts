@@ -11,10 +11,11 @@ export const createReservation = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { userId } = req.params; // Assuming the ownerId is in the request params
-    console.log(req.body);
+    const { userId } = req.params; // Assuming the userId is in the request params
+    console.log("request params:", req.params);
+    console.log("request body:", req.body);
     if (!userId) {
-      return next(createError("OwnerId is required in URL params", 400));
+      return next(createError("UserId is required in URL params", 400));
     }
 
     const {
@@ -25,9 +26,10 @@ export const createReservation = async (
       endTime,
       partySize,
       eventType,
-      status,
+      cart, // Extract cart from request body
     } = req.body;
 
+    // Validate the required fields
     if (
       !date ||
       !fullName ||
@@ -36,22 +38,18 @@ export const createReservation = async (
       !endTime ||
       partySize === undefined ||
       !eventType ||
-      !status
+      !cart || // Ensure cart is provided
+      !Array.isArray(cart) ||
+      cart.length === 0 // Ensure it's a non-empty array
     ) {
       return next(createError("Missing required fields", 400));
     }
 
-    // Catch the specific error from isReservationDateValid
-    try {
-      const isValid = await isReservationDateValid(date);
-      if (!isValid) {
-        return next(
-          createError("Events Reservations accommodated are 2 per month", 400)
-        );
-      }
-    } catch (error: any) {
+    // Check if the reservation date is valid (max 2 reservations per month)
+    const { isValid, message } = await isReservationDateValid(date);
+    if (!isValid) {
       return next(
-        createError(error.message || "Failed to validate reservation date", 400)
+        createError(message || "Failed to validate reservation date.", 400)
       );
     }
 
@@ -63,17 +61,17 @@ export const createReservation = async (
       );
     }
 
-    // Create the reservation
+    // Create the reservation with cart data
     const newReservation = new EventReservation({
-      user: user._id,
-      date,
+      userId, // Using userId as it's a string
       fullName,
       contactNumber,
+      partySize,
+      date,
       startTime,
       endTime,
-      partySize,
       eventType,
-      status,
+      cart, // Add cart to reservation
     });
 
     // Save the reservation
@@ -82,7 +80,11 @@ export const createReservation = async (
     // Populate the 'user' field with username and email after saving the reservation
     const populatedReservation = await EventReservation.findById(
       newReservation._id
-    ).populate("user", "username email", User);
+    ).populate(
+      "userId",
+      "username email",
+      User // Passing the User model here
+    );
 
     res.status(201).json({
       message: "Reservation created successfully!",
@@ -91,6 +93,11 @@ export const createReservation = async (
   } catch (error: any) {
     console.error(error);
 
+    // Handle specific errors and provide meaningful messages to the user
+    if (error.message.includes("Only 2 reservations are allowed")) {
+      return next(createError(error.message, 400));
+    }
+
     // Handle MongoDB duplicate key error
     if (error.code === 11000) {
       return next(
@@ -98,9 +105,11 @@ export const createReservation = async (
       );
     }
 
+    // Catch all other errors
     next(createError("Failed to create reservation.", 500));
   }
 };
+
 // Controller to get all reservations
 export const getReservations = async (
   req: Request,
@@ -110,7 +119,7 @@ export const getReservations = async (
   try {
     // Populate the 'user' field with username and email
     const reservations = await EventReservation.find().populate(
-      "user",
+      "userId",
       "username email",
       User
     );
