@@ -22,12 +22,12 @@ import {
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
 
-// Define Sidebar Menu Items
+// Define Sidebar Menu Itemss
 const items = [
   { title: "Dashboard", url: "#", icon: LayoutDashboard },
   { title: "Manage Users", url: "/manage-users", icon: UsersRound },
   { title: "Manage Menu", url: "/manage-menu", icon: Pizza },
-  { title: "Manage Events", url: "#", icon: Calendar },
+  { title: "Manage Events", url: "/manage-events", icon: Calendar },
   { title: "Settings", url: "#", icon: Settings },
 ];
 
