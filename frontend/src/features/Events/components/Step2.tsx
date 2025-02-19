@@ -14,6 +14,7 @@ type CartItem = {
   quantity: number;
   totalPrice: number;
   image: string;
+  description?: string;
 };
 
 type Step2Props = {
@@ -37,9 +38,12 @@ const Step2 = ({
   prevStep,
   nextStep,
 }: Step2Props) => {
-  const { data } = useFetchAllMenuItems();
-  const { setValue } = useFormContext<EventFormValues>();
+  const {
+    formState: { errors },
+  } = useFormContext<EventFormValues>();
 
+  const { data } = useFetchAllMenuItems();
+  const { setValue, register } = useFormContext<EventFormValues>();
   // Update the cart whenever selected items or quantities change
   const updateCart = useCallback(() => {
     const updatedCart: CartItem[] =
@@ -48,11 +52,13 @@ const Step2 = ({
         .map((item) => ({
           _id: item._id ?? "",
           title: item.title,
-          quantity: quantityMap[item._id ?? ""] || 1, // Default quantity is 1
+          quantity: quantityMap[item._id ?? ""] || 1,
           totalPrice:
             (quantityMap[item._id ?? ""] || 1) * (item.basePrice || 0),
           image: item.image,
+          description: item.description,
         })) || [];
+
     setCart(updatedCart);
   }, [data, setCart, selectedPackageIds, quantityMap]);
 
@@ -110,12 +116,20 @@ const Step2 = ({
   return (
     <>
       <ScrollToTop />
-      <div className="mb-2 mt-5 font-semibold">Packages</div>
-      <div className="space-y-2">{renderMenuItems("Event Meals")}</div>
-      <div className="mb-2 mt-5 font-semibold">Additionals</div>
-      <div className="space-y-2">{renderMenuItems("Event Additionals")}</div>
+      <div className="md:flex">
+        <div className="flex-1">
+          <div className="mb-2 mt-5 font-semibold">Packages</div>
+          <div className="space-y-2">{renderMenuItems("Event Meals")}</div>
+        </div>
+        <div className="flex-1">
+          <div className="mb-2 mt-5 font-semibold">Additionals</div>
+          <div className="space-y-2">
+            {renderMenuItems("Event Additionals")}
+          </div>
+        </div>
+      </div>
 
-      <p className="mb-2 mt-5">Pre Order</p>
+      <p className="mb-2 mt-5 font-semibold">Pre Order</p>
       <div className="block w-full rounded-md border bg-[#F8F8F8] p-8">
         {cart.map((item) => (
           <div key={item._id} className="mb-6 flex items-start gap-4">
@@ -129,23 +143,29 @@ const Step2 = ({
               <div className="mt-2 text-sm font-medium text-gray-800">
                 Price: ₱{item.totalPrice.toFixed(2)}
               </div>
+              {item.description && (
+                <p className="mt-1 max-w-prose text-sm text-gray-600">
+                  {item.description}
+                </p>
+              )}
               <div className="mt-2 flex items-center gap-2">
                 <Button
                   type="button"
-                  size="sm"
+                  className="h-7 w-7"
                   onClick={() => handleQuantityChange(item._id, false)}
                 >
-                  <Minus className="h-5 w-5" />
+                  <Minus className="!size-3" />
                 </Button>
                 <span>{item.quantity}</span>
                 <Button
                   type="button"
-                  size="sm"
+                  className="h-7 w-7"
                   onClick={() => handleQuantityChange(item._id, true)}
                 >
-                  <Plus className="h-5 w-5" />
+                  <Plus className="!size-3" />
                 </Button>
               </div>
+
               <div className="mt-2 text-base font-semibold text-gray-800">
                 Total Price: ₱{item.totalPrice.toFixed(2)}
               </div>
@@ -162,6 +182,7 @@ const Step2 = ({
       <Textarea
         placeholder="Special Request"
         className="block w-full rounded-md border p-10 focus:outline-none"
+        {...register("specialRequest")}
       />
       <div className="mt-5 flex gap-4">
         <Button type="button" onClick={prevStep} className="w-full">
@@ -171,6 +192,10 @@ const Step2 = ({
           Next
         </Button>
       </div>
+      {/* Display error message for the cart if validation fails */}
+      {errors.cart && (
+        <p className="mt-2 text-sm text-red-500">{errors.cart.message}</p>
+      )}
     </>
   );
 };

@@ -41,63 +41,80 @@ const Step1 = ({ nextStep }: Step1Props) => {
   return (
     <>
       <ScrollToTop />
+      <EventCalendar />
+      <div className="mt-10 lg:flex lg:space-x-2">
+        <div className="flex-1">
+          <label htmlFor="fullName">Full Name</label>
+          <input
+            type="text"
+            id="fullName"
+            {...register("fullName")}
+            className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
+              errors.fullName ? "border-red-500" : ""
+            }`}
+          />
+          {errors.fullName && (
+            <div className="text-xs text-red-700">
+              {errors.fullName.message}
+            </div>
+          )}
+        </div>
+        <div className="flex-1">
+          <label htmlFor="contactNumber">Contact Number</label>
+          <input
+            type="text"
+            id="contactNumber"
+            {...register("contactNumber")}
+            className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
+              errors.contactNumber ? "border-red-500" : ""
+            }`}
+          />
+          {errors.contactNumber && (
+            <div className="text-xs text-red-700">
+              {errors.contactNumber.message}
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="lg:flex lg:space-x-2">
+        <div className="flex-1">
+          <label htmlFor="partySize">Party Size</label>
+          <input
+            type="number"
+            min={24} // Assuming the minimum party size is 24
+            placeholder="minimum of 24"
+            {...register("partySize")}
+            className={`w-full rounded border p-3 focus:outline-secondary ${
+              errors.partySize ? "border-red-500" : ""
+            }`}
+          />
+          {errors.partySize && (
+            <div className="text-xs text-red-700">
+              {errors.partySize.message}
+            </div>
+          )}
+        </div>
+        <div className="flex-1">
+          <label htmlFor="eventType">Event Type</label>
+          <input
+            type="text"
+            id="eventType"
+            placeholder="Ex. Birthday, Party "
+            {...register("eventType")}
+            className={`w-full rounded border p-3 focus:outline-secondary ${
+              errors.eventType ? "border-red-500" : ""
+            }`}
+          />
+          {errors.eventType && (
+            <div className="text-xs text-red-700">
+              {errors.eventType.message}
+            </div>
+          )}
+        </div>
+      </div>
 
-      <div className="mt-10">
-        <EventCalendar />
-        <label htmlFor="fullName" className="block">
-          Full Name
-        </label>
-        <input
-          type="text"
-          id="fullName"
-          {...register("fullName")}
-          className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
-            errors.fullName ? "border-red-500" : ""
-          }`}
-        />
-        {errors.fullName && (
-          <div className="text-xs text-red-700">{errors.fullName.message}</div>
-        )}
-      </div>
       <div>
-        <label htmlFor="contactNumber" className="block">
-          Contact Number
-        </label>
-        <input
-          type="text"
-          id="contactNumber"
-          {...register("contactNumber")}
-          className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
-            errors.contactNumber ? "border-red-500" : ""
-          }`}
-        />
-        {errors.contactNumber && (
-          <div className="text-xs text-red-700">
-            {errors.contactNumber.message}
-          </div>
-        )}
-      </div>
-      <div>
-        <label htmlFor="partySize" className="block">
-          Party Size
-        </label>
-        <input
-          type="number"
-          min={24} // Assuming the minimum party size is 24
-          placeholder="minimum of 24"
-          {...register("partySize")}
-          className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
-            errors.partySize ? "border-red-500" : ""
-          }`}
-        />
-        {errors.partySize && (
-          <div className="text-xs text-red-700">{errors.partySize.message}</div>
-        )}
-      </div>
-      <div>
-        <label htmlFor="date" className="block">
-          Date
-        </label>
+        <label htmlFor="date">Date</label>
         <input
           type="date"
           {...register("date")}
@@ -109,6 +126,7 @@ const Step1 = ({ nextStep }: Step1Props) => {
           <div className="text-xs text-red-700">{errors.date.message}</div>
         )}
       </div>
+
       <div className="flex gap-4">
         <div className="flex-1">
           <label htmlFor="startTime">Start Time</label>
@@ -137,24 +155,8 @@ const Step1 = ({ nextStep }: Step1Props) => {
           )}
         </div>
       </div>
-      <div>
-        <label htmlFor="eventType" className="mt-4 block">
-          Event Type
-        </label>
-        <input
-          type="text"
-          id="eventType"
-          placeholder="Ex. Birthday, Party "
-          {...register("eventType")}
-          className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
-            errors.eventType ? "border-red-500" : ""
-          }`}
-        />
-        {errors.eventType && (
-          <div className="text-xs text-red-700">{errors.eventType.message}</div>
-        )}
-      </div>
-      <Button type="button" onClick={handleNextStep}>
+
+      <Button type="button" onClick={handleNextStep} className="mt-10">
         Next
       </Button>
     </>

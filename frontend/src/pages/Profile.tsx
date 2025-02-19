@@ -31,6 +31,7 @@ interface Reservation {
   status: string;
   createdAt: string;
   updatedAt: string;
+  specialRequest: string;
   __v: number;
 }
 
@@ -43,13 +44,10 @@ const Profile = () => {
   // Cast hook data to our ReservationData type
   const { data } = useGetReservations() as { data?: ReservationData };
 
-  // Extract the logged-in user's ID
-  const userId: string | undefined = user?._id;
-
-  // Filter reservations to include only those for the current user
+  // Filter reservations for the current user
   const userReservations: Reservation[] =
     data?.reservations.filter(
-      (reservation: Reservation) => reservation.userId._id === userId,
+      (reservation: Reservation) => reservation.userId._id === user?._id,
     ) || [];
 
   return (
@@ -60,7 +58,6 @@ const Profile = () => {
       {/* Profile Info */}
       <div className="px-5">
         <div className="relative flex flex-col items-center">
-          {/* Profile Image */}
           <CircleUserRound className="absolute -top-10 h-20 w-20 rounded-full bg-white p-1 shadow-md" />
           <h3 className="mt-12 text-lg font-semibold">{user?.username}</h3>
         </div>
@@ -82,36 +79,75 @@ const Profile = () => {
         <h3 className="text-lg font-semibold">Your Reservations</h3>
         {userReservations.length > 0 ? (
           userReservations.map((reservation: Reservation) => (
-            <div key={reservation._id} className="my-4 rounded border p-3">
-              <p>
-                <strong>Date:</strong>{" "}
-                {new Date(reservation.date).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Event:</strong> {reservation.eventType}
-              </p>
-              <p>
-                <strong>Party Size:</strong> {reservation.partySize}
-              </p>
-              <p>
-                <strong>Status:</strong> {reservation.status}
-              </p>
-              {/* Map over the cart items */}
-              {reservation.cart.map((item: CartItem) => (
-                <div key={item._id} className="my-2 flex items-center">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="h-12 w-12 rounded object-cover"
-                  />
-                  <div className="ml-4">
-                    <p className="font-semibold">{item.title}</p>
-                    <p>
-                      {item.quantity} x ₱{item.totalPrice}
-                    </p>
-                  </div>
-                </div>
-              ))}
+            // Reservation Card with enhanced styling
+            <div
+              key={reservation._id}
+              className="my-4 rounded border border-gray-300 p-4 shadow-sm"
+            >
+              {/* Reservation Details Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <p>
+                  <strong>Full Name:</strong> {reservation.fullName}
+                </p>
+                <p>
+                  <strong>Contact Number:</strong> {reservation.contactNumber}
+                </p>
+                <p>
+                  <strong>Party Size:</strong> {reservation.partySize}
+                </p>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {new Date(reservation.date).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Start Time:</strong> {reservation.startTime}
+                </p>
+                <p>
+                  <strong>End Time:</strong> {reservation.endTime}
+                </p>
+                <p>
+                  <strong>Event:</strong> {reservation.eventType}
+                </p>
+                <p>
+                  <strong>Status:</strong> {reservation.status}
+                </p>
+                <p className="col-span-2">
+                  <strong>Special Request:</strong> {reservation.specialRequest}
+                </p>
+                <p>
+                  <strong>Created At:</strong>{" "}
+                  {new Date(reservation.createdAt).toLocaleString()}
+                </p>
+                <p>
+                  <strong>Updated At:</strong>{" "}
+                  {new Date(reservation.updatedAt).toLocaleString()}
+                </p>
+              </div>
+
+              {/* Cart Items */}
+              <div className="mt-3">
+                <h4 className="font-semibold">Ordered Items:</h4>
+                {reservation.cart.length > 0 ? (
+                  reservation.cart.map((item: CartItem) => (
+                    <div key={item._id} className="my-2 flex items-center">
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="h-12 w-12 rounded object-cover"
+                      />
+                      <div className="ml-4">
+                        <p className="font-semibold">{item.title}</p>
+                        <p>
+                          {item.quantity} x ₱{item.totalPrice}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  // Display message if cart is empty
+                  <p className="mt-2 text-gray-500">No item selected</p>
+                )}
+              </div>
             </div>
           ))
         ) : (

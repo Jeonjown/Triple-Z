@@ -26,7 +26,7 @@ const EventCalendar = () => {
       {isPending && <p>Loading...</p>}
       {isError && <p>Error occurred!</p>}
 
-      <div className="mx-auto">
+      <div className="mx-auto mt-5">
         <div className="text-center font-semibold text-primary">
           Reserved Dates
         </div>
@@ -38,6 +38,16 @@ const EventCalendar = () => {
           // Disable the calendar visually and prevent interaction
           disabled={true}
         />
+        <div className="mt-2 flex justify-evenly">
+          <div className="flex space-x-1">
+            <p className="text-xs">Reserved Dates: </p>
+            <div className="h-4 w-4 rounded bg-primary"></div>
+          </div>
+          <div className="flex space-x-2">
+            <p className="text-xs">Today:</p>
+            <div className="h-4 w-4 rounded bg-secondary"></div>
+          </div>
+        </div>
       </div>
     </>
   );

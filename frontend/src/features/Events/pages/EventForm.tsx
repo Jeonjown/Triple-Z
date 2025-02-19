@@ -29,23 +29,23 @@ const reservationSchema = z.object({
     .refine((val) => {
       const selectedDate = new Date(val);
       const twoWeeksFromNow = new Date();
-      twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14); // Add 14 days
+      twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
       return selectedDate >= twoWeeksFromNow;
     }, "Date must be at least two weeks in advance"),
   startTime: z.string().nonempty("Start Time is required"),
   endTime: z.string().nonempty("End Time is required"),
   eventType: z.string().nonempty("Event Type is required"),
-  cart: z
-    .array(
-      z.object({
-        _id: z.string(),
-        title: z.string(),
-        quantity: z.number().min(1, "Quantity must be at least 1"),
-        totalPrice: z.number().min(0, "Total Price cannot be negative"),
-        image: z.string().url("Image URL must be a valid URL"),
-      }),
-    )
-    .min(1, "At least one item must be in the cart"),
+  cart: z.array(
+    z.object({
+      _id: z.string(),
+      title: z.string(),
+      quantity: z.number().min(1, "Quantity must be at least 1"),
+      totalPrice: z.number().min(0, "Total Price cannot be negative"),
+      image: z.string().url("Image URL must be a valid URL"),
+    }),
+  ),
+  // Make specialRequest optional
+  specialRequest: z.string().optional(),
 });
 
 // Infer the form data type from the schema
@@ -62,13 +62,14 @@ const EventForm = () => {
   const methods = useForm<EventFormValues>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
-      fullName: "sdfsadf",
-      contactNumber: "12341234213",
+      fullName: "Jon Stewart Doe",
+      contactNumber: "6019521325",
       partySize: 24,
-      date: new Date().toISOString().split("T")[0], // Initial date as today's date
-      startTime: "11:00 AM",
-      endTime: "11:00 AM",
-      eventType: "ewrtfwetet",
+      date: "2025-03-08", // Initial date as today's date new Date().toISOString().split("T")[0]
+      startTime: "10:00 AM",
+      endTime: "3:00 PM",
+      eventType: "sdfsdf",
+      specialRequest: "you are my special",
       cart: [],
     },
   });
@@ -85,13 +86,13 @@ const EventForm = () => {
     <>
       <FormProvider {...methods}>
         {/* Parent container with flex for centering */}
-        <div className="mx-auto flex flex-col items-center justify-center space-y-8">
+        <div className="mx-auto mt-10 flex flex-col items-center justify-center space-y-8 p-5">
           {/* Form container */}
           <form
             onSubmit={methods.handleSubmit(onSubmit)}
-            className="w-full max-w-lg"
+            className="w-full max-w-4xl bg-blue-50"
           >
-            <div className="md:shadow-aesthetic flex max-w-screen-sm flex-col border px-20">
+            <div className="md:shadow-aesthetic flex w-full flex-col">
               {/* Step-by-step content */}
               {currentStep !== 4 ? (
                 <>
@@ -111,7 +112,7 @@ const EventForm = () => {
 
               {/* Progress bar */}
               <div className="relative mb-10 mt-10">
-                <div className="relative m-auto h-1 w-[90%] rounded-full bg-gray-200">
+                <div className="relative m-auto h-1 w-[95%] rounded-full bg-gray-200">
                   <div
                     className="h-1 rounded-full bg-primary transition-all duration-300"
                     style={{ width: `${((currentStep - 1) / (4 - 1)) * 100}%` }}

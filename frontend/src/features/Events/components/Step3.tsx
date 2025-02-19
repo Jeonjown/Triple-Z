@@ -22,12 +22,11 @@ type Step3Props = {
 
 const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   const { mutate } = useCreateReservations();
-
   const eventFee = 3000;
   const { watch, handleSubmit, reset } = methods;
   const formValues = watch();
 
-  // Format the date in MM-DD-YYYY format
+  // Format date as MM-DD-YYYY
   const formatDate = (date: Date) => {
     const d = new Date(date);
     const month = d.getMonth() + 1;
@@ -36,58 +35,61 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     return `${month}-${day}-${year}`;
   };
 
-  // Converts military time to 12-hour format (AM/PM)
+  // Convert military time to standard 12-hour format
   const militaryToStandard = (militaryTime: string | undefined): string => {
     if (!militaryTime) return "";
     const parts = militaryTime.split(":");
     let hour: number = parseInt(parts[0], 10);
     const minute = parts[1];
-    const ampm: string = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12;
-    hour = hour ? hour : 12; // 12:00 AM/PM case
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
     return `${hour}:${minute} ${ampm}`;
   };
 
-  // Handles form submission
+  // Submit form and process mutation
   const onSubmit = (data: EventFormValues) => {
-    // Call mutate to submit the data
-    console.log(data);
-    mutate(data);
+    mutate(data, {
+      onSuccess: () => {
+        nextStep(); // Advance only after success
+        reset();
+      },
+      onError: (error) => {
+        console.error("Error creating reservation:", error);
+      },
+    });
   };
 
-  // Handles checkout action (submitting the form and moving to the next step)
+  // Trigger form submission
   const handleCheckout = () => {
-    console.log("submitted step 3");
-    handleSubmit(onSubmit)(); // Triggers the mutation
-    nextStep(); // Move to next step
-    reset(); // Reset the form after submission
+    handleSubmit(onSubmit)();
   };
 
-  // Renders the cart items in the preorder list
+  // Render cart items
   const renderCartItems = () => {
-    if (cart.length === 0) {
-      return <div>No items in your cart.</div>;
-    }
+    if (cart.length === 0) return <div>No items in your cart.</div>;
 
     return cart.map((item) => (
-      <div key={item._id} className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <img
-            src={item.image}
-            alt={item.title}
-            className="h-20 w-20 object-cover"
-          />
-          <div>
-            <div className="font-semibold">{item.title}</div>
-            <div>Quantity: {item.quantity}</div>
-            <div>Total Price: ${item.totalPrice.toFixed(2)}</div>
+      <div
+        key={item._id}
+        className="flex items-center gap-4 border-b p-2 last:border-b-0"
+      >
+        <img
+          src={item.image}
+          alt={item.title}
+          className="h-16 w-16 rounded object-cover"
+        />
+        <div>
+          <div className="font-semibold">{item.title}</div>
+          <div className="text-sm text-gray-600">Quantity: {item.quantity}</div>
+          <div className="text-sm text-gray-600">
+            Total: ${item.totalPrice.toFixed(2)}
           </div>
         </div>
       </div>
     ));
   };
 
-  // Calculate the total price of all items in the cart
+  // Calculate total price including event fee
   const calculateTotalPrice = () => {
     const cartTotal = cart.reduce((total, item) => total + item.totalPrice, 0);
     return cartTotal + eventFee;
@@ -96,39 +98,69 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   return (
     <>
       <ScrollToTop />
-      <div className="mt-5 rounded-sm border p-8">
-        <div className="text-text">Full Name:</div>
-        <div className="font-semibold">{formValues.fullName}</div>
-        <div className="text-text">Phone Number:</div>
-        <div className="font-semibold">{formValues.contactNumber}</div>
-        <div className="text-text">Event Type:</div>
-        <div className="font-semibold">{formValues.eventType}</div>
-        <div className="text-text">Party Size:</div>
-        <div className="font-semibold">{formValues.partySize}</div>
-        <div className="text-text">Date:</div>
-        <div className="font-semibold">
-          {formValues.date ? formatDate(new Date(formValues.date)) : ""}
+      {/* Confirmation Card */}
+      <div className="mx-auto mt-8 w-full rounded-lg bg-white p-6 shadow">
+        <h2 className="mb-10 text-center text-2xl font-semibold">
+          Confirm Your Details
+        </h2>
+        <div className="mb-6 grid grid-cols-2 gap-4">
+          <div>
+            <span className="font-semibold">Full Name:</span>
+            <p className="">{formValues.fullName}</p>
+          </div>
+          <div>
+            <span className="font-semibold">Phone Number:</span>
+            <p className="">{formValues.contactNumber}</p>
+          </div>
+          <div>
+            <span className="font-semibold">Event Type:</span>
+            <p className="">{formValues.eventType}</p>
+          </div>
+          <div>
+            <span className="font-semibold">Party Size:</span>
+            <p className="">{formValues.partySize}</p>
+          </div>
+          <div>
+            <span className="font-semibold">Date:</span>
+            <p className="">
+              {formValues.date ? formatDate(new Date(formValues.date)) : ""}
+            </p>
+          </div>
+          <div>
+            <span className="font-semibold">Time:</span>
+            <p className="">
+              {militaryToStandard(formValues.startTime)} -{" "}
+              {militaryToStandard(formValues.endTime)}
+            </p>
+          </div>
         </div>
-        <div className="text-text">Time:</div>
-        <div className="font-semibold">
-          <span>{militaryToStandard(formValues.startTime)}</span> -{" "}
-          <span>{militaryToStandard(formValues.endTime)}</span>
+        <div className="mb-4">
+          <span className="text-gray-600">Special request</span>
+          <div className="mt-2">{formValues.specialRequest ?? "None"}</div>
         </div>
-        <div className="text-text">Preorder List:</div>
-        <div className="font-semibold text-text">{renderCartItems()}</div>
-        <span className="text-text">Event Fee:</span>
-        <div className="font-semibold">₱{eventFee}</div>
 
-        {/* Display the total price of the cart */}
-        <div className="mt-4 font-semibold">
+        {/* Preorder List */}
+        <div className="mb-4">
+          <span className="text-gray-600">Preorder List:</span>
+          <div className="mt-2 rounded border">{renderCartItems()}</div>
+        </div>
+
+        {/* Fees and Total */}
+        <div className="mb-4">
+          <span className="text-gray-600">Event Fee:</span>
+          <p className="font-semibold">₱{eventFee}</p>
+        </div>
+        <div className="text-right text-xl font-semibold">
           Total Price: ₱{calculateTotalPrice().toFixed(2)}
         </div>
       </div>
-      <div className="mt-5 flex gap-4">
-        <Button type="button" onClick={prevStep} className="w-full">
+
+      {/* Navigation Buttons with original styles */}
+      <div className="mt-6 flex max-w-full gap-4">
+        <Button type="button" onClick={prevStep} className="flex-1">
           Previous
         </Button>
-        <Button type="submit" onClick={handleCheckout} className="w-full">
+        <Button type="button" onClick={handleCheckout} className="flex-1">
           Checkout
         </Button>
       </div>

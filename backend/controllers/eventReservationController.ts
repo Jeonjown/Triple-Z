@@ -26,7 +26,8 @@ export const createReservation = async (
       endTime,
       partySize,
       eventType,
-      cart, // Extract cart from request body
+      cart,
+      specialRequest,
     } = req.body;
 
     // Validate the required fields
@@ -38,9 +39,8 @@ export const createReservation = async (
       !endTime ||
       partySize === undefined ||
       !eventType ||
-      !cart || // Ensure cart is provided
-      !Array.isArray(cart) ||
-      cart.length === 0 // Ensure it's a non-empty array
+      !cart ||
+      !Array.isArray(cart)
     ) {
       return next(createError("Missing required fields", 400));
     }
@@ -72,6 +72,7 @@ export const createReservation = async (
       endTime,
       eventType,
       cart, // Add cart to reservation
+      specialRequest,
     });
 
     // Save the reservation

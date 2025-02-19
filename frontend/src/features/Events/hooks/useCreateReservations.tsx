@@ -23,8 +23,7 @@ export const useCreateReservations = () => {
       console.error("Error creating reservation:", err);
       toast({
         title: "Error creating reservation",
-        description:
-          "There was an error creating the reservation. Please try again.",
+        description: `${err}`,
         variant: "destructive",
       });
     },

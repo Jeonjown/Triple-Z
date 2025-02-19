@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { EventFormValues } from "../pages/EventForm";
 
 // Set the baseURL to your backend server's address
@@ -25,26 +25,32 @@ export interface Reservation {
   endTime: string;
   eventType: string;
   partySize: number;
+  specialRequest?: string;
   status: string;
   createdAt: string;
   updatedAt: string;
   __v: number;
 }
+interface ReservationError {
+  error: string;
+}
 
 export const createReservation = async (
   eventFormValues: EventFormValues,
   userId: string,
-) => {
+): Promise<Reservation> => {
   try {
     console.log("from request:", eventFormValues);
-    const response = await api.post(
+    // Make POST request and specify the response type as Reservation
+    const response: AxiosResponse<Reservation> = await api.post(
       `/api/menu/events/reservations/${userId}`,
       eventFormValues,
     );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || "an error occurred");
+      const axiosError = error as AxiosError<ReservationError>;
+      throw new Error(axiosError.response?.data?.error || "An error occurred");
     }
     throw new Error("An unexpected error occurred");
   }
