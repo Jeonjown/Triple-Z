@@ -1,10 +1,20 @@
 import { Column, ColumnDef, ColumnMeta } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/ui/DataTableColumnHeader";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
+import { formatDate } from "date-fns";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Module augmentation to add our custom meta type.
-// 1. We export the interface so it can be referenced outside the module.
-// 2. We add dummy properties (_dummyData and _dummyValue) to "use" the generic types
-//    and avoid the "defined but never used" warnings.
+
 declare module "@tanstack/react-table" {
   export interface ColumnMeta<TData = unknown, TValue = unknown> {
     title: string;
@@ -56,16 +66,73 @@ export type MyColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
 
 export const columns: MyColumnDef<Reservation>[] = [
   {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: "_id",
     header: "Id",
   },
   {
+    // Status column now renders as a dropdown
     accessorKey: "status",
     header: "Status",
+    cell: ({ row }) => {
+      const reservation = row.original;
+
+      const updateStatus = (newStatus: string) => {
+        console.log(`Update status for ${reservation._id} to ${newStatus}`);
+      };
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="h-8 w-20 p-0">
+              {reservation.status}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuLabel>Status</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => updateStatus("Pending")}>
+              Pending
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateStatus("Confirmed")}>
+              Confirmed
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateStatus("Canceled")}>
+              Canceled
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateStatus("Completed")}>
+              Completed
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
   },
   {
     accessorKey: "fullName",
-    header: "Full Name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Full Name" />
+    ),
   },
   {
     id: "email",
@@ -73,18 +140,31 @@ export const columns: MyColumnDef<Reservation>[] = [
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
-    meta: { title: "Email" }, // Added meta title
+    meta: { title: "Email" },
   },
   {
     accessorKey: "contactNumber",
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="Contact No." />
     ),
-    meta: { title: "Contact No." }, // Added meta title
+    meta: { title: "Contact No." },
   },
   {
     accessorKey: "partySize",
-    header: "Party Size",
+    header: ({ column }: { column: Column<Reservation, unknown> }) => (
+      <DataTableColumnHeader column={column} title="Party Size" />
+    ),
+  },
+  {
+    accessorKey: "date",
+    header: ({ column }: { column: Column<Reservation, unknown> }) => (
+      <DataTableColumnHeader column={column} title="Date" />
+    ),
+    // Format the date as MM-dd-yyyy (Month-Day-Year)
+    cell: ({ row }) => {
+      const rawDate = row.getValue<string>("date");
+      return formatDate(new Date(rawDate), "MM-dd-yyyy");
+    },
   },
   {
     id: "timeRange",
@@ -94,5 +174,33 @@ export const columns: MyColumnDef<Reservation>[] = [
   {
     accessorKey: "specialRequest",
     header: "Special Request",
+  },
+  {
+    id: "actions",
+    enableHiding: false, // Always visible actions column
+    cell: ({ row }) => {
+      const reservation = row.original;
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(reservation._id)}
+            >
+              Copy reservation ID
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>View customer</DropdownMenuItem>
+            <DropdownMenuItem>View details</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
   },
 ];
