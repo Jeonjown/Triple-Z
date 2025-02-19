@@ -132,7 +132,7 @@ const Step2 = ({
       <p className="mb-2 mt-5 font-semibold">Pre Order</p>
       <div className="block w-full rounded-md border bg-[#F8F8F8] p-8">
         {cart.map((item) => (
-          <div key={item._id} className="mb-6 flex items-start gap-4">
+          <div key={item._id} className="flex items-start gap-4">
             <img
               src={item.image}
               alt={`${item.title} image`}
@@ -148,6 +148,7 @@ const Step2 = ({
                   {item.description}
                 </p>
               )}
+              {/* Quantity Control */}
               <div className="mt-2 flex items-center gap-2">
                 <Button
                   type="button"
@@ -156,7 +157,21 @@ const Step2 = ({
                 >
                   <Minus className="!size-3" />
                 </Button>
-                <span>{item.quantity}</span>
+                {/* Added input field for direct quantity entry */}
+                <input
+                  type="number"
+                  min="1"
+                  value={quantityMap[item._id] || 1} // Use quantityMap state or default to 1
+                  onChange={(e) => {
+                    // Convert input value to a number and ensure it's at least 1
+                    const newQuantity = Math.max(1, Number(e.target.value));
+                    setQuantityMap((prev) => ({
+                      ...prev,
+                      [item._id]: newQuantity,
+                    }));
+                  }}
+                  className="w-16 rounded border text-center"
+                />
                 <Button
                   type="button"
                   className="h-7 w-7"

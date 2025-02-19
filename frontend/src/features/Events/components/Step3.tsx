@@ -35,17 +35,6 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     return `${month}-${day}-${year}`;
   };
 
-  // Convert military time to standard 12-hour format
-  const militaryToStandard = (militaryTime: string | undefined): string => {
-    if (!militaryTime) return "";
-    const parts = militaryTime.split(":");
-    let hour: number = parseInt(parts[0], 10);
-    const minute = parts[1];
-    const ampm = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
-    return `${hour}:${minute} ${ampm}`;
-  };
-
   // Submit form and process mutation
   const onSubmit = (data: EventFormValues) => {
     mutate(data, {
@@ -99,7 +88,8 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     <>
       <ScrollToTop />
       {/* Confirmation Card */}
-      <div className="mx-auto mt-8 w-full rounded-lg bg-white p-6 shadow">
+
+      <div className="mx-auto mt-8 w-full rounded-lg bg-white p-6 md:border">
         <h2 className="mb-10 text-center text-2xl font-semibold">
           Confirm Your Details
         </h2>
@@ -129,14 +119,15 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
           <div>
             <span className="font-semibold">Time:</span>
             <p className="">
-              {militaryToStandard(formValues.startTime)} -{" "}
-              {militaryToStandard(formValues.endTime)}
+              {formValues.startTime} - {formValues.endTime}
             </p>
           </div>
         </div>
         <div className="mb-4">
-          <span className="text-gray-600">Special request</span>
-          <div className="mt-2">{formValues.specialRequest ?? "None"}</div>
+          <span className="font-semibold">Special request:</span>
+          <div className="mt-2 border">
+            {formValues.specialRequest ?? "None"}
+          </div>
         </div>
 
         {/* Preorder List */}
