@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -6,6 +6,7 @@ import Step2 from "../components/Step2";
 import Step1 from "../components/Step1";
 import Step4 from "../components/Step4";
 import Step3 from "../components/Step3";
+import { useGetReservationSettings } from "../hooks/useGetReservationSettings";
 
 type CartItem = {
   _id: string;
@@ -15,43 +16,59 @@ type CartItem = {
   image: string;
 };
 
+const defaultMinGuests = 24;
+const defaultMinDaysPrior = 14;
+
 // Define the Zod schema for your form values
-const reservationSchema = z.object({
-  fullName: z.string().nonempty("Full Name is required."),
-  contactNumber: z.string().nonempty("Contact is required"),
-  partySize: z.preprocess(
-    (val) => Number(val),
-    z.number().min(24, "Party size must be at least 24"),
-  ),
-  date: z
-    .string()
-    .nonempty("Date is required")
-    .refine((val) => {
-      const selectedDate = new Date(val);
-      const twoWeeksFromNow = new Date();
-      twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
-      return selectedDate >= twoWeeksFromNow;
-    }, "Date must be at least two weeks in advance"),
-  startTime: z.string().nonempty("Start Time is required"),
-  endTime: z.string().nonempty("End Time is required"),
-  eventType: z.string().nonempty("Event Type is required"),
-  cart: z.array(
-    z.object({
-      _id: z.string(),
-      title: z.string(),
-      quantity: z.number().min(1, "Quantity must be at least 1"),
-      totalPrice: z.number().min(0, "Total Price cannot be negative"),
-      image: z.string().url("Image URL must be a valid URL"),
-    }),
-  ),
-  // Make specialRequest optional
-  specialRequest: z.string().optional(),
-});
+const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
+  z.object({
+    fullName: z.string().nonempty("Full Name is required."),
+    contactNumber: z.string().nonempty("Contact is required"),
+    partySize: z.preprocess(
+      (val) => Number(val),
+      z.number().min(minGuests, `Party size must be at least ${minGuests}`),
+    ),
+    date: z
+      .string()
+      .nonempty("Date is required")
+      .refine(
+        (val) => {
+          const selectedDate = new Date(val);
+          const minDate = new Date();
+          minDate.setDate(minDate.getDate() + minDaysPrior);
+          return selectedDate >= minDate;
+        },
+        { message: `Date must be at least ${minDaysPrior} days in advance` },
+      ),
+    startTime: z.string().nonempty("Start Time is required"),
+    endTime: z.string().nonempty("End Time is required"),
+    eventType: z.string().nonempty("Event Type is required"),
+    cart: z.array(
+      z.object({
+        _id: z.string(),
+        title: z.string(),
+        quantity: z.number().min(1, "Quantity must be at least 1"),
+        totalPrice: z.number().min(0, "Total Price cannot be negative"),
+        image: z.string().url("Image URL must be a valid URL"),
+      }),
+    ),
+    specialRequest: z.string().optional(),
+  });
 
 // Infer the form data type from the schema
-export type EventFormValues = z.infer<typeof reservationSchema>;
+export type EventFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 
 const EventForm = () => {
+  const { data: settings } = useGetReservationSettings();
+
+  const minGuests = settings?.minGuests || defaultMinGuests;
+  const minDaysPrior = settings?.minDaysPrior || defaultMinDaysPrior;
+  console.log(minGuests);
+  const reservationSchema = useMemo(
+    () => getReservationSchema(minGuests, minDaysPrior),
+    [minGuests, minDaysPrior],
+  );
+
   const [selectedPackageIds, setSelectedPackageIds] = useState<string[]>([]);
   const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -144,7 +161,9 @@ const EventForm = () => {
               </div>
 
               {/* Render the correct step */}
-              {currentStep === 1 && <Step1 nextStep={nextStep} />}
+              {currentStep === 1 && (
+                <Step1 nextStep={nextStep} minGuests={minGuests} />
+              )}
               {currentStep === 2 && (
                 <Step2
                   selectedPackageIds={selectedPackageIds}
