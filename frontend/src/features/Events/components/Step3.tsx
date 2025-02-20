@@ -73,7 +73,7 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
           <div className="font-semibold">{item.title}</div>
           <div className="text-sm text-gray-600">Quantity: {item.quantity}</div>
           <div className="text-sm text-gray-600">
-            Total: ${item.totalPrice.toFixed(2)}
+            Total: ₱{item.totalPrice.toFixed(2)}
           </div>
         </div>
       </div>
@@ -141,7 +141,7 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         {/* Fees and Total */}
         <div className="mb-4">
           <span className="text-gray-600">Event Fee:</span>
-          <p className="font-semibold">₱{eventFee}</p>
+          <p className="font-semibold">₱{settings?.eventFee}</p>
         </div>
         <div className="text-right text-xl font-semibold">
           Total Price: ₱{calculateTotalPrice().toFixed(2)}
