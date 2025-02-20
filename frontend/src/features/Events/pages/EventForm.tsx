@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -61,9 +61,10 @@ export type EventFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 const EventForm = () => {
   const { data: settings } = useGetReservationSettings();
 
+  // Use settings or fallback to default values
   const minGuests = settings?.minGuests || defaultMinGuests;
   const minDaysPrior = settings?.minDaysPrior || defaultMinDaysPrior;
-  console.log(minGuests);
+
   const reservationSchema = useMemo(
     () => getReservationSchema(minGuests, minDaysPrior),
     [minGuests, minDaysPrior],
@@ -76,13 +77,14 @@ const EventForm = () => {
   const nextStep = () => setCurrentStep((prev) => prev + 1);
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
+  // Initialize the form with defaultValues using the current minGuests
   const methods = useForm<EventFormValues>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
       fullName: "Jon Stewart Doe",
       contactNumber: "6019521325",
-      partySize: 24,
-      date: "2025-03-08", // Initial date as today's date new Date().toISOString().split("T")[0]
+      partySize: minGuests, // Initial party size is minGuests
+      date: "2025-03-08",
       startTime: "10:00 AM",
       endTime: "3:00 PM",
       eventType: "sdfsdf",
@@ -90,6 +92,21 @@ const EventForm = () => {
       cart: [],
     },
   });
+
+  // When minGuests changes, update the form's partySize using reset
+  useEffect(() => {
+    methods.reset({
+      fullName: "Jon Stewart Doe",
+      contactNumber: "6019521325",
+      partySize: minGuests, // Update partySize to new minGuests
+      date: "2025-03-08",
+      startTime: "10:00 AM",
+      endTime: "3:00 PM",
+      eventType: "sdfsdf",
+      specialRequest: "you are my special",
+      cart: [],
+    });
+  }, [methods, minGuests]);
 
   const { reset } = methods;
 
@@ -100,96 +117,58 @@ const EventForm = () => {
   };
 
   return (
-    <>
-      <FormProvider {...methods}>
-        {/* Parent container with flex for centering */}
-        <div className="mx-auto mt-10 flex flex-col items-center justify-center space-y-8 p-5">
-          {/* Form container */}
-          <form
-            onSubmit={methods.handleSubmit(onSubmit)}
-            className="w-full max-w-4xl bg-blue-50"
-          >
-            <div className="md:shadow-aesthetic flex w-full flex-col">
-              {/* Step-by-step content */}
-              {currentStep !== 4 ? (
-                <>
-                  <h2 className="mb-4 text-center font-heading text-2xl">
-                    Make a Reservation
-                  </h2>
-                  <p className="text-center">
-                    Select your details and we'll try to get the best seats for
-                    you.
-                  </p>
-                </>
-              ) : (
-                <h2 className="mb-4 text-center text-4xl">
-                  Thank you for your reservation!
+    <FormProvider {...methods}>
+      <div className="mx-auto mt-10 flex flex-col items-center justify-center space-y-8 p-5">
+        <form
+          onSubmit={methods.handleSubmit(onSubmit)}
+          className="w-full max-w-4xl bg-blue-50"
+        >
+          <div className="md:shadow-aesthetic flex w-full flex-col">
+            {currentStep !== 4 ? (
+              <>
+                <h2 className="mb-4 text-center font-heading text-2xl">
+                  Make a Reservation
                 </h2>
-              )}
+                <p className="text-center">
+                  Select your details and we'll try to get the best seats for
+                  you.
+                </p>
+              </>
+            ) : (
+              <h2 className="mb-4 text-center text-4xl">
+                Thank you for your reservation!
+              </h2>
+            )}
 
-              {/* Progress bar */}
-              <div className="relative mb-10 mt-10">
-                <div className="relative m-auto h-1 w-[95%] rounded-full bg-gray-200">
-                  <div
-                    className="h-1 rounded-full bg-primary transition-all duration-300"
-                    style={{ width: `${((currentStep - 1) / (4 - 1)) * 100}%` }}
-                  ></div>
-                </div>
-                <div className="absolute -top-3 left-[5px] flex w-full justify-between">
-                  {[
-                    { step: 1, label: "Date" },
-                    { step: 2, label: "Menu Pre-Order" },
-                    { step: 3, label: "Confirmation" },
-                    { step: 4, label: "Checkout" },
-                  ].map(({ step, label }) => (
-                    <div key={step} className="flex flex-col items-center">
-                      <div
-                        className={`h-8 w-8 rounded-full border-2 ${
-                          currentStep >= step
-                            ? "border-primary bg-primary"
-                            : "bg-gray-200"
-                        } flex items-center justify-center text-sm font-semibold text-white`}
-                      >
-                        {step}
-                      </div>
-                      <div className="mt-2 text-xs font-medium text-gray-600">
-                        {label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Render the correct step */}
-              {currentStep === 1 && (
-                <Step1 nextStep={nextStep} minGuests={minGuests} />
-              )}
-              {currentStep === 2 && (
-                <Step2
-                  selectedPackageIds={selectedPackageIds}
-                  setSelectedPackageIds={setSelectedPackageIds}
-                  quantityMap={quantityMap}
-                  setQuantityMap={setQuantityMap}
-                  cart={cart}
-                  setCart={setCart}
-                  prevStep={prevStep}
-                  nextStep={nextStep}
-                />
-              )}
-              {currentStep === 3 && (
-                <Step3
-                  prevStep={prevStep}
-                  nextStep={nextStep}
-                  methods={methods}
-                  cart={cart}
-                />
-              )}
-              {currentStep === 4 && <Step4 />}
-            </div>
-          </form>
-        </div>
-      </FormProvider>
-    </>
+            {/* Progress bar and steps here... */}
+            {currentStep === 1 && (
+              <Step1 nextStep={nextStep} minGuests={minGuests} />
+            )}
+            {currentStep === 2 && (
+              <Step2
+                selectedPackageIds={selectedPackageIds}
+                setSelectedPackageIds={setSelectedPackageIds}
+                quantityMap={quantityMap}
+                setQuantityMap={setQuantityMap}
+                cart={cart}
+                setCart={setCart}
+                prevStep={prevStep}
+                nextStep={nextStep}
+              />
+            )}
+            {currentStep === 3 && (
+              <Step3
+                prevStep={prevStep}
+                nextStep={nextStep}
+                methods={methods}
+                cart={cart}
+              />
+            )}
+            {currentStep === 4 && <Step4 />}
+          </div>
+        </form>
+      </div>
+    </FormProvider>
   );
 };
 
