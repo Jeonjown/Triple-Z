@@ -29,7 +29,7 @@ export const useCreateReservations = () => {
     },
     onSuccess: (data) => {
       console.log("Reservation created successfully:", data);
-      queryClient.invalidateQueries({ queryKey: ["reservations"] });
+      queryClient.invalidateQueries({ queryKey: ["eventReservations"] });
       toast({
         title: "Reservation created",
         description: "The reservation was created successfully.",
