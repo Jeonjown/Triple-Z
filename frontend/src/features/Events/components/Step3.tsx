@@ -24,7 +24,6 @@ type Step3Props = {
 const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   const { data: settings } = useGetReservationSettings();
   const { mutate } = useCreateReservations();
-  const eventFee = 3000;
   const { watch, handleSubmit, reset } = methods;
   const formValues = watch();
 

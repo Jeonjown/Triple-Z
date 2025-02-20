@@ -22,7 +22,7 @@ const reservationSchema = new mongoose.Schema(
     },
     fullName: { type: String, required: true },
     contactNumber: { type: String, required: true },
-    partySize: { type: Number, required: true, min: 24 },
+    partySize: { type: Number, required: true, min: 0 },
     date: { type: Date, required: true },
     startTime: { type: String, required: true },
     endTime: { type: String, required: true },
