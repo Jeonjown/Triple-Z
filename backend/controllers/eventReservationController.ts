@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { EventReservation } from "../models/eventReservationModel";
 import { createError } from "../utils/createError";
 import User from "../models/userModel";
-import { isReservationDateValid } from "../utils/isReservationValid";
+import { EventSettings } from "../models/eventSettingsModel";
 
 //  createReservation
 export const createReservation = async (
@@ -11,9 +11,7 @@ export const createReservation = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { userId } = req.params; // Assuming the userId is in the request params
-    console.log("request params:", req.params);
-    console.log("request body:", req.body);
+    const { userId } = req.params;
     if (!userId) {
       return next(createError("UserId is required in URL params", 400));
     }
@@ -30,7 +28,7 @@ export const createReservation = async (
       specialRequest,
     } = req.body;
 
-    // Validate the required fields
+    // Validate required fields
     if (
       !date ||
       !fullName ||
@@ -45,15 +43,7 @@ export const createReservation = async (
       return next(createError("Missing required fields", 400));
     }
 
-    // Check if the reservation date is valid (max 2 reservations per month)
-    const { isValid, message } = await isReservationDateValid(date);
-    if (!isValid) {
-      return next(
-        createError(message || "Failed to validate reservation date.", 400)
-      );
-    }
-
-    // Fetch the user
+    // Fetch the user to ensure it exists
     const user = await User.findById(userId);
     if (!user) {
       return next(
@@ -61,9 +51,27 @@ export const createReservation = async (
       );
     }
 
-    // Create the reservation with cart data
+    // Calculate the total price of the cart
+    const cartTotal = cart.reduce(
+      (sum: number, item: { totalPrice: number }) => {
+        return sum + item.totalPrice;
+      },
+      0
+    );
+
+    // Fetch event settings to retrieve the event fee
+    const eventSettings = await EventSettings.findOne();
+    if (!eventSettings) {
+      return next(createError("Event settings not found", 500));
+    }
+    const eventFee = eventSettings.eventFee;
+
+    // Calculate the overall total payment (cart total + event fee)
+    const totalPayment = cartTotal + eventFee;
+
+    // Create the reservation document including the totalPayment field
     const newReservation = new EventReservation({
-      userId, // Using userId as it's a string
+      userId,
       fullName,
       contactNumber,
       partySize,
@@ -71,21 +79,18 @@ export const createReservation = async (
       startTime,
       endTime,
       eventType,
-      cart, // Add cart to reservation
+      cart,
       specialRequest,
+      totalPayment,
     });
 
     // Save the reservation
     await newReservation.save();
 
-    // Populate the 'user' field with username and email after saving the reservation
+    // Populate the user field for the response
     const populatedReservation = await EventReservation.findById(
       newReservation._id
-    ).populate(
-      "userId",
-      "username email",
-      User // Passing the User model here
-    );
+    ).populate("userId", "username email", User);
 
     res.status(201).json({
       message: "Reservation created successfully!",
@@ -93,20 +98,14 @@ export const createReservation = async (
     });
   } catch (error: any) {
     console.error(error);
-
-    // Handle specific errors and provide meaningful messages to the user
     if (error.message.includes("Only 2 reservations are allowed")) {
       return next(createError(error.message, 400));
     }
-
-    // Handle MongoDB duplicate key error
     if (error.code === 11000) {
       return next(
         createError("A reservation with this email already exists.", 400)
       );
     }
-
-    // Catch all other errors
     next(createError("Failed to create reservation.", 500));
   }
 };
@@ -118,12 +117,11 @@ export const getReservations = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Populate the 'user' field with username and email
-    const reservations = await EventReservation.find().populate(
-      "userId",
-      "username email",
-      User
-    );
+    // Fetch reservations, sort by createdAt (newest first),
+    // and populate the 'userId' field with username and email from the User model
+    const reservations = await EventReservation.find()
+      .sort({ createdAt: -1 })
+      .populate("userId", "username email", User);
 
     res.status(200).json({
       message: "Reservations fetched successfully!",
@@ -142,14 +140,15 @@ export const updateReservationStatus = async (
   next: NextFunction
 ) => {
   try {
-    const { reservationId } = req.params;
-    const { status } = req.body;
+    const { eventStatus, reservationId } = req.body;
 
     // Validate status against the allowed enum values
-    if (!["pending", "confirmed", "completed", "canceled"].includes(status)) {
+    if (
+      !["Pending", "Confirmed", "Completed", "Canceled"].includes(eventStatus)
+    ) {
       return next(
         createError(
-          "Invalid status. Valid statuses are: pending, confirmed, completed, or canceled.",
+          "Invalid status. Valid statuses are: Pending, Confirmed, Completed, or Canceled.",
           400
         )
       );
@@ -158,7 +157,7 @@ export const updateReservationStatus = async (
     // Find and update the reservation
     const updatedReservation = await EventReservation.findByIdAndUpdate(
       reservationId,
-      { status },
+      { eventStatus },
       { new: true }
     );
 

@@ -28,7 +28,7 @@ const items = [
   { title: "Manage Users", url: "/manage-users", icon: UsersRound },
   { title: "Manage Menu", url: "/manage-menu", icon: Pizza },
   { title: "Manage Events", url: "/manage-events", icon: Calendar },
-  { title: "Settings", url: "#", icon: Settings },
+  { title: "Settings", url: "settings", icon: Settings },
 ];
 
 export function AppAdminSidebar() {

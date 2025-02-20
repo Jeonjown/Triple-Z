@@ -6,6 +6,7 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
   SortingState,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 
 import {
@@ -54,6 +55,7 @@ export function DataTable<TData, TValue>({
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     state: {
       globalFilter,
       sorting,
@@ -73,7 +75,8 @@ export function DataTable<TData, TValue>({
           />
           <Select
             value={
-              (table.getColumn("status")?.getFilterValue() as string) || "All"
+              (table.getColumn("eventStatus")?.getFilterValue() as string) ||
+              "All"
             }
             onValueChange={(value) =>
               table

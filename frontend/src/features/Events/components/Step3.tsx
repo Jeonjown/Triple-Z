@@ -3,6 +3,7 @@ import { UseFormReturn } from "react-hook-form";
 import { EventFormValues } from "../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useCreateReservations } from "../hooks/useCreateReservations";
+import { useGetReservationSettings } from "../hooks/useGetReservationSettings";
 
 interface CartItem {
   _id: string;
@@ -21,6 +22,7 @@ type Step3Props = {
 };
 
 const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
+  const { data: settings } = useGetReservationSettings();
   const { mutate } = useCreateReservations();
   const eventFee = 3000;
   const { watch, handleSubmit, reset } = methods;
@@ -81,7 +83,7 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   // Calculate total price including event fee
   const calculateTotalPrice = () => {
     const cartTotal = cart.reduce((total, item) => total + item.totalPrice, 0);
-    return cartTotal + eventFee;
+    return cartTotal + (settings?.eventFee ?? 0);
   };
 
   return (

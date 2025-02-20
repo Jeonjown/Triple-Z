@@ -13,9 +13,11 @@ import subcategoryRoutes from "./routes/subcategoryRoutes";
 import { ResponseError } from "./utils/createError";
 
 import eventReservationRoutes from "./routes/eventReservationRoutes";
+import eventSettingsRoutes from "./routes/eventSettingsRoutes";
 
 const server = express();
 // Middleware setup
+server.use(express.json());
 server.use(passport.initialize());
 server.use(express.urlencoded({ extended: true, limit: "10mb" }));
 server.use(cookieParser());
@@ -43,6 +45,7 @@ server.use("/api/menu/menu-items", menuItemRoutes);
 server.use("/api/menu/categories", categoryRoutes);
 server.use("/api/menu/categories", subcategoryRoutes);
 server.use("/api/menu/events/reservations", eventReservationRoutes);
+server.use("/api/menu/events/settings", eventSettingsRoutes);
 
 server.use(
   (err: ResponseError, req: Request, res: Response, next: NextFunction) => {

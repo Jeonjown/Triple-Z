@@ -28,12 +28,18 @@ const reservationSchema = new mongoose.Schema(
     endTime: { type: String, required: true },
     eventType: { type: String, required: true },
     cart: [cartItemSchema], // Added cart array with menu items
-    status: {
+    eventStatus: {
       type: String,
       enum: ["Pending", "Confirmed", "Completed", "Canceled"],
       default: "Pending",
     },
+    paymentStatus: {
+      type: String,
+      enum: ["Not Paid", "Partially Paid", "Paid"],
+      default: "Not Paid",
+    },
     specialRequest: { type: String },
+    totalPayment: { type: Number, required: true },
   },
   { timestamps: true }
 );

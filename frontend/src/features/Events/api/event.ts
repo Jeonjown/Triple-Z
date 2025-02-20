@@ -9,6 +9,26 @@ const api = axios.create({
   withCredentials: true,
 });
 
+export interface EventReservationSettings {
+  _id: string;
+  __v: number;
+  closingHours: string;
+  createdAt: string;
+  eventReservationLimit: number;
+  groupReservationLimit: number;
+  minDaysPrior: number;
+  minGuests: number;
+  maxTables: number;
+  openingHours: string;
+  updatedAt: string;
+  eventFee: number;
+}
+
+interface EventReservationSettingsResponse {
+  success: boolean;
+  data: EventReservationSettings;
+}
+
 interface UserReservation {
   _id: string;
   username: string;
@@ -67,3 +87,44 @@ export const getReservations = async () => {
     throw new Error("An unexpected error occurred");
   }
 };
+
+export const updateReservationStatus = async (
+  eventStatus: string,
+  reservationId: string,
+) => {
+  try {
+    const response: AxiosResponse<string> = await api.patch(
+      `/api/menu/events/reservations/status`,
+      {
+        eventStatus,
+        reservationId,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<ReservationError>;
+      throw new Error(axiosError.response?.data?.error || "An error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
+//EVENT RESERVATIONS SETTINGS
+export const getEventReservationSettings =
+  async (): Promise<EventReservationSettings> => {
+    try {
+      const response: AxiosResponse<EventReservationSettingsResponse> =
+        await api.get(`/api/menu/events/settings`);
+
+      return response.data.data; // ✅ Ensure we return the nested 'data' object
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<ReservationError>;
+        throw new Error(
+          axiosError.response?.data?.error || "An error occurred",
+        );
+      }
+      throw new Error("An unexpected error occurred");
+    }
+  };

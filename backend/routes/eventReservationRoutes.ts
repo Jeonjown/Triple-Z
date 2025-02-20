@@ -5,12 +5,13 @@ import {
   getReservations,
   updateReservationStatus,
 } from "../controllers/eventReservationController";
+import { validateEventReservation } from "../middleware/validateEventReservation";
 
 const router = Router();
 
 router.get("/", getReservations);
-router.post("/:userId", createReservation);
+router.post("/:userId", validateEventReservation, createReservation);
 router.delete("/:reservationId", deleteReservation);
-router.patch("/:reservationId", updateReservationStatus);
+router.patch("/status", updateReservationStatus);
 
 export default router;

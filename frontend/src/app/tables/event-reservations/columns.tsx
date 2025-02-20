@@ -12,26 +12,24 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { formatDate } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
+import EventStatusCell from "./EventStatusCell";
 
-// Module augmentation to add our custom meta type.
-
+// Module augmentation for custom meta type
 declare module "@tanstack/react-table" {
   export interface ColumnMeta<TData = unknown, TValue = unknown> {
     title: string;
-    // Dummy properties to utilize the generic parameters (no runtime effect)
     _dummyData?: TData;
     _dummyValue?: TValue;
   }
 }
 
-// Represents a user object inside a reservation.
+// Reservation-related interfaces
 export interface User {
   _id: string;
   username: string;
   email: string;
 }
 
-// Represents an individual item in the cart.
 export interface CartItem {
   _id: string;
   title: string;
@@ -40,7 +38,6 @@ export interface CartItem {
   image: string;
 }
 
-// Represents a reservation.
 export interface Reservation {
   _id: string;
   userId: User;
@@ -52,18 +49,20 @@ export interface Reservation {
   endTime: string;
   eventType: string;
   cart: CartItem[];
-  status: string;
+  eventStatus: string;
+  paymentStatus: string;
   specialRequest: string;
   createdAt: string;
   updatedAt: string;
   __v: number;
 }
 
-// Extend ColumnDef with our custom meta type using module augmentation.
+// Extend ColumnDef with our custom meta type
 export type MyColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
   meta?: ColumnMeta<TData, TValue>;
 };
 
+// --- Columns Definition ---
 export const columns: MyColumnDef<Reservation>[] = [
   {
     id: "select",
@@ -92,40 +91,53 @@ export const columns: MyColumnDef<Reservation>[] = [
     header: "Id",
   },
   {
-    // Status column now renders as a dropdown
-    accessorKey: "status",
+    accessorKey: "eventStatus",
     header: "Status",
+    // Use the EventStatusCell component instead of inline code
+    cell: ({ row }) => <EventStatusCell reservation={row.original} />,
+  },
+  {
+    accessorKey: "paymentStatus",
+    header: "Payment",
     cell: ({ row }) => {
       const reservation = row.original;
-
       const updateStatus = (newStatus: string) => {
-        console.log(`Update status for ${reservation._id} to ${newStatus}`);
+        console.log(
+          `Update payment status for ${reservation._id} to ${newStatus}`,
+        );
       };
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="h-8 w-20 p-0">
-              {reservation.status}
+              {reservation.paymentStatus}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuLabel>Status</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => updateStatus("Pending")}>
-              Pending
+            <DropdownMenuItem onClick={() => updateStatus("Not Paid")}>
+              Not Paid
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateStatus("Confirmed")}>
-              Confirmed
+            <DropdownMenuItem onClick={() => updateStatus("Partially Paid")}>
+              Partially Paid
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateStatus("Canceled")}>
-              Canceled
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateStatus("Completed")}>
-              Completed
+            <DropdownMenuItem onClick={() => updateStatus("Full Paid")}>
+              Full Paid
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
+    },
+  },
+  {
+    accessorKey: "totalPayment",
+    header: ({ column }: { column: Column<Reservation, unknown> }) => (
+      <DataTableColumnHeader column={column} title="Total Payment" />
+    ),
+    cell: ({ getValue }) => {
+      const value = getValue<number>();
+      return `₱${value.toLocaleString()}`;
     },
   },
   {
@@ -160,7 +172,6 @@ export const columns: MyColumnDef<Reservation>[] = [
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="Date" />
     ),
-    // Format the date as MM-dd-yyyy (Month-Day-Year)
     cell: ({ row }) => {
       const rawDate = row.getValue<string>("date");
       return formatDate(new Date(rawDate), "MM-dd-yyyy");
@@ -177,7 +188,7 @@ export const columns: MyColumnDef<Reservation>[] = [
   },
   {
     id: "actions",
-    enableHiding: false, // Always visible actions column
+    enableHiding: false,
     cell: ({ row }) => {
       const reservation = row.original;
       return (

@@ -18,17 +18,20 @@ import {
   MousePointerClick,
   ReceiptText,
 } from "lucide-react";
+import { useGetReservationSettings } from "@/features/Events/hooks/useGetReservationSettings";
 
 const Home = () => {
   const [itemsToShow, setItemsToShow] = useState(6);
+  const { data: settings } = useGetReservationSettings();
+  console.log(settings);
 
   // Adjust item count based on screen size
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
-        setItemsToShow(8); // lg (≥ 1024px)
+        setItemsToShow(8);
       } else {
-        setItemsToShow(6); // md (≥ 768px)
+        setItemsToShow(6);
       }
     };
 
@@ -83,7 +86,7 @@ const Home = () => {
               at Triple Z Coffee. Reserve your spot today!
             </h2>
             <h3 className="my-5 text-base text-[#DFA593] sm:text-lg">
-              MON-FRI 4:00 PM - 10:00 PM
+              MON-FRI {settings?.openingHours} - {settings?.closingHours}
             </h3>
             <Button
               size="lg"
@@ -266,7 +269,10 @@ const Home = () => {
             <p className="mt-5 text-xl">
               You deserve a good time with friends.
             </p>
-            <p className="mt-5 font-semibold">MON-FRI: 4:00 PM - 10:00 PM</p>
+            <p className="mt-5 font-semibold">
+              {" "}
+              MON-FRI {settings?.openingHours} - {settings?.closingHours}
+            </p>
             <Button size="lg" className="mt-10">
               Book Now!
             </Button>
