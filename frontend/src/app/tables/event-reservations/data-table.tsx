@@ -80,7 +80,7 @@ export function DataTable<TData, TValue>({
             }
             onValueChange={(value) =>
               table
-                .getColumn("status")
+                .getColumn("eventStatus")
                 ?.setFilterValue(value === "All" ? undefined : value)
             }
             aria-label="Filter by status"

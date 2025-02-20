@@ -175,6 +175,46 @@ export const updateReservationStatus = async (
   }
 };
 
+// update a payment status
+// Update a reservation's payment status
+export const updatePaymentStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { paymentStatus, reservationId } = req.body;
+
+    // Validate allowed payment status values
+    if (!["Not Paid", "Partially Paid", "Paid"].includes(paymentStatus)) {
+      return next(
+        createError(
+          "Invalid payment status. Valid statuses are: Not Paid, Partially Paid, or Paid.",
+          400
+        )
+      );
+    }
+
+    // Update the reservation's payment status
+    const updatedReservation = await EventReservation.findByIdAndUpdate(
+      reservationId,
+      { paymentStatus },
+      { new: true }
+    );
+    if (!updatedReservation) {
+      return next(createError("Reservation not found.", 404));
+    }
+
+    res.status(200).json({
+      message: "Reservation payment status updated successfully!",
+      reservation: updatedReservation,
+    });
+  } catch (error) {
+    console.error(error);
+    next(createError("Failed to update reservation payment status.", 500));
+  }
+};
+
 // Delete a reservation
 export const deleteReservation = async (
   req: Request,
@@ -182,7 +222,7 @@ export const deleteReservation = async (
   next: NextFunction
 ) => {
   try {
-    const { reservationId } = req.params;
+    const { reservationId } = req.body;
 
     // Delete the reservation
     const deletedReservation = await EventReservation.findByIdAndDelete(

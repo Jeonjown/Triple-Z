@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useGetReservationSettings } from "@/features/Events/hooks/useGetReservationSettings";
 import HourlyTimePicker from "@/features/Events/components/HourlyTimePicker";
+import { useCreateOrUpdateSettings } from "@/features/Events/hooks/useCreateorUpdateSettings";
 
 // Define validation schema using zod
 const formSchema = z.object({
@@ -36,6 +37,7 @@ const formSchema = z.object({
 type SettingsFormValues = z.infer<typeof formSchema>;
 
 const Settings: React.FC = () => {
+  const { mutate } = useCreateOrUpdateSettings();
   const { data: settings } = useGetReservationSettings();
 
   const form = useForm<SettingsFormValues>({
@@ -77,6 +79,7 @@ const Settings: React.FC = () => {
 
   const onSubmit = async (values: SettingsFormValues) => {
     console.log("form submitted: ", values);
+    mutate(values);
   };
 
   return (

@@ -9,10 +9,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import { MoreHorizontal } from "lucide-react";
 import { formatDate } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import EventStatusCell from "./EventStatusCell";
+import PaymentStatusCell from "./PaymentStatusCell";
+import DeleteReservationAction from "./DeleteReservationAction";
 
 // Module augmentation for custom meta type
 declare module "@tanstack/react-table" {
@@ -99,36 +102,7 @@ export const columns: MyColumnDef<Reservation>[] = [
   {
     accessorKey: "paymentStatus",
     header: "Payment",
-    cell: ({ row }) => {
-      const reservation = row.original;
-      const updateStatus = (newStatus: string) => {
-        console.log(
-          `Update payment status for ${reservation._id} to ${newStatus}`,
-        );
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-8 w-20 p-0">
-              {reservation.paymentStatus}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuLabel>Status</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => updateStatus("Not Paid")}>
-              Not Paid
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateStatus("Partially Paid")}>
-              Partially Paid
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateStatus("Full Paid")}>
-              Full Paid
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <PaymentStatusCell reservation={row.original} />,
   },
   {
     accessorKey: "totalPayment",
@@ -209,6 +183,8 @@ export const columns: MyColumnDef<Reservation>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem>View customer</DropdownMenuItem>
             <DropdownMenuItem>View details</DropdownMenuItem>
+            {/* Use the DeleteReservationAction component */}
+            <DeleteReservationAction reservationId={reservation._id} />
           </DropdownMenuContent>
         </DropdownMenu>
       );

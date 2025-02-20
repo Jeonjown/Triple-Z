@@ -94,11 +94,50 @@ export const updateReservationStatus = async (
 ) => {
   try {
     const response: AxiosResponse<string> = await api.patch(
-      `/api/menu/events/reservations/status`,
+      `/api/menu/events/reservations/event-status`,
       {
         eventStatus,
         reservationId,
       },
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<ReservationError>;
+      throw new Error(axiosError.response?.data?.error || "An error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
+export const updateReservationPaymentStatus = async (
+  paymentStatus: string,
+  reservationId: string,
+) => {
+  try {
+    const response: AxiosResponse<string> = await api.patch(
+      `/api/menu/events/reservations/payment-status`,
+      {
+        paymentStatus,
+        reservationId,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<ReservationError>;
+      throw new Error(axiosError.response?.data?.error || "An error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
+export const deleteReservation = async (reservationId: string) => {
+  try {
+    // Pass the reservationId in the request body under the "data" key
+    const response: AxiosResponse<string> = await api.delete(
+      `/api/menu/events/reservations/`,
+      { data: { reservationId } },
     );
     return response.data;
   } catch (error) {
@@ -128,3 +167,21 @@ export const getEventReservationSettings =
       throw new Error("An unexpected error occurred");
     }
   };
+export const createOrUpdateEventSettings = async (
+  settings: Partial<EventReservationSettings>,
+): Promise<EventReservationSettings> => {
+  try {
+    // Use POST (or PUT) to send the settings data to your endpoint
+    const response: AxiosResponse<EventReservationSettingsResponse> =
+      await api.post(`/api/menu/events/settings`, settings);
+
+    // Return the nested data property from the response
+    return response.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<ReservationError>;
+      throw new Error(axiosError.response?.data?.error || "An error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
