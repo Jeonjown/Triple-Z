@@ -1,0 +1,15 @@
+{
+    "short_name": "Triple-Z",
+    "name": "TRIPLE Z APPs",
+    "icons": [
+      {
+        "src": "./triple-z-logo.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ],
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#000000"
+  }
