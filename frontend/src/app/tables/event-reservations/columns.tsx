@@ -94,11 +94,21 @@ export const columns: MyColumnDef<Reservation>[] = [
     header: "Id",
   },
   {
+    accessorKey: "createdAt",
+    header: "Created At",
+    cell: ({ row }) => {
+      const rawCreatedAt: string = row.getValue<string>("createdAt");
+      // Convert the string to a Date object and format it to "MM-dd-yyyy"
+      return formatDate(new Date(rawCreatedAt), "MM-dd-yyyy h:mm a");
+    },
+  },
+  {
     accessorKey: "eventStatus",
     header: "Status",
     // Use the EventStatusCell component instead of inline code
     cell: ({ row }) => <EventStatusCell reservation={row.original} />,
   },
+
   {
     accessorKey: "paymentStatus",
     header: "Payment",
@@ -181,6 +191,7 @@ export const columns: MyColumnDef<Reservation>[] = [
               Copy reservation ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+            <DropdownMenuItem>Edit</DropdownMenuItem>
             <DropdownMenuItem>View customer</DropdownMenuItem>
             <DropdownMenuItem>View details</DropdownMenuItem>
             {/* Use the DeleteReservationAction component */}

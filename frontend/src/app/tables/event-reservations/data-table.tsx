@@ -48,6 +48,7 @@ export function DataTable<TData, TValue>({
       columnVisibility: {
         _id: false,
         specialRequest: false,
+        createdAt: false,
       },
     },
     onSortingChange: setSorting,

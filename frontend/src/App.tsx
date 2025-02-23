@@ -24,15 +24,39 @@ import Settings from "./features/Admin/pages/Settings";
 import Footer from "./components/Footer";
 import AdminDashboard from "./features/Admin/pages/AdminDashboard";
 import ManageEvents from "./features/Events/pages/ManageEvents";
+import { useServiceworker } from "./notifications/useServiceWorker";
+import { useSendNotification } from "./notifications/hooks/useSendNotification";
 
 function App() {
+  const { registerAndSubscribe } = useServiceworker();
+  const { mutate } = useSendNotification();
   const { user } = useAuthStore();
   const isAdmin = user?.role === "admin";
+
+  const handleSendNotification = () => {
+    // Replace these values with dynamic content as needed
+    mutate({
+      title: "Title po",
+      description: "Heyhy",
+    });
+  };
 
   return (
     <Router>
       <ScrollToTop />
       <main className="mt-24 flex min-h-[200vh] w-full flex-col">
+        <button
+          onClick={registerAndSubscribe}
+          className="bg-primary text-white"
+        >
+          subscribe for push notification
+        </button>
+        <button
+          onClick={handleSendNotification}
+          className="bg-primary text-white"
+        >
+          send notifications
+        </button>
         <Toaster />
         <Navbar />
         <div className="flex-grow">

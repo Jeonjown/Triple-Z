@@ -12,11 +12,14 @@ if (
   throw new Error("Mongo URI for one or more DBs is missing!");
 }
 
-// Create separate connections for user, menu, and reservation databases
+//  separate connections for user, menu, and reservation databases
 export const userDB = mongoose.createConnection(process.env.MONGO_URI_USER_DB!);
 export const menuDB = mongoose.createConnection(process.env.MONGO_URI_MENU_DB!);
 export const reservationDB = mongoose.createConnection(
   process.env.MONGO_URI_RESERVATION_DB!
+);
+export const subscriptionDB = mongoose.createConnection(
+  process.env.MONGO_URI_SUBSCRIPTION_DB!
 );
 
 // Connection handling for menuDB
@@ -33,4 +36,12 @@ reservationDB.once("open", () =>
 );
 reservationDB.on("error", (err) =>
   console.error("Error connecting to Reservation DB:", err)
+);
+
+// Connection handling for subscriptionDB
+subscriptionDB.once("open", () =>
+  console.log("Subscriptions DB connected successfully")
+);
+subscriptionDB.on("error", (err) =>
+  console.error("Error connecting to Subscriptions DB:", err)
 );

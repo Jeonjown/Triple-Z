@@ -23,7 +23,6 @@ import { useGetReservationSettings } from "@/features/Events/hooks/useGetReserva
 const Home = () => {
   const [itemsToShow, setItemsToShow] = useState(6);
   const { data: settings } = useGetReservationSettings();
-  console.log(settings);
 
   // Adjust item count based on screen size
   useEffect(() => {
@@ -81,6 +80,7 @@ const Home = () => {
             <h1 className="font-heading text-5xl font-light sm:text-6xl lg:text-7xl xl:mt-0">
               Welcome to Triple Z
             </h1>
+
             <h2 className="mt-6 text-lg sm:mt-5 sm:text-xl">
               Discover the perfect space to celebrate life’s special occasions
               at Triple Z Coffee. Reserve your spot today!
