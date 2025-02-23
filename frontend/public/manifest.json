@@ -1,15 +1,41 @@
 {
-    "short_name": "Triple-Z",
-    "name": "TRIPLE Z APPs",
-    "icons": [
-      {
-        "src": "./triple-z-logo.png",
-        "type": "image/png",
-        "sizes": "512x512"
-      }
-    ],
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#000000"
-  }
+  "short_name": "Triple-Z",
+  "name": "TRIPLE Z APPs",
+  "icons": [
+    {
+
+      "src": "./triple-z-logo.png",
+      "type": "image/png",
+      "sizes": "144x144",
+      "purpose": "any"
+    },
+    {
+    
+      "src": "./triple-z-logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      
+      "src": "./triple-z-logo.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Wide View Screenshot",
+      "formFactor": "wide" 
+    },
+    {
+    
+      "src": "./triple-z-logo.png",
+      "sizes": "800x600",
+      "type": "image/png",
+      "label": "Default Screenshot"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000"
+}
