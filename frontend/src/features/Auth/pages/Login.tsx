@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../api/auth";
 import { useMutation } from "@tanstack/react-query";
 import useAuthStore from "../stores/useAuthStore";
-import { useServiceworker } from "@/notifications/hooks/useServiceWorker";
+import { useEffect } from "react";
 
 interface LoginProps {
   text?: string;
@@ -12,22 +12,28 @@ interface LoginProps {
 }
 
 const Login = ({ text = "Welcome Back!", destination = "/" }: LoginProps) => {
-  const { registerAndSubscribe } = useServiceworker();
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
   const mutation = useMutation({
     mutationFn: (credentials: { email: string; password: string }) =>
       loginUser(credentials),
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       console.log("data from login:", data);
       login(data);
-      // Subscribe for push notifications right after login.
-      await registerAndSubscribe();
-      // Navigate to the destination.
-      navigate(destination, { replace: true });
+      console.log(destination);
+      setTimeout(() => {
+        navigate(destination, { replace: true });
+      }, 300);
     },
   });
+
+  // ✅ Move useEffect inside the component
+  useEffect(() => {
+    if (mutation.isSuccess) {
+      navigate(destination, { replace: true });
+    }
+  }, [mutation.isSuccess, navigate, destination]);
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -46,6 +52,7 @@ const Login = ({ text = "Welcome Back!", destination = "/" }: LoginProps) => {
     const redirectUri = encodeURIComponent(
       `${window.location.origin}${destination}`,
     );
+
     window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google?redirect_uri=${redirectUri}`;
   };
 

@@ -17,31 +17,29 @@ export const subscribe = async (req: Request, res: Response): Promise<void> => {
   const subscriptionData = req.body;
   console.log("Subscription Data:", subscriptionData);
 
-  if (!subscriptionData.userId) {
-    res.status(400).json({ message: "UserId is required" });
+  if (
+    !subscriptionData.userId ||
+    !subscriptionData.endpoint ||
+    !subscriptionData.keys
+  ) {
+    res.status(400).json({ message: "Invalid subscription data" });
     return;
   }
 
   try {
-    // Check if the subscription exists by its unique endpoint instead of userId.
+    // Check if the subscription exists by endpoint.
     const existing = await Subscription.findOne({
       endpoint: subscriptionData.endpoint,
     });
 
     if (existing) {
-      // If the subscription exists (same device), update the details if needed.
-      if (existing.endpoint !== subscriptionData.endpoint) {
-        existing.endpoint = subscriptionData.endpoint;
-        existing.expirationTime = subscriptionData.expirationTime;
-        existing.keys = subscriptionData.keys;
-        await existing.save();
-      }
-      res.sendStatus(200);
-      return;
+      // Update the existing subscription with new data.
+      Object.assign(existing, subscriptionData);
+      await existing.save();
+    } else {
+      // Create a new subscription record.
+      await Subscription.create(subscriptionData);
     }
-
-    // Create a new subscription record.
-    await Subscription.create(subscriptionData);
     res.sendStatus(200);
   } catch (error) {
     console.error("Subscription error:", error);
@@ -49,39 +47,12 @@ export const subscribe = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Controller to handle unsubscription
-export const unsubscribe = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const { endpoint } = req.body;
-
-  // Validate that the endpoint is provided in the request body.
-  if (!endpoint) {
-    res.status(400).json({ message: "Endpoint is required" });
-    return;
-  }
-
-  try {
-    // Find and delete the subscription by its unique endpoint.
-    await Subscription.findOneAndDelete({ endpoint });
-
-    // Respond with a success message.
-    res.status(200).json({ message: "Unsubscribed successfully" });
-  } catch (error) {
-    console.error("Unsubscribe error:", error);
-    res.status(500).json({ message: "Error unsubscribing" });
-  }
-};
-
-// Send a dynamic notification based on request payload.
+// Send a notification to all subscribers.
 export const sendNotificationToAll = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  // Expect title, description, and userId in the request body
   const { title, description, userId } = req.body;
-  // Include userId in the notification payload
   const payload = JSON.stringify({
     title,
     description,
@@ -95,51 +66,58 @@ export const sendNotificationToAll = async (
       res.status(400).json({ message: "No subscriptions found" });
       return;
     }
-    // Send notifications to all subscriptions
-    const sendPromises = subscriptions.map((sub: ISubscription) =>
-      webpush.sendNotification(sub, payload).catch((error: unknown) => {
-        console.error(
-          `Error sending notification for subscription ${sub.endpoint}:`,
-          error
-        );
-      })
-    );
+
+    const sendPromises = subscriptions.map(async (sub: ISubscription) => {
+      try {
+        await webpush.sendNotification(sub, payload);
+      } catch (error: any) {
+        console.error(`Error sending notification for ${sub.endpoint}:`, error);
+        if (error.statusCode === 410) {
+          await Subscription.deleteOne({ endpoint: sub.endpoint });
+          console.log(`Subscription removed: ${sub.endpoint}`);
+        }
+      }
+    });
     await Promise.all(sendPromises);
+
     res.status(200).json({ message: "Notification sent!" });
-  } catch (err: unknown) {
-    console.error("Notification error:", err);
+  } catch (error) {
+    console.error("Notification error:", error);
     res.status(500).json({ message: "Error sending notification" });
   }
 };
 
+// Send a notification to a specific user.
 export const sendNotification = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  // Expect the userId along with title and description in the request body
   const { userId, title, description } = req.body;
   const payload = JSON.stringify({ title, description, image: "/logo.png" });
 
   try {
-    // Filter subscriptions by the provided userId
     const subscriptions: ISubscription[] = await Subscription.find({ userId });
-
     if (subscriptions.length === 0) {
       res.status(400).json({ message: "No subscriptions found for this user" });
       return;
     }
 
-    // Send notifications to all subscriptions for the user
-    const sendPromises = subscriptions.map((sub: ISubscription) =>
-      webpush.sendNotification(sub, payload).catch((error: unknown) => {
+    const sendPromises = subscriptions.map(async (sub: ISubscription) => {
+      try {
+        await webpush.sendNotification(sub, payload);
+      } catch (error: any) {
         console.error(`Error sending notification for ${sub.endpoint}:`, error);
-      })
-    );
+        if (error.statusCode === 410) {
+          await Subscription.deleteOne({ endpoint: sub.endpoint });
+          console.log(`Subscription removed: ${sub.endpoint}`);
+        }
+      }
+    });
     await Promise.all(sendPromises);
 
     res.status(200).json({ message: "Notification sent!" });
-  } catch (err: unknown) {
-    console.error("Notification error:", err);
+  } catch (error) {
+    console.error("Notification error:", error);
     res.status(500).json({ message: "Error sending notification" });
   }
 };
