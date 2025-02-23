@@ -16,19 +16,17 @@ webpush.setVapidDetails(`mailto:${email}`, publicKey, privateKey);
 export const subscribe = async (req: Request, res: Response): Promise<void> => {
   const subscriptionData = req.body;
   try {
-    // Check if a subscription with the same endpoint already exists.
     const existing = await Subscription.findOne({
       endpoint: subscriptionData.endpoint,
     });
     if (existing) {
-      // Subscription exists; optionally update it if needed.
-      res.sendStatus(200); // Or return a message indicating it's already subscribed.
+      res.sendStatus(200);
       return;
     }
-    // No duplicate found; create a new subscription.
     await Subscription.create(subscriptionData);
     res.sendStatus(200);
   } catch (error) {
+    console.error("Subscription error:", error);
     res.sendStatus(500);
   }
 };
@@ -38,9 +36,10 @@ export const sendNotification = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  // Expect dynamic data from the request body.
-  const { title, body } = req.body;
-  const payload = JSON.stringify({ title, body });
+  // Use description instead of body to match client payload
+  const { title, description } = req.body;
+  // Always include your logo as the image.
+  const payload = JSON.stringify({ title, description, image: "/logo.png" });
 
   try {
     const subscriptions: ISubscription[] = await Subscription.find({});
@@ -48,14 +47,19 @@ export const sendNotification = async (
       res.status(400).json({ message: "No subscriptions found" });
       return;
     }
-    subscriptions.forEach((sub: ISubscription) => {
+    // Send notifications to all subscriptions and wait for them.
+    const sendPromises = subscriptions.map((sub: ISubscription) =>
       webpush.sendNotification(sub, payload).catch((error: unknown) => {
-        console.error("Error sending notification:", error);
-      });
-    });
+        console.error(
+          `Error sending notification for subscription ${sub.endpoint}:`,
+          error
+        );
+      })
+    );
+    await Promise.all(sendPromises);
     res.status(200).json({ message: "Notification sent!" });
   } catch (err: unknown) {
     console.error("Notification error:", err);
-    res.status(500).json({ error: "Error sending notification" });
+    res.status(500).json({ message: "Error sending notification" });
   }
 };
