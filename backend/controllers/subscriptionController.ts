@@ -48,6 +48,32 @@ export const subscribe = async (req: Request, res: Response): Promise<void> => {
     res.sendStatus(500);
   }
 };
+
+// Controller to handle unsubscription
+export const unsubscribe = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { endpoint } = req.body;
+
+  // Validate that the endpoint is provided in the request body.
+  if (!endpoint) {
+    res.status(400).json({ message: "Endpoint is required" });
+    return;
+  }
+
+  try {
+    // Find and delete the subscription by its unique endpoint.
+    await Subscription.findOneAndDelete({ endpoint });
+
+    // Respond with a success message.
+    res.status(200).json({ message: "Unsubscribed successfully" });
+  } catch (error) {
+    console.error("Unsubscribe error:", error);
+    res.status(500).json({ message: "Error unsubscribing" });
+  }
+};
+
 // Send a dynamic notification based on request payload.
 export const sendNotificationToAll = async (
   req: Request,

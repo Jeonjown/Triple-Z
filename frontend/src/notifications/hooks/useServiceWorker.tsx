@@ -60,5 +60,38 @@ export const useServiceworker = () => {
     }
   }
 
-  return { regSw, subscribe, registerAndSubscribe };
+  // Unsubscribe from push notifications on logout.
+  const unsubscribe = async (): Promise<void> => {
+    if ("serviceWorker" in navigator) {
+      try {
+        // Get the existing service worker registration at the root scope.
+        const registration = await navigator.serviceWorker.getRegistration("/");
+        if (registration) {
+          // Get the current push subscription.
+          const subscription = await registration.pushManager.getSubscription();
+          if (subscription) {
+            // Unsubscribe from push notifications.
+            const unsubscribed = await subscription.unsubscribe();
+            if (unsubscribed) {
+              // Optionally, notify your backend to remove the subscription record.
+              await axios.post("/api/subscriptions/unsubscribe", {
+                endpoint: subscription.endpoint,
+              });
+              console.log("Push subscription removed successfully");
+            } else {
+              console.error("Failed to unsubscribe from push notifications");
+            }
+          } else {
+            console.log("No push subscription found to unsubscribe");
+          }
+        }
+      } catch (error) {
+        console.error("Error during unsubscription:", error);
+      }
+    } else {
+      console.error("Service workers are not supported in this browser");
+    }
+  };
+
+  return { regSw, subscribe, registerAndSubscribe, unsubscribe };
 };
