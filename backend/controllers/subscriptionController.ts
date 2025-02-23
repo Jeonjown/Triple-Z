@@ -23,13 +23,22 @@ export const subscribe = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
+    // Look for an existing subscription by userId
     const existing = await Subscription.findOne({
-      endpoint: subscriptionData.endpoint,
+      userId: subscriptionData.userId,
     });
     if (existing) {
+      // If the endpoint changed, update it (and keys/expirationTime if needed)
+      if (existing.endpoint !== subscriptionData.endpoint) {
+        existing.endpoint = subscriptionData.endpoint;
+        existing.expirationTime = subscriptionData.expirationTime;
+        existing.keys = subscriptionData.keys;
+        await existing.save();
+      }
       res.sendStatus(200);
       return;
     }
+    // Create new subscription if not found
     await Subscription.create(subscriptionData);
     res.sendStatus(200);
   } catch (error) {

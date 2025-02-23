@@ -1,3 +1,5 @@
+// Step 3 Component
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +25,6 @@ interface CartItem {
   image: string;
 }
 
-// Step 3: Confirmation
 type Step3Props = {
   nextStep: () => void;
   prevStep: () => void;
@@ -64,6 +65,17 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   // Trigger form submission
   const handleCheckout = () => {
     handleSubmit(onSubmit)();
+  };
+
+  // New function: Checks notification permission before opening the dialog.
+  const handleCheckoutFlow = async () => {
+    // If notifications are already granted, proceed directly.
+    if (Notification.permission === "granted") {
+      handleCheckout();
+    } else {
+      // Otherwise, open the dialog to ask user preference.
+      setDialogOpen(true);
+    }
   };
 
   // Render cart items
@@ -161,11 +173,8 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         <Button type="button" onClick={prevStep} className="flex-1">
           Previous
         </Button>
-        <Button
-          type="button"
-          onClick={() => setDialogOpen(true)}
-          className="flex-1"
-        >
+        {/* Use the new handler here */}
+        <Button type="button" onClick={handleCheckoutFlow} className="flex-1">
           Checkout
         </Button>
       </div>
