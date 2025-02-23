@@ -1,6 +1,6 @@
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import axios from "axios";
-
+const apiUrl: string | undefined = import.meta.env.VITE_API_URL;
 // Convert a URL-safe base64 string to a Uint8Array.
 const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -29,6 +29,22 @@ export const useServiceworker = () => {
     throw new Error("Service worker not supported");
   };
 
+  //logout
+  const unsubscribe = async () => {
+    const registration = await navigator.serviceWorker.getRegistration("/");
+    if (registration) {
+      const subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        // Unsubscribe from push notifications.
+        await subscription.unsubscribe();
+        // Optionally, inform your backend to remove this subscription.
+        await axios.post(`${apiUrl}/api/subscriptions/unsubscribe`, {
+          endpoint: subscription.endpoint,
+        });
+      }
+    }
+  };
+
   // Subscribe to push notifications.
   const subscribe = async (
     serviceWorkerReg: ServiceWorkerRegistration,
@@ -43,7 +59,7 @@ export const useServiceworker = () => {
     }
     // Convert the subscription to JSON and add the userId.
     const subscriptionData = { ...subscription.toJSON(), userId: user?._id };
-    const apiUrl: string | undefined = import.meta.env.VITE_API_URL;
+
     if (!apiUrl) {
       throw new Error("VITE_API_URL is not defined");
     }
@@ -60,5 +76,5 @@ export const useServiceworker = () => {
     }
   }
 
-  return { regSw, subscribe, registerAndSubscribe };
+  return { regSw, subscribe, unsubscribe, registerAndSubscribe };
 };

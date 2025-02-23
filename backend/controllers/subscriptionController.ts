@@ -47,6 +47,24 @@ export const subscribe = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const unsubscribe = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { endpoint } = req.body;
+  if (!endpoint) {
+    res.status(400).json({ message: "Endpoint is required" });
+    return;
+  }
+  try {
+    await Subscription.deleteOne({ endpoint });
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("Unsubscribe error:", error);
+    res.sendStatus(500);
+  }
+};
+
 // Send a notification to all subscribers.
 export const sendNotificationToAll = async (
   req: Request,
