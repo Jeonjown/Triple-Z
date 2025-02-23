@@ -1,5 +1,5 @@
 // models/Subscription.ts
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 import { subscriptionDB } from "../db";
 
 // Define an interface for push subscriptions
@@ -10,6 +10,7 @@ export interface ISubscription extends Document {
     p256dh: string;
     auth: string;
   };
+  userId: Types.ObjectId;
 }
 
 // Define the subscription schema based on the PushSubscription structure
@@ -19,6 +20,10 @@ const SubscriptionSchema: Schema<ISubscription> = new Schema({
   keys: {
     p256dh: { type: String, required: true },
     auth: { type: String, required: true },
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
   },
 });
 

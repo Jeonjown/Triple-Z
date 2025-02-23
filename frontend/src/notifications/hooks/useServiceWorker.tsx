@@ -1,3 +1,4 @@
+import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import axios from "axios";
 
 // Convert a URL-safe base64 string to a Uint8Array.
@@ -9,6 +10,7 @@ const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
 };
 
 export const useServiceworker = () => {
+  const { user } = useAuthStore();
   const frontendUrl: string = import.meta.env.VITE_FRONTEND_URL || "";
   const vapidPublicKey: string | undefined = import.meta.env
     .VITE_VAPID_PUBLIC_KEY;
@@ -39,12 +41,14 @@ export const useServiceworker = () => {
         applicationServerKey: convertedKey,
       });
     }
+    // Convert the subscription to JSON and add the userId.
+    const subscriptionData = { ...subscription.toJSON(), userId: user?._id };
     const apiUrl: string | undefined = import.meta.env.VITE_API_URL;
     if (!apiUrl) {
       throw new Error("VITE_API_URL is not defined");
     }
     // Send the dynamic subscription object to your backend.
-    await axios.post(`${apiUrl}/api/subscriptions/subscribe`, subscription);
+    await axios.post(`${apiUrl}/api/subscriptions/subscribe`, subscriptionData);
   };
 
   async function registerAndSubscribe() {

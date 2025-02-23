@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createReservation, Reservation } from "../api/event";
 import { toast } from "@/hooks/use-toast";
 import { EventFormValues } from "../pages/EventForm";
-
 import { useParams } from "react-router-dom";
 
 export const useCreateReservations = () => {
@@ -19,11 +18,11 @@ export const useCreateReservations = () => {
       }
       return createReservation(values, userId);
     },
-    onError: (err) => {
+    onError: (err: Error) => {
       console.error("Error creating reservation:", err);
       toast({
         title: "Error creating reservation",
-        description: `${err}`,
+        description: err.message, // Use the error message provided by the API
         variant: "destructive",
       });
     },

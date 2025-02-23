@@ -35,6 +35,11 @@ interface UserReservation {
   email: string;
 }
 
+interface ReservationError {
+  success: boolean;
+  message: string;
+}
+
 export interface Reservation {
   _id: string;
   user: UserReservation;
@@ -61,7 +66,6 @@ export const createReservation = async (
 ): Promise<Reservation> => {
   try {
     console.log("from request:", eventFormValues);
-    // Make POST request and specify the response type as Reservation
     const response: AxiosResponse<Reservation> = await api.post(
       `/api/menu/events/reservations/${userId}`,
       eventFormValues,
@@ -70,12 +74,14 @@ export const createReservation = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<ReservationError>;
-      throw new Error(axiosError.response?.data?.error || "An error occurred");
+      // Use the "message" field from the error response if available.
+      throw new Error(
+        axiosError.response?.data?.message || "An error occurred",
+      );
     }
     throw new Error("An unexpected error occurred");
   }
 };
-
 export const getReservations = async () => {
   try {
     const response = await api.get("/api/menu/events/reservations");

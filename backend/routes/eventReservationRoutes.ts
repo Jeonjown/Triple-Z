@@ -8,13 +8,14 @@ import {
 } from "../controllers/eventReservationController";
 import { validateEventReservation } from "../middleware/validateEventReservation";
 import { verifyAdminToken } from "../middleware/verifyAdminToken";
+import { verifyToken } from "../middleware/verifyToken";
 
 const router = Router();
 
 router.get("/", getReservations);
 router.post(
   "/:userId",
-  verifyAdminToken,
+  verifyToken,
   validateEventReservation,
   createReservation
 );

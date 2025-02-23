@@ -1,33 +1,33 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { sendNotification } from "../api/notification";
+import {
+  sendNotificationToAll,
+  NotificationPayload,
+  NotificationResponse,
+} from "../api/notification";
 
-// Define the shape of the payload you send.
-interface NotificationPayload {
-  title: string;
-  description: string;
-}
-
-// Define the expected response type.
-interface NotificationResponse {
-  message: string;
-}
-
-export const useSendNotification = () => {
+/**
+ * Custom hook to send a notification to all users.
+ * Payload now includes userId.
+ */
+export const useSendNotificationToAll = () => {
   const queryClient = useQueryClient();
 
+  // Use the full NotificationPayload which includes userId
   const { mutate, isPending, isError, error } = useMutation<
     NotificationResponse, // Success type
     Error, // Error type
-    NotificationPayload // Payload shape
+    NotificationPayload // Payload type
   >({
-    // Wrap the sendNotification function so that it accepts a payload.
     mutationFn: async (payload: NotificationPayload) => {
-      return await sendNotification(payload.title, payload.description);
+      return await sendNotificationToAll(
+        payload.title,
+        payload.description,
+        payload.userId,
+      );
     },
-    // Called when the mutation fails.
     onError: (err: Error) => {
-      console.error("Error sending notification:", err);
+      console.error("Error sending notification to all:", err);
       toast({
         title: "Error sending notification",
         description:
@@ -35,7 +35,6 @@ export const useSendNotification = () => {
         variant: "destructive",
       });
     },
-    // Called when the mutation is successful.
     onSuccess: (data: NotificationResponse) => {
       console.log("Notification sent successfully:", data);
       queryClient.invalidateQueries({ queryKey: ["notifications"] });

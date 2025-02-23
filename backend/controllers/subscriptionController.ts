@@ -15,6 +15,13 @@ webpush.setVapidDetails(`mailto:${email}`, publicKey, privateKey);
 // Save the subscription dynamically.
 export const subscribe = async (req: Request, res: Response): Promise<void> => {
   const subscriptionData = req.body;
+  console.log("Subscription Data:", subscriptionData);
+
+  if (!subscriptionData.userId) {
+    res.status(400).json({ message: "UserId is required" });
+    return;
+  }
+
   try {
     const existing = await Subscription.findOne({
       endpoint: subscriptionData.endpoint,
@@ -32,14 +39,19 @@ export const subscribe = async (req: Request, res: Response): Promise<void> => {
 };
 
 // Send a dynamic notification based on request payload.
-export const sendNotification = async (
+export const sendNotificationToAll = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  // Use description instead of body to match client payload
-  const { title, description } = req.body;
-  // Always include your logo as the image.
-  const payload = JSON.stringify({ title, description, image: "/logo.png" });
+  // Expect title, description, and userId in the request body
+  const { title, description, userId } = req.body;
+  // Include userId in the notification payload
+  const payload = JSON.stringify({
+    title,
+    description,
+    image: "/logo.png",
+    userId,
+  });
 
   try {
     const subscriptions: ISubscription[] = await Subscription.find({});
@@ -47,7 +59,7 @@ export const sendNotification = async (
       res.status(400).json({ message: "No subscriptions found" });
       return;
     }
-    // Send notifications to all subscriptions and wait for them.
+    // Send notifications to all subscriptions
     const sendPromises = subscriptions.map((sub: ISubscription) =>
       webpush.sendNotification(sub, payload).catch((error: unknown) => {
         console.error(
@@ -57,6 +69,38 @@ export const sendNotification = async (
       })
     );
     await Promise.all(sendPromises);
+    res.status(200).json({ message: "Notification sent!" });
+  } catch (err: unknown) {
+    console.error("Notification error:", err);
+    res.status(500).json({ message: "Error sending notification" });
+  }
+};
+
+export const sendNotification = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  // Expect the userId along with title and description in the request body
+  const { userId, title, description } = req.body;
+  const payload = JSON.stringify({ title, description, image: "/logo.png" });
+
+  try {
+    // Filter subscriptions by the provided userId
+    const subscriptions: ISubscription[] = await Subscription.find({ userId });
+
+    if (subscriptions.length === 0) {
+      res.status(400).json({ message: "No subscriptions found for this user" });
+      return;
+    }
+
+    // Send notifications to all subscriptions for the user
+    const sendPromises = subscriptions.map((sub: ISubscription) =>
+      webpush.sendNotification(sub, payload).catch((error: unknown) => {
+        console.error(`Error sending notification for ${sub.endpoint}:`, error);
+      })
+    );
+    await Promise.all(sendPromises);
+
     res.status(200).json({ message: "Notification sent!" });
   } catch (err: unknown) {
     console.error("Notification error:", err);

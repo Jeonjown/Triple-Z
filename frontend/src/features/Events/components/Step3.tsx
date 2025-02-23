@@ -1,9 +1,19 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { UseFormReturn } from "react-hook-form";
 import { EventFormValues } from "../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useCreateReservations } from "../hooks/useCreateReservations";
 import { useGetReservationSettings } from "../hooks/useGetReservationSettings";
+import { useServiceworker } from "@/notifications/hooks/useServiceWorker";
 
 interface CartItem {
   _id: string;
@@ -22,10 +32,12 @@ type Step3Props = {
 };
 
 const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
+  const { registerAndSubscribe } = useServiceworker();
   const { data: settings } = useGetReservationSettings();
   const { mutate } = useCreateReservations();
   const { watch, handleSubmit, reset } = methods;
   const formValues = watch();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   // Format date as MM-DD-YYYY
   const formatDate = (date: Date) => {
@@ -89,7 +101,6 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     <>
       <ScrollToTop />
       {/* Confirmation Card */}
-
       <div className="mx-auto mt-8 w-full rounded-lg bg-white p-6 md:border">
         <h2 className="mb-10 text-center text-2xl font-semibold">
           Confirm Your Details
@@ -97,29 +108,29 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         <div className="mb-6 grid grid-cols-2 gap-4">
           <div>
             <span className="font-semibold">Full Name:</span>
-            <p className="">{formValues.fullName}</p>
+            <p>{formValues.fullName}</p>
           </div>
           <div>
             <span className="font-semibold">Phone Number:</span>
-            <p className="">{formValues.contactNumber}</p>
+            <p>{formValues.contactNumber}</p>
           </div>
           <div>
             <span className="font-semibold">Event Type:</span>
-            <p className="">{formValues.eventType}</p>
+            <p>{formValues.eventType}</p>
           </div>
           <div>
             <span className="font-semibold">Party Size:</span>
-            <p className="">{formValues.partySize}</p>
+            <p>{formValues.partySize}</p>
           </div>
           <div>
             <span className="font-semibold">Date:</span>
-            <p className="">
+            <p>
               {formValues.date ? formatDate(new Date(formValues.date)) : ""}
             </p>
           </div>
           <div>
             <span className="font-semibold">Time:</span>
-            <p className="">
+            <p>
               {formValues.startTime} - {formValues.endTime}
             </p>
           </div>
@@ -130,13 +141,11 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
             {formValues.specialRequest ?? "None"}
           </div>
         </div>
-
         {/* Preorder List */}
         <div className="mb-4">
           <span className="text-gray-600">Preorder List:</span>
           <div className="mt-2 rounded border">{renderCartItems()}</div>
         </div>
-
         {/* Fees and Total */}
         <div className="mb-4">
           <span className="text-gray-600">Event Fee:</span>
@@ -147,15 +156,51 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         </div>
       </div>
 
-      {/* Navigation Buttons with original styles */}
+      {/* Navigation Buttons */}
       <div className="mt-6 flex max-w-full gap-4">
         <Button type="button" onClick={prevStep} className="flex-1">
           Previous
         </Button>
-        <Button type="button" onClick={handleCheckout} className="flex-1">
+        <Button
+          type="button"
+          onClick={() => setDialogOpen(true)}
+          className="flex-1"
+        >
           Checkout
         </Button>
       </div>
+
+      {/* shadcn Dialog Box for Notification Preference */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enable Notifications?</DialogTitle>
+            <DialogDescription>
+              Would you like to receive push notifications for order updates?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDialogOpen(false);
+                handleCheckout();
+              }}
+            >
+              No, proceed
+            </Button>
+            <Button
+              onClick={async () => {
+                setDialogOpen(false);
+                await registerAndSubscribe();
+                handleCheckout();
+              }}
+            >
+              Yes, subscribe me
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
