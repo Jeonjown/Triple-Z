@@ -23,12 +23,13 @@ export const subscribe = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    // Look for an existing subscription by userId
+    // Check if the subscription exists by its unique endpoint instead of userId.
     const existing = await Subscription.findOne({
-      userId: subscriptionData.userId,
+      endpoint: subscriptionData.endpoint,
     });
+
     if (existing) {
-      // If the endpoint changed, update it (and keys/expirationTime if needed)
+      // If the subscription exists (same device), update the details if needed.
       if (existing.endpoint !== subscriptionData.endpoint) {
         existing.endpoint = subscriptionData.endpoint;
         existing.expirationTime = subscriptionData.expirationTime;
@@ -38,7 +39,8 @@ export const subscribe = async (req: Request, res: Response): Promise<void> => {
       res.sendStatus(200);
       return;
     }
-    // Create new subscription if not found
+
+    // Create a new subscription record.
     await Subscription.create(subscriptionData);
     res.sendStatus(200);
   } catch (error) {
@@ -46,7 +48,6 @@ export const subscribe = async (req: Request, res: Response): Promise<void> => {
     res.sendStatus(500);
   }
 };
-
 // Send a dynamic notification based on request payload.
 export const sendNotificationToAll = async (
   req: Request,

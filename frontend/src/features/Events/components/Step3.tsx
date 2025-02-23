@@ -69,13 +69,27 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
 
   // New function: Checks notification permission before opening the dialog.
   const handleCheckoutFlow = async () => {
-    // If notifications are already granted, proceed directly.
-    if (Notification.permission === "granted") {
-      handleCheckout();
-    } else {
-      // Otherwise, open the dialog to ask user preference.
-      setDialogOpen(true);
+    try {
+      // First, if notifications are already granted...
+      if (Notification.permission === "granted") {
+        // Get any existing service worker registration.
+        const registration = await navigator.serviceWorker.getRegistration("/");
+        if (registration) {
+          // Check if a push subscription already exists.
+          const existingSubscription =
+            await registration.pushManager.getSubscription();
+          if (existingSubscription) {
+            // If subscription exists, proceed directly.
+            handleCheckout();
+            return;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error checking subscription:", error);
     }
+    // If not granted or no subscription, open the dialog.
+    setDialogOpen(true);
   };
 
   // Render cart items
