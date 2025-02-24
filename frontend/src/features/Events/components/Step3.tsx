@@ -199,7 +199,8 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
           <DialogHeader>
             <DialogTitle>Enable Notifications?</DialogTitle>
             <DialogDescription>
-              Would you like to receive push notifications for order updates?
+              Would you like to receive push notification for order updates in
+              this device?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

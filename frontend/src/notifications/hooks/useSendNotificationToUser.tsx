@@ -1,10 +1,14 @@
+// hooks/useSendNotificationToUser.ts
 import { toast } from "@/hooks/use-toast";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import {
+  createNotification,
+  NotificationData,
   NotificationResponse,
-  NotificationPayload,
   sendNotificationToUser,
 } from "../api/notification";
+
+export type NotificationPayload = NotificationData;
 
 export const useSendNotificationToUser = () => {
   const queryClient = useQueryClient();
@@ -12,7 +16,7 @@ export const useSendNotificationToUser = () => {
   const { mutate, isPending, isError, error } = useMutation<
     NotificationResponse, // Success type
     Error, // Error type
-    NotificationPayload // Payload type; userId is required here.
+    NotificationPayload // Payload type
   >({
     mutationFn: async (payload: NotificationPayload) => {
       if (!payload.userId) {
@@ -33,14 +37,20 @@ export const useSendNotificationToUser = () => {
         variant: "destructive",
       });
     },
-    onSuccess: (data: NotificationResponse) => {
-      console.log("Notification sent successfully:", data);
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      toast({
-        title: "Notification sent",
-        description: "The notification was sent successfully.",
-        variant: "default",
-      });
+    onSuccess: async (data, variables) => {
+      try {
+        // Use the original payload (variables) to save the notification
+        await createNotification(variables);
+        console.log("Notification sent and saved successfully:", data);
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        toast({
+          title: "Notification sent",
+          description: "The notification was sent successfully.",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error("Error saving notification:", error);
+      }
     },
   });
 

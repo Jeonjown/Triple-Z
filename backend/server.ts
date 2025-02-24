@@ -15,6 +15,7 @@ import { ResponseError } from "./utils/createError";
 import eventReservationRoutes from "./routes/eventReservationRoutes";
 import eventSettingsRoutes from "./routes/eventSettingsRoutes";
 import subscriptionRoutes from "./routes/subscriptionRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
 
 const server = express();
 // Middleware setup
@@ -48,6 +49,7 @@ server.use("/api/menu/categories", subcategoryRoutes);
 server.use("/api/menu/events/reservations", eventReservationRoutes);
 server.use("/api/menu/events/settings", eventSettingsRoutes);
 server.use("/api/subscriptions", subscriptionRoutes);
+server.use("/api/notifications", notificationRoutes);
 
 server.use(
   (err: ResponseError, req: Request, res: Response, next: NextFunction) => {

@@ -7,7 +7,8 @@ dotenv.config(); // Load environment variables
 if (
   !process.env.MONGO_URI_MENU_DB ||
   !process.env.MONGO_URI_USER_DB ||
-  !process.env.MONGO_URI_RESERVATION_DB
+  !process.env.MONGO_URI_RESERVATION_DB ||
+  !process.env.MONGO_URI_NOTIFICATION_DB
 ) {
   throw new Error("Mongo URI for one or more DBs is missing!");
 }
@@ -20,6 +21,9 @@ export const reservationDB = mongoose.createConnection(
 );
 export const subscriptionDB = mongoose.createConnection(
   process.env.MONGO_URI_SUBSCRIPTION_DB!
+);
+export const notificationDB = mongoose.createConnection(
+  process.env.MONGO_URI_NOTIFICATION_DB!
 );
 
 // Connection handling for menuDB
@@ -44,4 +48,12 @@ subscriptionDB.once("open", () =>
 );
 subscriptionDB.on("error", (err) =>
   console.error("Error connecting to Subscriptions DB:", err)
+);
+
+// Connection handling for notificationDB
+notificationDB.once("open", () =>
+  console.log("Notification DB connected successfully")
+);
+notificationDB.on("error", (err) =>
+  console.error("Error connecting to Notification DB:", err)
 );
