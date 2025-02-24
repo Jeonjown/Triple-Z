@@ -19,6 +19,7 @@ import {
   ReceiptText,
 } from "lucide-react";
 import { useGetReservationSettings } from "@/features/Events/hooks/useGetReservationSettings";
+import Chat from "@/features/Chat/components/chat";
 
 const Home = () => {
   const [itemsToShow, setItemsToShow] = useState(6);
@@ -112,6 +113,7 @@ const Home = () => {
 
       {/* FEATURED PRODUCTS */}
       <section className="relative my-10 min-h-screen w-full">
+        <Chat />
         <h2 className="my-4 text-center font-heading text-4xl font-light">
           Featured Products
         </h2>

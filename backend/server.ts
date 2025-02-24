@@ -11,13 +11,15 @@ import categoryRoutes from "./routes/categoryRoutes";
 import menuItemRoutes from "./routes/menuItemRoutes";
 import subcategoryRoutes from "./routes/subcategoryRoutes";
 import { ResponseError } from "./utils/createError";
-
 import eventReservationRoutes from "./routes/eventReservationRoutes";
 import eventSettingsRoutes from "./routes/eventSettingsRoutes";
 import subscriptionRoutes from "./routes/subscriptionRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
+import http from "http";
+import { Server as SocketIOServer } from "socket.io";
 
 const server = express();
+
 // Middleware setup
 server.use(express.json());
 server.use(passport.initialize());
@@ -32,12 +34,6 @@ server.use(
     credentials: true,
   })
 );
-
-// Start server
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
 
 // Route handling
 server.use("/api/auth", authRoutes);
@@ -58,3 +54,31 @@ server.use(
       .json({ error: err.message || "Internal Server Error" });
   }
 );
+
+// Create an HTTP server
+const httpServer = http.createServer(server);
+
+// Initialize Socket.io
+const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: ["http://localhost:5173", "https://triple-z.vercel.app"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+  },
+});
+
+// Handle Socket.io connections
+io.on("connection", (socket) => {
+  console.log(`New client connected: ${socket.id}`);
+
+  socket.on("send-message", (message) => {
+    console.log(message);
+    socket.broadcast.emit("receive-message", message);
+  });
+});
+
+// Start the HTTP (and Socket.io) server
+const port = process.env.PORT || 3000;
+httpServer.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
