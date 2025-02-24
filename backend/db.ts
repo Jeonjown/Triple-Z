@@ -8,12 +8,13 @@ if (
   !process.env.MONGO_URI_MENU_DB ||
   !process.env.MONGO_URI_USER_DB ||
   !process.env.MONGO_URI_RESERVATION_DB ||
-  !process.env.MONGO_URI_NOTIFICATION_DB
+  !process.env.MONGO_URI_NOTIFICATION_DB ||
+  !process.env.MONGO_URI_MESSAGE_DB
 ) {
   throw new Error("Mongo URI for one or more DBs is missing!");
 }
 
-//  separate connections for user, menu, and reservation databases
+// Separate connections for user, menu, reservation, subscription, notification, and message databases
 export const userDB = mongoose.createConnection(process.env.MONGO_URI_USER_DB!);
 export const menuDB = mongoose.createConnection(process.env.MONGO_URI_MENU_DB!);
 export const reservationDB = mongoose.createConnection(
@@ -24,6 +25,9 @@ export const subscriptionDB = mongoose.createConnection(
 );
 export const notificationDB = mongoose.createConnection(
   process.env.MONGO_URI_NOTIFICATION_DB!
+);
+export const messageDB = mongoose.createConnection(
+  process.env.MONGO_URI_MESSAGE_DB!
 );
 
 // Connection handling for menuDB
@@ -56,4 +60,10 @@ notificationDB.once("open", () =>
 );
 notificationDB.on("error", (err) =>
   console.error("Error connecting to Notification DB:", err)
+);
+
+// Connection handling for messageDB
+messageDB.once("open", () => console.log("Message DB connected successfully"));
+messageDB.on("error", (err) =>
+  console.error("Error connecting to Message DB:", err)
 );

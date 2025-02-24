@@ -5,6 +5,7 @@ import {
   Settings,
   Pizza,
   X,
+  MessageCircle,
 } from "lucide-react";
 
 import {
@@ -28,7 +29,8 @@ const items = [
   { title: "Manage Users", url: "/manage-users", icon: UsersRound },
   { title: "Manage Menu", url: "/manage-menu", icon: Pizza },
   { title: "Manage Events", url: "/manage-events", icon: Calendar },
-  { title: "Settings", url: "settings", icon: Settings },
+  { title: "Admin Chat", url: "/admin-chat", icon: MessageCircle },
+  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 export function AppAdminSidebar() {

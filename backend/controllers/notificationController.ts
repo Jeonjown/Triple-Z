@@ -29,7 +29,6 @@ export const getNotifications = async (
   res: Response
 ): Promise<void> => {
   const { userId } = req.body;
-  console.log("Received userId:", userId);
 
   if (!userId) {
     res.status(400).json({ message: "Missing userId in request body" });

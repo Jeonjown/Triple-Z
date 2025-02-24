@@ -2,44 +2,72 @@ import React, { useState, ChangeEvent, KeyboardEvent, useEffect } from "react";
 import { MessageCircle } from "lucide-react";
 import { io } from "socket.io-client";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
+import { v4 as uuid } from "uuid"; // Import uuid for generating unique IDs
 
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
 
 interface Message {
+  roomId: string;
   id: string;
   text: string;
   sender: "user" | "admin";
 }
 
-const Chat: React.FC = () => {
+const UserChat: React.FC = () => {
   const { user } = useAuthStore();
   const [open, setOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
 
-  // Listen for incoming messages once when the component mounts
+  // Step 1: Determine the room ID based on user authentication.
+  // If a user is logged in, use their unique ID. Otherwise, generate and store a unique ID.
+  const [roomId, setRoomId] = useState<string>(() => {
+    if (user?._id) {
+      return `room_${user._id}`;
+    }
+    // For first-time or unauthenticated users, check localStorage for a stored room ID.
+    let storedRoom = localStorage.getItem("chatRoomId");
+    if (!storedRoom) {
+      storedRoom = `room_${uuid()}`;
+      localStorage.setItem("chatRoomId", storedRoom);
+    }
+    return storedRoom;
+  });
+
+  // Step 2: If the user logs in (or their info changes), update the room ID accordingly.
   useEffect(() => {
+    if (user?._id) {
+      const newRoom = `room_${user._id}`;
+      if (newRoom !== roomId) {
+        setRoomId(newRoom);
+      }
+    }
+  }, [user?._id, roomId]);
+
+  // Step 3: Join the room and set up the message listener.
+  useEffect(() => {
+    socket.emit("join-room", roomId);
     socket.on("receive-message", (data: Message) => {
       setMessages((prev) => [...prev, data]);
     });
 
-    // Clean up the event listener when the component unmounts
+    // Clean up the listener on component unmount or roomId change.
     return () => {
       socket.off("receive-message");
     };
-  }, []);
+  }, [roomId]);
 
+  // Step 4: Send a message using the appropriate room ID.
   const sendMessage = (): void => {
     if (input.trim() === "") return;
-
     const newMessage: Message = {
-      id: user?._id || "",
+      roomId,
+      // Use the user's ID if available; otherwise, use the roomId as an identifier.
+      id: user?._id || roomId,
       text: input,
-      // Ensure sender is either "user" or "admin"
       sender: user?.role === "admin" ? "admin" : "user",
     };
-
-    setMessages((prev) => [...prev, newMessage]);
+    console.log(newMessage);
     setInput("");
     socket.emit("send-message", newMessage);
   };
@@ -108,4 +136,4 @@ const Chat: React.FC = () => {
   );
 };
 
-export default Chat;
+export default UserChat;

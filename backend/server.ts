@@ -17,6 +17,8 @@ import subscriptionRoutes from "./routes/subscriptionRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
 import http from "http";
 import { Server as SocketIOServer } from "socket.io";
+import messageRoutes from "./routes/messageRoutes";
+import { Message } from "./models/messageModel";
 
 const server = express();
 
@@ -46,6 +48,7 @@ server.use("/api/menu/events/reservations", eventReservationRoutes);
 server.use("/api/menu/events/settings", eventSettingsRoutes);
 server.use("/api/subscriptions", subscriptionRoutes);
 server.use("/api/notifications", notificationRoutes);
+server.use("/api/messages", messageRoutes);
 
 server.use(
   (err: ResponseError, req: Request, res: Response, next: NextFunction) => {
@@ -71,9 +74,43 @@ const io = new SocketIOServer(httpServer, {
 io.on("connection", (socket) => {
   console.log(`New client connected: ${socket.id}`);
 
-  socket.on("send-message", (message) => {
-    console.log(message);
-    socket.broadcast.emit("receive-message", message);
+  socket.on("join-room", (roomId: string) => {
+    socket.join(roomId);
+    console.log(`Socket ${socket.id} joined room ${roomId}`);
+  });
+
+  socket.on("send-message", async (messageData) => {
+    try {
+      // Save the message data to MongoDB
+      const savedMessage = await Message.create({
+        text: messageData.text,
+        sender: messageData.sender,
+        roomId: messageData.roomId,
+      });
+      console.log("Message saved:", savedMessage);
+
+      // Emit the message to clients in the room
+      io.to(messageData.roomId).emit("receive-message", messageData);
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+  });
+
+  socket.on("admin-message", async (messageData) => {
+    try {
+      // Save the admin message to MongoDB
+      const savedMessage = await Message.create({
+        text: messageData.text,
+        sender: messageData.sender,
+        roomId: messageData.roomId,
+      });
+      console.log("Admin message saved:", savedMessage);
+
+      // Emit the admin message to clients in the room
+      io.to(messageData.roomId).emit("receive-message", messageData);
+    } catch (error) {
+      console.error("Error saving admin message:", error);
+    }
   });
 });
 

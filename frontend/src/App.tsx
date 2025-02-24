@@ -24,6 +24,7 @@ import Settings from "./features/Admin/pages/Settings";
 import Footer from "./components/Footer";
 import AdminDashboard from "./features/Admin/pages/AdminDashboard";
 import ManageEvents from "./features/Events/pages/ManageEvents";
+import AdminChat from "./features/Chat/components/AdminChat";
 
 function App() {
   const { user } = useAuthStore();
@@ -72,6 +73,7 @@ function App() {
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/manage-menu" element={<ManageMenu />} />
                 <Route path="/manage-events" element={<ManageEvents />} />
+                <Route path="/admin-chat" element={<AdminChat />} />
               </Routes>
             </AdminSidebarLayout>
           ) : (
