@@ -1,6 +1,7 @@
 import { Response, Request, NextFunction } from "express";
 import { createError } from "../utils/createError";
 import User from "../models/userModel";
+import mongoose from "mongoose";
 
 export const getAllUsers = async (
   req: Request,
@@ -18,6 +19,42 @@ export const getAllUsers = async (
     res.status(200).json(users);
   } catch (error) {
     createError("something went wrong.", 500);
+  }
+};
+
+export const getUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.params.userId;
+
+    // Step 1: Validate the userId format
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      res.status(200).json([]);
+      return;
+    }
+
+    // Step 2: Attempt to find the user
+    const user = await User.findById(userId);
+
+    // If no user is found, return an empty array
+    if (!user) {
+      res.status(200).json([]);
+      return;
+    }
+
+    // Return the found user object
+    res.status(200).json(user);
+  } catch (error: any) {
+    // Step 3: Handle specific CastError from Mongoose
+    if (error.name === "CastError") {
+      res.status(200).json([]);
+      return;
+    }
+    // For any other error, pass it to the error handler
+    return next(createError("something went wrong.", 500));
   }
 };
 

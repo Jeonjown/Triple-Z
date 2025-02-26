@@ -16,7 +16,7 @@ const NotificationIcon = () => {
   // Pass the user ID directly (if available) to your hook
   const {
     data: notifications,
-    isLoading,
+    isPending,
     error,
   } = useNotifications(user?._id || "");
 
@@ -31,7 +31,7 @@ const NotificationIcon = () => {
             NOTIFICATIONS
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {isLoading ? (
+          {isPending ? (
             <DropdownMenuItem>Loading notifications...</DropdownMenuItem>
           ) : error ? (
             <DropdownMenuItem>Error loading notifications</DropdownMenuItem>

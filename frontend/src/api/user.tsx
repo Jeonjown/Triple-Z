@@ -56,3 +56,22 @@ export const deleteUser = async ({ userId }: { userId: string }) => {
     throw error;
   }
 };
+
+export const fetchUser = async (userId: string) => {
+  try {
+    const response = await api.get(`/api/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw {
+        statusCode: error.response?.status || 500,
+        message: error.response?.data?.message || "An error occurred",
+      };
+    }
+    // Handle unexpected errors
+    throw {
+      statusCode: 500,
+      message: "An unexpected error occurred",
+    };
+  }
+};

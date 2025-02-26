@@ -8,8 +8,8 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// types.ts (or any file you keep your shared types)
 export interface Message {
+  userId: string;
   _id?: string;
   roomId: string;
   text: string;

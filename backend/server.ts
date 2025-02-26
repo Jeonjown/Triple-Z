@@ -1,3 +1,4 @@
+// server.ts (or index.ts)
 import express, { NextFunction, Response, Request } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -19,6 +20,8 @@ import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import messageRoutes from "./routes/messageRoutes";
 import { Message } from "./models/messageModel";
+import User from "./models/userModel";
+import mongoose from "mongoose";
 
 const server = express();
 
@@ -58,10 +61,8 @@ server.use(
   }
 );
 
-// Create an HTTP server
 const httpServer = http.createServer(server);
 
-// Initialize Socket.io
 const io = new SocketIOServer(httpServer, {
   cors: {
     origin: ["http://localhost:5173", "https://triple-z.vercel.app"],
@@ -70,7 +71,14 @@ const io = new SocketIOServer(httpServer, {
   },
 });
 
-// Handle Socket.io connections
+// Define an interface for socket messages
+interface SocketMessage {
+  text: string;
+  sender: "user" | "admin";
+  roomId: string;
+  userId: string;
+}
+
 io.on("connection", (socket) => {
   console.log(`New client connected: ${socket.id}`);
 
@@ -79,42 +87,61 @@ io.on("connection", (socket) => {
     console.log(`Socket ${socket.id} joined room ${roomId}`);
   });
 
-  socket.on("send-message", async (messageData) => {
+  socket.on("send-message", async (messageData: SocketMessage) => {
     try {
-      // Save the message data to MongoDB
+      let username: string;
+      let email: string;
+
+      // Check if messageData.userId is a valid ObjectId before attempting lookup.
+      if (mongoose.Types.ObjectId.isValid(messageData.userId)) {
+        const user = await User.findById(messageData.userId);
+        if (user) {
+          username = user.username;
+          email = user.email;
+        } else {
+          username = "Guest";
+          email = "No email";
+        }
+      } else {
+        // For guest messages, default to guest values.
+        username = "Guest";
+        email = "No email";
+      }
+
+      // Create the message with embedded username and email.
       const savedMessage = await Message.create({
         text: messageData.text,
         sender: messageData.sender,
         roomId: messageData.roomId,
+        userId: messageData.userId,
+        username: username,
+        email: email,
       });
-      console.log("Message saved:", savedMessage);
 
-      // Emit the message to clients in the room
-      io.to(messageData.roomId).emit("receive-message", messageData);
-    } catch (error) {
+      console.log("Message saved:", savedMessage);
+      io.to(messageData.roomId).emit("receive-message", savedMessage);
+    } catch (error: any) {
       console.error("Error saving message:", error);
     }
   });
 
-  socket.on("admin-message", async (messageData) => {
+  socket.on("admin-message", async (messageData: SocketMessage) => {
     try {
-      // Save the admin message to MongoDB
+      // Save the admin message to MongoDB.
       const savedMessage = await Message.create({
         text: messageData.text,
         sender: messageData.sender,
         roomId: messageData.roomId,
+        userId: messageData.userId,
       });
       console.log("Admin message saved:", savedMessage);
-
-      // Emit the admin message to clients in the room
       io.to(messageData.roomId).emit("receive-message", messageData);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving admin message:", error);
     }
   });
 });
 
-// Start the HTTP (and Socket.io) server
 const port = process.env.PORT || 3000;
 httpServer.listen(port, () => {
   console.log(`Server listening on port ${port}`);

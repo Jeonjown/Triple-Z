@@ -8,7 +8,7 @@ const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
 
 interface Message {
   roomId: string;
-  id: string;
+  userId: string;
   text: string;
   sender: "user" | "admin";
 }
@@ -63,7 +63,7 @@ const UserChat: React.FC = () => {
     const newMessage: Message = {
       roomId,
       // Use the user's ID if available; otherwise, use the roomId as an identifier.
-      id: user?._id || roomId,
+      userId: user?._id || roomId,
       text: input,
       sender: user?.role === "admin" ? "admin" : "user",
     };

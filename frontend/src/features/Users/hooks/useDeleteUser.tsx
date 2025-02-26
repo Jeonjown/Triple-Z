@@ -36,7 +36,6 @@ const useDeleteUser = () => {
     },
   });
 
-  // Alias `isLoading` as `isPending` to match your UI naming conventions.
   return { mutate, isPending, isError, error };
 };
 
