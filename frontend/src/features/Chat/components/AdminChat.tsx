@@ -7,6 +7,7 @@ import { useRoomsWithLatestMessage } from "../hooks/useRoomsWithLatestMessage";
 import { useMessagesForRoom } from "../hooks/useMessagesForRoom";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { useGetUser } from "@/features/Users/hooks/useGetUser";
+import { useQueryClient } from "@tanstack/react-query";
 
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
 
@@ -30,6 +31,9 @@ const AdminChat: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | undefined>(
     undefined,
   );
+
+  // Define queryClient to invalidate queries later
+  const queryClient = useQueryClient();
 
   // Fetch rooms with their latest messages
   const { data: rooms } = useRoomsWithLatestMessage();
@@ -86,12 +90,14 @@ const AdminChat: React.FC = () => {
     socket.on("receive-message", (data: Message) => {
       if (data.roomId === roomId) {
         setMessages((prev) => [...prev, data]);
+        // Invalidate the room list query to refresh latest messages.
+        queryClient.invalidateQueries({ queryKey: ["rooms", "latestMessage"] });
       }
     });
     return () => {
       socket.off("receive-message");
     };
-  }, [roomId]);
+  }, [roomId, queryClient]);
 
   // Send an admin message
   const sendAdminMessage = () => {

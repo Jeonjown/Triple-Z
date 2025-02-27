@@ -1,6 +1,7 @@
 // controllers/notificationController.ts
 import { Request, Response } from "express";
 import { Notification } from "../models/notificationsModel";
+import User from "../models/userModel";
 
 export const createNotification = async (
   req: Request,
@@ -21,6 +22,33 @@ export const createNotification = async (
   } catch (error) {
     console.error("Error saving notification:", error);
     res.status(500).json({ message: "Error saving notification" });
+  }
+};
+
+export const createAdminNotification = async (
+  title: string,
+  description: string
+): Promise<any> => {
+  if (!title || !description) {
+    throw new Error("Missing required fields");
+  }
+  try {
+    // Find all users with the role "admin"
+    const adminUsers = await User.find({ role: "admin" });
+    // Create a notification for each admin user
+    const notifications = await Promise.all(
+      adminUsers.map(async (admin) => {
+        return await Notification.create({
+          title,
+          description,
+          userId: admin._id,
+        });
+      })
+    );
+    return notifications;
+  } catch (error) {
+    console.error("Error saving admin notifications:", error);
+    throw new Error("Error saving admin notifications");
   }
 };
 
