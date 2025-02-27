@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import webpush from "web-push";
 import { ISubscription, Subscription } from "../models/subscriptionModel";
+import User from "../models/userModel";
 
 const publicKey = process.env.VAPID_PUBLIC_KEY;
 const privateKey = process.env.VAPID_PRIVATE_KEY;
@@ -137,5 +138,62 @@ export const sendNotification = async (
   } catch (error) {
     console.error("Notification error:", error);
     res.status(500).json({ message: "Error sending notification" });
+  }
+};
+
+export const sendNotificationToAdmin = async (req: Request, res: Response) => {
+  try {
+    const { title, description } = req.body;
+
+    if (!title || !description) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
+    }
+
+    // Retrieve all admin users.
+    const adminUsers = await User.find({ role: "admin" });
+
+    // Send a web push for each admin.
+    const pushResults = await Promise.all(
+      adminUsers.map(async (admin) => {
+        // Retrieve push subscriptions for this admin.
+        const subscriptions = await Subscription.find({ userId: admin._id });
+
+        // Prepare the payload.
+        const payload = JSON.stringify({
+          title,
+          description,
+          image: "/logo.png",
+          userId: admin._id,
+        });
+
+        // Send a push notification to each subscription.
+        const pushPromises = subscriptions.map(async (sub: ISubscription) => {
+          try {
+            await webpush.sendNotification(sub, payload);
+          } catch (error: any) {
+            console.error(
+              `Error sending push notification for admin ${admin._id} to endpoint ${sub.endpoint}:`,
+              error
+            );
+            // If the subscription is no longer valid, remove it.
+            if (error.statusCode === 410) {
+              await Subscription.deleteOne({ endpoint: sub.endpoint });
+              console.log(`Subscription removed: ${sub.endpoint}`);
+            }
+          }
+        });
+        return Promise.all(pushPromises);
+      })
+    );
+
+    res
+      .status(200)
+      .json({ message: "Web push notifications sent", results: pushResults });
+  } catch (error) {
+    console.error("Error sending admin web push notifications:", error);
+    res
+      .status(500)
+      .json({ error: "Error sending admin web push notifications" });
   }
 };

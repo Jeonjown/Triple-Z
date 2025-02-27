@@ -2,7 +2,7 @@ import express from "express";
 import {
   getMessages,
   getRoomsWithLatestMessage,
-} from "../socket/services/messageServices";
+} from "../socket/services/messageService";
 
 const router = express.Router();
 

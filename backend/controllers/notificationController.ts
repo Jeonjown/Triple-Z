@@ -25,33 +25,6 @@ export const createNotification = async (
   }
 };
 
-export const createAdminNotification = async (
-  title: string,
-  description: string
-): Promise<any> => {
-  if (!title || !description) {
-    throw new Error("Missing required fields");
-  }
-  try {
-    // Find all users with the role "admin"
-    const adminUsers = await User.find({ role: "admin" });
-    // Create a notification for each admin user
-    const notifications = await Promise.all(
-      adminUsers.map(async (admin) => {
-        return await Notification.create({
-          title,
-          description,
-          userId: admin._id,
-        });
-      })
-    );
-    return notifications;
-  } catch (error) {
-    console.error("Error saving admin notifications:", error);
-    throw new Error("Error saving admin notifications");
-  }
-};
-
 export const getNotifications = async (
   req: Request,
   res: Response

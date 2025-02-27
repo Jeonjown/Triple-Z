@@ -75,6 +75,29 @@ export const sendNotificationToAll = async (
   }
 };
 
+export const sendNotificationToAdmin = async (
+  title: string,
+  description: string,
+): Promise<NotificationResponse> => {
+  try {
+    const response = await api.post("/api/subscriptions/send/admin", {
+      title,
+      description,
+    });
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw {
+        statusCode: error.response?.status || 500,
+        message:
+          error.response?.data?.message ||
+          "An error occurred while sending admin notification",
+      };
+    }
+    throw { statusCode: 500, message: "An unexpected error occurred" };
+  }
+};
+
 export interface NotificationData {
   _id: string;
   title: string;

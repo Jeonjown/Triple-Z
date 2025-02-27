@@ -3,6 +3,7 @@ import { MessageCircle } from "lucide-react";
 import { io } from "socket.io-client";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { v4 as uuid } from "uuid"; // Import uuid for generating unique IDs
+import { useSendNotificationToAdmin } from "@/notifications/hooks/useSendNotificationToAdmins";
 
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
 
@@ -18,7 +19,7 @@ const UserChat: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
-
+  const { mutate } = useSendNotificationToAdmin();
   // Step 1: Determine the room ID based on user authentication.
   // If a user is logged in, use their unique ID. Otherwise, generate and store a unique ID.
   const [roomId, setRoomId] = useState<string>(() => {
@@ -70,6 +71,10 @@ const UserChat: React.FC = () => {
     console.log(newMessage);
     setInput("");
     socket.emit("send-message", newMessage);
+    mutate({
+      title: "New Message Received",
+      description: `User ${user?._id || roomId} sent: "${newMessage.text}"`,
+    });
   };
 
   return (

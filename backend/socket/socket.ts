@@ -3,7 +3,8 @@ import {
   saveAdminMessage,
   saveUserMessage,
   SocketMessage,
-} from "./services/messageServices";
+} from "./services/messageService";
+import { saveNotification } from "./services/notificationService";
 
 export const initSocket = (httpServer: any) => {
   const io = new SocketIOServer(httpServer, {
@@ -39,6 +40,20 @@ export const initSocket = (httpServer: any) => {
         io.to(messageData.roomId).emit("receive-message", savedMessage);
       } catch (error: any) {
         console.error("Error saving admin message:", error);
+      }
+    });
+
+    socket.on("send-notification", async (notificationData: any) => {
+      try {
+        const savedNotification = await saveNotification(notificationData);
+        console.log("Notification saved:", savedNotification);
+        // Emit the notification to a specific room or user
+        io.to(notificationData.roomId).emit(
+          "receive-notification",
+          savedNotification
+        );
+      } catch (error: any) {
+        console.error("Error saving notification:", error);
       }
     });
   });
