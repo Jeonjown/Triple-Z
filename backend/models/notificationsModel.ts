@@ -7,6 +7,7 @@ export interface INotification extends Document {
   description: string;
   userId: mongoose.Types.ObjectId;
   read: boolean;
+  soundUrl?: string;
   createdAt: Date;
 }
 
@@ -15,6 +16,7 @@ const NotificationSchema: Schema = new Schema({
   description: { type: String, required: true },
   userId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
   read: { type: Boolean, default: false },
+  soundUrl: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 

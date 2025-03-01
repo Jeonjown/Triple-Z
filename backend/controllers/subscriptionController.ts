@@ -143,7 +143,7 @@ export const sendNotification = async (
 
 export const sendNotificationToAdmin = async (req: Request, res: Response) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, soundUrl } = req.body;
 
     if (!title || !description) {
       res.status(400).json({ error: "Missing required fields" });
@@ -165,6 +165,7 @@ export const sendNotificationToAdmin = async (req: Request, res: Response) => {
           description,
           image: "/logo.png",
           userId: admin._id,
+          soundUrl: "../../frontend/public/notification-sound.mp3",
         });
 
         // Send a push notification to each subscription.

@@ -31,7 +31,7 @@ const RoomList: React.FC<RoomListProps> = ({
   };
 
   return (
-    <div className="h-full overflow-y-auto p-4">
+    <div className="h-full max-h-screen overflow-y-auto p-4">
       <h1 className="mb-4 text-center text-2xl font-bold">Chats</h1>
       <div className="space-y-2">
         {rooms.map((room) => (

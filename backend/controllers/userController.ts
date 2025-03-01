@@ -32,7 +32,7 @@ export const getUser = async (
 
     // Step 1: Validate the userId format
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-      res.status(200).json([]);
+      res.status(200).json({ mesage: "User is Guest", info: null });
       return;
     }
 
@@ -41,12 +41,12 @@ export const getUser = async (
 
     // If no user is found, return an empty array
     if (!user) {
-      res.status(200).json([]);
+      res.status(200).json({ mesage: "User is Guest", info: null });
       return;
     }
 
     // Return the found user object
-    res.status(200).json(user);
+    res.status(200).json({ mesage: "User Found!", info: user });
   } catch (error: any) {
     // Step 3: Handle specific CastError from Mongoose
     if (error.name === "CastError") {
