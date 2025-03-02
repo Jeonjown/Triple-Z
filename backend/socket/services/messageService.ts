@@ -19,6 +19,7 @@ export const getRoomsWithLatestMessage = async (
 ) => {
   try {
     const results = await Message.aggregate([
+      { $match: { sender: "user" } }, // Only consider user messages
       { $sort: { createdAt: -1 } },
       {
         $group: {
@@ -83,10 +84,24 @@ export const saveUserMessage = async (messageData: SocketMessage) => {
  * Save an admin message.
  */
 export const saveAdminMessage = async (messageData: SocketMessage) => {
-  return await Message.create({
-    text: messageData.text,
-    sender: messageData.sender,
-    roomId: messageData.roomId,
-    userId: messageData.userId,
-  });
+  try {
+    const [adminUser, originalUser] = await Promise.all([
+      User.findById(messageData.userId),
+      Message.findOne({ roomId: messageData.roomId, sender: "user" })
+        .sort({ createdAt: 1 })
+        .select("username userId"),
+    ]);
+
+    return await Message.create({
+      text: messageData.text,
+      sender: messageData.sender,
+      roomId: messageData.roomId,
+      userId: originalUser?.userId || messageData.userId,
+      username: originalUser?.username || "User",
+      adminUsername: adminUser?.username || "Admin",
+    });
+  } catch (error) {
+    console.error("Error saving admin message:", error);
+    throw error;
+  }
 };

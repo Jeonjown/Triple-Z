@@ -9,6 +9,7 @@ const api = axios.create({
 });
 
 export interface Message {
+  username: string;
   userId: string;
   _id?: string;
   roomId: string;

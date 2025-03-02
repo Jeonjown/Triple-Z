@@ -4,6 +4,7 @@ import { io } from "socket.io-client";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { v4 as uuid } from "uuid"; // Import uuid for generating unique IDs
 import { useSendNotificationToAdmin } from "@/notifications/hooks/useSendNotificationToAdmins";
+import { useMessagesForRoom } from "../hooks/useMessagesForRoom";
 
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
 
@@ -12,16 +13,13 @@ interface Message {
   userId: string;
   text: string;
   sender: "user" | "admin";
+  username?: string;
 }
 
 const UserChat: React.FC = () => {
   const { user } = useAuthStore();
-  const [open, setOpen] = useState<boolean>(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState<string>("");
-  const { mutate } = useSendNotificationToAdmin();
-  // Step 1: Determine the room ID based on user authentication.
-  // If a user is logged in, use their unique ID. Otherwise, generate and store a unique ID.
+
+  // Declare roomId state before using it in any hook.
   const [roomId, setRoomId] = useState<string>(() => {
     if (user?._id) {
       return `room_${user._id}`;
@@ -35,7 +33,23 @@ const UserChat: React.FC = () => {
     return storedRoom;
   });
 
-  // Step 2: If the user logs in (or their info changes), update the room ID accordingly.
+  // Use the hook to fetch chat history
+  const { data } = useMessagesForRoom(roomId);
+
+  // Local states for managing chat
+  const [open, setOpen] = useState<boolean>(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState<string>("");
+  const { mutate } = useSendNotificationToAdmin();
+
+  // Update local messages state when chat history is loaded
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setMessages(data);
+    }
+  }, [data]);
+
+  // Update roomId when user logs in or their info changes.
   useEffect(() => {
     if (user?._id) {
       const newRoom = `room_${user._id}`;
@@ -45,25 +59,27 @@ const UserChat: React.FC = () => {
     }
   }, [user?._id, roomId]);
 
-  // Step 3: Join the room and set up the message listener.
+  // Join the room and set up the message listener.
   useEffect(() => {
+    const previousRoomId = roomId;
     socket.emit("join-room", roomId);
-    socket.on("receive-message", (data: Message) => {
-      setMessages((prev) => [...prev, data]);
-    });
 
-    // Clean up the listener on component unmount or roomId change.
+    const messageHandler = (msg: Message) => {
+      setMessages((prev) => [...prev, msg]);
+    };
+    socket.on("receive-message", messageHandler);
+
     return () => {
-      socket.off("receive-message");
+      socket.off("receive-message", messageHandler);
+      socket.emit("leave-room", previousRoomId);
     };
   }, [roomId]);
 
-  // Step 4: Send a message using the appropriate room ID.
+  // Send a message using the appropriate room ID.
   const sendMessage = (): void => {
     if (input.trim() === "") return;
     const newMessage: Message = {
       roomId,
-      // Use the user's ID if available; otherwise, use the roomId as an identifier.
       userId: user?._id || roomId,
       text: input,
       sender: user?.role === "admin" ? "admin" : "user",
@@ -77,6 +93,7 @@ const UserChat: React.FC = () => {
     });
   };
 
+  if (user?.role === "admin") return null;
   return (
     <div className="fixed bottom-10 right-10 z-20">
       {open ? (
@@ -100,7 +117,7 @@ const UserChat: React.FC = () => {
                 }`}
               >
                 <p className="text-sm font-bold">
-                  {msg.sender === "user" ? "You" : "Admin"}
+                  {msg.sender === "user" ? "You" : msg.username || "Admin"}
                 </p>
                 <p>{msg.text}</p>
               </div>

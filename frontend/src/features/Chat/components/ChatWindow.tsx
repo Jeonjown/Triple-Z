@@ -46,8 +46,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             <div
               className={`max-w-xs rounded-lg px-4 py-2 text-sm ${
                 msg.sender === "admin"
-                  ? "ml-auto rounded-bl-none bg-primary text-white"
-                  : "mr-auto rounded-br-none border bg-blue-500 text-white"
+                  ? "ml-auto rounded-br-none bg-primary text-white"
+                  : "mr-auto rounded-bl-none border bg-blue-500 text-white"
               }`}
             >
               <p>

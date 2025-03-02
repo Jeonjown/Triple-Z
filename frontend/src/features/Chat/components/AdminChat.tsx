@@ -29,6 +29,7 @@ export interface Message {
   sender: "user" | "admin";
   roomId: string;
   createdAt?: string;
+  username?: string;
 }
 
 const AdminChat: React.FC = () => {
@@ -38,152 +39,159 @@ const AdminChat: React.FC = () => {
   const [joined, setJoined] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
-
-  // State to track whether sound notifications are enabled.
   const [soundEnabled, setSoundEnabled] = useState<boolean>(false);
-
-  // Dialog state for enabling notifications and sound.
   const [dialogOpen, setDialogOpen] = useState(false);
-  // State to track the selected user for details.
-  const [selectedUserId, setSelectedUserId] = useState<string | undefined>(
-    undefined,
-  );
+  const [selectedUserId, setSelectedUserId] = useState<string | undefined>();
 
-  // On mount, load the persisted sound preference.
+  // Sound preferences and UI setup
   useEffect(() => {
     const storedSoundPref = localStorage.getItem("soundEnabled");
     if (storedSoundPref !== null) {
       setSoundEnabled(storedSoundPref === "true");
     }
-  }, []);
-
-  // Persist soundEnabled changes to localStorage.
-  useEffect(() => {
-    localStorage.setItem("soundEnabled", soundEnabled.toString());
-  }, [soundEnabled]);
-
-  useEffect(() => {
-    // Disable scrolling on mount.
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "auto";
     };
   }, []);
 
-  // Create a query client to update queries later.
-  const queryClient = useQueryClient();
-
-  // Fetch rooms with their latest messages.
-  const { data: rooms } = useRoomsWithLatestMessage();
-  // Fetch historical messages for the current room.
-  const {
-    data: fetchedMessages,
-    isPending: messagesLoading,
-    error: messagesError,
-  } = useMessagesForRoom(roomId);
-  // Fetch user details for the selected user.
-  const { data: userInfo, isPending, error } = useGetUser(selectedUserId);
-
-  // Prompt for notifications if the permission is still default.
   useEffect(() => {
-    if (Notification.permission === "default") {
-      setDialogOpen(true);
-    }
+    localStorage.setItem("soundEnabled", soundEnabled.toString());
+  }, [soundEnabled]);
+
+  const queryClient = useQueryClient();
+  const { data: rooms } = useRoomsWithLatestMessage();
+  const { data: fetchedMessages, isPending: messagesLoading } =
+    useMessagesForRoom(roomId);
+  const { data: userInfo } = useGetUser(selectedUserId);
+
+  useEffect(() => {
+    if (Notification.permission === "default") setDialogOpen(true);
   }, []);
 
+  // Room management
   const joinRoom = useCallback(
     (selectedRoomId?: string, roomUserId?: string) => {
-      const adminUserId = user?._id;
-      let newRoomId = selectedRoomId || roomId;
-      if (roomUserId === adminUserId && adminUserId) {
-        newRoomId = `room_${adminUserId}`;
-      }
-      if (newRoomId.trim() === "") return;
-      socket.emit("join-room", newRoomId);
-      setRoomId(newRoomId);
-      setJoined(true);
-      setMessages([]);
-      if (roomUserId) {
-        setSelectedUserId(roomUserId);
-      } else {
-        setSelectedUserId(undefined);
-      }
+      const newRoomId = selectedRoomId || roomId;
+      if (!newRoomId.trim() || newRoomId === roomId) return;
+
+      setSelectedUserId(roomUserId || newRoomId.replace("room_", ""));
+
+      if (roomId) socket.emit("leave-room", roomId);
+
+      socket.emit("join-room", newRoomId, (ack: { status: string }) => {
+        if (ack.status === "joined") {
+          setRoomId(newRoomId);
+          setJoined(true);
+          setMessages([]);
+        }
+      });
     },
-    [roomId, user],
+    [roomId],
   );
 
-  // Automatically select the top room if none is selected.
   useEffect(() => {
-    if (!roomId && rooms && rooms.length > 0) {
+    if (!roomId && rooms?.length) {
       const topRoom = rooms[0] as Room;
       joinRoom(topRoom.roomId, topRoom.latestMessage?.userId);
     }
   }, [rooms, roomId, joinRoom]);
 
-  // Update messages when historical messages are fetched.
+  // Message handling
   useEffect(() => {
     if (joined && fetchedMessages) {
-      const transformedMessages: Message[] = fetchedMessages.map((msg) => ({
-        ...msg,
-        _id: msg._id ?? "",
-        userId: msg.userId ?? "",
-      }));
-      setMessages(transformedMessages);
+      setMessages(
+        fetchedMessages.map((msg) => ({
+          ...msg,
+          _id: msg._id ?? "",
+          userId: msg.userId ?? "",
+          username: msg.username ?? "",
+        })),
+      );
     }
   }, [fetchedMessages, joined]);
 
-  // Listen for real-time messages.
+  // Real-time updates
   useEffect(() => {
-    socket.on("receive-message", (data: Message) => {
-      if (data.roomId === roomId) {
-        setMessages((prev) => [...prev, data]);
-        // If sound notifications are enabled, play the ping sound.
-        if (soundEnabled) {
-          playPingSound();
-        }
-      }
+    const updateRoomList = (data: Message) => {
       queryClient.setQueryData<Room[]>(
         ["rooms", "latestMessage"],
-        (oldRooms) => {
-          if (!oldRooms) return oldRooms;
-          return oldRooms.map((room) => {
-            if (room.roomId === data.roomId) {
-              return {
-                ...room,
-                latestMessage: {
-                  text: data.text,
-                  createdAt: data.createdAt,
-                  username: data.sender === "user" ? data.userId : "Admin",
-                  userId: data.userId,
-                },
-              };
-            }
-            return room;
+        (oldRooms = []) => {
+          const updatedRooms = [...oldRooms];
+          const roomIndex = updatedRooms.findIndex(
+            (room) => room.roomId === data.roomId,
+          );
+
+          if (roomIndex > -1) {
+            // Preserve original username and user ID, only update message and timestamp
+            updatedRooms[roomIndex] = {
+              ...updatedRooms[roomIndex],
+              latestMessage: {
+                ...updatedRooms[roomIndex].latestMessage,
+                text: data.text,
+                createdAt: data.createdAt,
+              },
+            };
+          } else if (data.sender === "user") {
+            // Only create new rooms for user messages
+            updatedRooms.push({
+              roomId: data.roomId,
+              latestMessage: {
+                text: data.text,
+                createdAt: data.createdAt,
+                username: data.username,
+                userId: data.userId,
+              },
+            });
+          }
+
+          // Sort by latest message timestamp
+          return updatedRooms.sort((a, b) => {
+            const aTime = new Date(a.latestMessage?.createdAt || 0).getTime();
+            const bTime = new Date(b.latestMessage?.createdAt || 0).getTime();
+            return bTime - aTime;
           });
         },
       );
-    });
-    return () => {
-      socket.off("receive-message");
     };
-  }, [roomId, queryClient, soundEnabled]);
 
-  // Send an admin message.
+    const handleNewMessage = (data: Message) => {
+      updateRoomList(data);
+
+      if (data.roomId === roomId) {
+        setMessages((prev) => [...prev, data]);
+        if (soundEnabled) playPingSound();
+      }
+    };
+
+    socket.on("new-user-message", updateRoomList);
+    socket.on("new-admin-message", updateRoomList);
+    socket.on("receive-message", handleNewMessage);
+
+    return () => {
+      socket.off("new-user-message", updateRoomList);
+      socket.off("new-admin-message", updateRoomList);
+      socket.off("receive-message", handleNewMessage);
+      if (roomId) socket.emit("leave-room", roomId);
+    };
+  }, [roomId, soundEnabled, queryClient]);
+
+  // Message sending
   const sendAdminMessage = () => {
-    if (input.trim() === "" || !joined) return;
+    if (!input.trim() || !joined) return;
     const adminMessage: Message = {
-      _id: "admin", // Placeholder; ideally assigned by the backend.
+      _id: user!._id,
       text: input,
       sender: "admin",
       roomId,
       userId: user?._id || "",
       createdAt: new Date().toISOString(),
+      username: user?.username ?? "Admin",
     };
     socket.emit("admin-message", adminMessage);
     setInput("");
   };
 
-  // If no user information is available, show a centered message.
   if (!userInfo) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -194,9 +202,8 @@ const AdminChat: React.FC = () => {
 
   return (
     <div className="inset-0 grid h-screen grid-cols-12">
-      {/* Left Sidebar: Room List */}
       <div className="col-span-3 border-r bg-white">
-        {rooms && rooms.length > 0 && (
+        {rooms?.length > 0 && (
           <RoomList
             rooms={rooms as Room[]}
             activeRoomId={roomId}
@@ -205,7 +212,6 @@ const AdminChat: React.FC = () => {
         )}
       </div>
 
-      {/* Main Chat Window */}
       <div className="col-span-6 flex flex-col">
         {messagesLoading ? (
           <div className="flex h-full items-center justify-center text-gray-500">
@@ -223,24 +229,20 @@ const AdminChat: React.FC = () => {
             onInputChange={setInput}
             onSendMessage={sendAdminMessage}
             messagesLoading={messagesLoading}
-            messagesError={messagesError}
           />
         )}
       </div>
 
-      {/* Right Sidebar: User Details */}
       <div className="col-span-3 border-l bg-white">
-        <UserDetails user={userInfo} isPending={isPending} error={error} />
+        <UserDetails user={userInfo} />
       </div>
 
-      {/* Dialog for enabling push and sound notifications */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Enable Notifications?</DialogTitle>
             <DialogDescription>
-              Please turn on notifications to receive push notifications for
-              messages on this device.
+              Receive push notifications for new messages
             </DialogDescription>
           </DialogHeader>
           <div className="my-4 flex items-center">
@@ -257,7 +259,7 @@ const AdminChat: React.FC = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              No, proceed
+              No
             </Button>
             <Button
               onClick={async () => {

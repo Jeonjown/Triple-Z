@@ -50,7 +50,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
   const userInfo = user.info;
 
   return (
-    <div className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-lg">
+    <div className="mx-auto h-screen max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-lg">
       <SquareUser className="mx-auto size-20" />
       <h2 className="mb-4 text-center text-2xl font-bold">User Details</h2>
       <div className="space-y-2">
