@@ -60,7 +60,7 @@ const AdminChat: React.FC = () => {
   }, [soundEnabled]);
 
   const queryClient = useQueryClient();
-  const { data: rooms } = useRoomsWithLatestMessage();
+  const { data: rooms = [] } = useRoomsWithLatestMessage();
   const { data: fetchedMessages, isPending: messagesLoading } =
     useMessagesForRoom(roomId);
   const { data: userInfo } = useGetUser(selectedUserId);

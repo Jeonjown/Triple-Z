@@ -18,27 +18,11 @@ interface UserResponse {
 
 interface UserDetailsProps {
   user?: UserResponse;
-  isPending: boolean;
-  error: unknown;
+  isPending?: boolean;
+  error?: unknown;
 }
 
-const UserDetails: React.FC<UserDetailsProps> = ({
-  user,
-  isPending,
-  error,
-}) => {
-  if (isPending)
-    return (
-      <p className="text-center font-semibold text-gray-600">
-        Loading user details...
-      </p>
-    );
-  if (error)
-    return (
-      <p className="text-center font-semibold text-red-600">
-        Error loading user details.
-      </p>
-    );
+const UserDetails: React.FC<UserDetailsProps> = ({ user }) => {
   if (!user || !user.info)
     return (
       <div className="mt-6">
