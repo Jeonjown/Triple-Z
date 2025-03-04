@@ -33,7 +33,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <main className="mt-24 flex min-h-[200vh] w-full flex-col">
+      <main className="mt-24 flex min-h-screen w-full flex-col">
         <Toaster />
         <Navbar />
         <div className="flex-grow">

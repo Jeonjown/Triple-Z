@@ -117,7 +117,7 @@ const UserChat: React.FC = () => {
                 }`}
               >
                 <p className="text-sm font-bold">
-                  {msg.sender === "user" ? "You" : msg.username || "Admin"}
+                  {msg.sender === "user" ? "You" : "Triple-Z"}
                 </p>
                 <p>{msg.text}</p>
               </div>
