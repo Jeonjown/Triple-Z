@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Schedule = () => {
   const { user } = useAuthStore();
@@ -99,9 +100,11 @@ const Schedule = () => {
               </ul>
             </CardContent>
             <CardFooter className="mt-auto flex justify-center">
-              <Button variant={"outline"} className="w-full">
-                Select
-              </Button>
+              <Link to={`/schedule/event-form/${user._id}`} className="w-full">
+                <Button variant={"outline"} className="w-full">
+                  Select
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
         </div>

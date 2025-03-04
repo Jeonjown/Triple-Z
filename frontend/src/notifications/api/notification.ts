@@ -99,12 +99,12 @@ export const sendNotificationToAdmin = async (
 };
 
 export interface NotificationData {
-  _id: string;
+  _id?: string;
   title: string;
   description: string;
   userId: string;
-  read: boolean;
-  createdAt: Date;
+  read?: boolean;
+  createdAt?: Date;
 }
 
 export const createNotification = async (

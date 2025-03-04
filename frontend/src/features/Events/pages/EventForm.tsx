@@ -121,7 +121,7 @@ const EventForm = () => {
       <div className="mx-auto mt-10 flex flex-col items-center justify-center space-y-8 p-5">
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
-          className="w-full max-w-4xl bg-blue-50"
+          className="w-full max-w-4xl"
         >
           <div className="md:shadow-aesthetic flex w-full flex-col">
             {currentStep !== 4 ? (

@@ -28,7 +28,7 @@ const EventStatusCell = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="h-8 w-20 p-0">
+        <Button variant="outline" className="h-8 w-20 px-12">
           {reservation.eventStatus}
         </Button>
       </DropdownMenuTrigger>

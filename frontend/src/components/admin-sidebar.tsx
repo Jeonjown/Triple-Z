@@ -6,6 +6,9 @@ import {
   Pizza,
   X,
   MessageCircle,
+  ChevronDown,
+  ChevronRight,
+  CalendarDays,
 } from "lucide-react";
 
 import {
@@ -18,20 +21,17 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
-
-// Define Sidebar Menu Itemss
-const items = [
-  { title: "Dashboard", url: "#", icon: LayoutDashboard },
-  { title: "Manage Users", url: "/manage-users", icon: UsersRound },
-  { title: "Manage Menu", url: "/manage-menu", icon: Pizza },
-  { title: "Manage Events", url: "/manage-events", icon: Calendar },
-  { title: "Admin Chat", url: "/admin-chat", icon: MessageCircle },
-  { title: "Settings", url: "/settings", icon: Settings },
-];
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./ui/collapsible";
 
 export function AppAdminSidebar() {
   const { open, isMobile, toggleSidebar } = useSidebar();
@@ -54,24 +54,124 @@ export function AppAdminSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Sidebar Group */}
         <SidebarGroup>
           <SidebarGroupLabel>Panel</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map(({ title, url, icon: Icon }) => (
-                <SidebarMenuItem key={title}>
-                  <SidebarMenuButton asChild className="[&>svg]:size-5">
-                    <Link
-                      to={url}
-                      className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
-                    >
-                      <Icon />
-                      <span className="text-base font-semibold">{title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {/* Dashboard */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="[&>svg]:size-5">
+                  <Link
+                    to="#"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                  >
+                    <LayoutDashboard />
+                    <span className="text-base font-semibold">Dashboard</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Manage Users */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="[&>svg]:size-5">
+                  <Link
+                    to="/manage-users"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                  >
+                    <UsersRound />
+                    <span className="text-base font-semibold">
+                      Manage Users
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Manage Menu */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="[&>svg]:size-5">
+                  <Link
+                    to="/manage-menu"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                  >
+                    <Pizza />
+                    <span className="text-base font-semibold">Manage Menu</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Manage Events with sub-items */}
+              <SidebarMenuItem>
+                <Collapsible defaultOpen className="group">
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className="[&>svg]:size-5">
+                      <div className="flex items-center justify-between gap-2 rounded">
+                        {/* Left side: Icon and label */}
+                        <div className="flex items-center gap-2">
+                          <Calendar />
+                          <span className="text-base font-semibold">
+                            Manage Events
+                          </span>
+                        </div>
+                        <ChevronRight className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                      </div>
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {/* Groups sub-item */}
+                      <SidebarMenuSubItem>
+                        <Link
+                          to="/manage-groups"
+                          className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                        >
+                          <UsersRound /> {/* Change icon if needed */}
+                          <span className="text-base font-semibold">
+                            Groups
+                          </span>
+                        </Link>
+                      </SidebarMenuSubItem>
+                      {/* Events sub-item */}
+                      <SidebarMenuSubItem>
+                        <Link
+                          to="/manage-events"
+                          className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                        >
+                          <CalendarDays />
+                          <span className="text-base font-semibold">
+                            Events
+                          </span>
+                        </Link>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </Collapsible>
+              </SidebarMenuItem>
+
+              {/* Admin Chat */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="[&>svg]:size-5">
+                  <Link
+                    to="/admin-chat"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                  >
+                    <MessageCircle />
+                    <span className="text-base font-semibold">Admin Chat</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Settings */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="[&>svg]:size-5">
+                  <Link
+                    to="/settings"
+                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                  >
+                    <Settings />
+                    <span className="text-base font-semibold">Settings</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

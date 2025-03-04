@@ -163,7 +163,7 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         </div>
         <div className="mb-4">
           <span className="font-semibold">Special request:</span>
-          <div className="mt-2 border">
+          <div className="mt-2 border p-2">
             {formValues.specialRequest ?? "None"}
           </div>
         </div>

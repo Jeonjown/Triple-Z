@@ -64,7 +64,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="mt-10 rounded-md border">
+    <div className="rounded-md md:mt-10 md:border">
       <div className="flex w-full justify-between px-4 py-5">
         {/* Left side: search input and select */}
         <div className="flex space-x-3">

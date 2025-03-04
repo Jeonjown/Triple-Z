@@ -32,6 +32,7 @@ const PaymentStatusCell = ({
         title: "PAYMENT STATUS UPDATE:",
         description: `your payment status is updated to: ${newStatus}`,
         userId: reservation.userId._id,
+        read: false,
       });
     }
   };
@@ -39,7 +40,7 @@ const PaymentStatusCell = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="h-8 w-20 p-0">
+        <Button variant="outline" className="h-8 w-20 px-12">
           {reservation.paymentStatus}
         </Button>
       </DropdownMenuTrigger>
