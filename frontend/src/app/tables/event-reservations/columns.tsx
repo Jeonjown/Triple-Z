@@ -90,8 +90,16 @@ export const columns: MyColumnDef<Reservation>[] = [
     enableHiding: false,
   },
   {
+    id: "userId",
+    accessorFn: (row: Reservation) => row.userId._id,
+    header: ({ column }: { column: Column<Reservation, unknown> }) => (
+      <DataTableColumnHeader column={column} title="User Id" />
+    ),
+    meta: { title: "userId" },
+  },
+  {
     accessorKey: "_id",
-    header: "Id",
+    header: "Transaction Id",
   },
   {
     accessorKey: "createdAt",

@@ -6,7 +6,6 @@ import {
   Pizza,
   X,
   MessageCircle,
-  ChevronDown,
   ChevronRight,
   CalendarDays,
 } from "lucide-react";
@@ -33,8 +32,22 @@ import {
   CollapsibleTrigger,
 } from "./ui/collapsible";
 
+// Import Dropdown components
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+
 export function AppAdminSidebar() {
   const { open, isMobile, toggleSidebar } = useSidebar();
+  // Define collapsed state: when sidebar is not open and not on mobile.
+  const isCollapsed = !open && !isMobile;
+
   return (
     <Sidebar variant="floating" collapsible="icon" className="mt-24">
       <SidebarTrigger className="absolute -right-7 hidden md:flex" />
@@ -63,7 +76,7 @@ export function AppAdminSidebar() {
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
                     to="#"
-                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                    className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
                   >
                     <LayoutDashboard />
                     <span className="text-base font-semibold">Dashboard</span>
@@ -76,7 +89,7 @@ export function AppAdminSidebar() {
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
                     to="/manage-users"
-                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                    className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
                   >
                     <UsersRound />
                     <span className="text-base font-semibold">
@@ -91,7 +104,7 @@ export function AppAdminSidebar() {
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
                     to="/manage-menu"
-                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                    className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
                   >
                     <Pizza />
                     <span className="text-base font-semibold">Manage Menu</span>
@@ -101,50 +114,94 @@ export function AppAdminSidebar() {
 
               {/* Manage Events with sub-items */}
               <SidebarMenuItem>
-                <Collapsible defaultOpen className="group">
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="[&>svg]:size-5">
-                      <div className="flex items-center justify-between gap-2 rounded">
-                        {/* Left side: Icon and label */}
-                        <div className="flex items-center gap-2">
-                          <Calendar />
+                {isCollapsed ? (
+                  // Render dropdown when sidebar is collapsed on desktop.
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuButton className="[&>svg]:size-6">
+                        <div className="flex items-center justify-between gap-2 rounded">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="size-5" />
+                          </div>
                           <span className="text-base font-semibold">
                             Manage Events
                           </span>
                         </div>
-                        <ChevronRight className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-90" />
-                      </div>
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {/* Groups sub-item */}
-                      <SidebarMenuSubItem>
-                        <Link
-                          to="/manage-groups"
-                          className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
-                        >
-                          <UsersRound /> {/* Change icon if needed */}
+                      </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="right" align="start">
+                      <DropdownMenuLabel>Manage Events</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <Link
+                            to="/manage-groups"
+                            className="flex w-full items-center gap-2 rounded"
+                          >
+                            <UsersRound className="!size-5" />
+                            <span className="text-base font-semibold">
+                              Groups
+                            </span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Link
+                            to="/manage-events"
+                            className="flex w-full items-center gap-2 rounded"
+                          >
+                            <CalendarDays className="!size-5" />
+                            <span className="text-base font-semibold">
+                              Events
+                            </span>
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  // Render collapsible when sidebar is expanded or on mobile.
+                  <Collapsible defaultOpen className="group">
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton className="[&>svg]:size-6">
+                        <div className="flex items-center justify-between gap-2 rounded">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="size-5" />
+                          </div>
                           <span className="text-base font-semibold">
-                            Groups
+                            Manage Events
                           </span>
-                        </Link>
-                      </SidebarMenuSubItem>
-                      {/* Events sub-item */}
-                      <SidebarMenuSubItem>
-                        <Link
-                          to="/manage-events"
-                          className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
-                        >
-                          <CalendarDays />
-                          <span className="text-base font-semibold">
-                            Events
-                          </span>
-                        </Link>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </Collapsible>
+                          <ChevronRight className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                        </div>
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="ml-1">
+                      <SidebarMenuSub>
+                        <SidebarMenuSubItem>
+                          <Link
+                            to="/manage-groups"
+                            className="flex w-full items-center gap-2 rounded p-1 hover:bg-muted"
+                          >
+                            <UsersRound className="!size-5" />
+                            <span className="text-base font-semibold">
+                              Groups
+                            </span>
+                          </Link>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
+                          <Link
+                            to="/manage-events"
+                            className="flex w-full items-center gap-2 rounded p-1 hover:bg-muted"
+                          >
+                            <CalendarDays className="!size-5" />
+                            <span className="text-base font-semibold">
+                              Events
+                            </span>
+                          </Link>
+                        </SidebarMenuSubItem>
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
               </SidebarMenuItem>
 
               {/* Admin Chat */}
@@ -152,7 +209,7 @@ export function AppAdminSidebar() {
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
                     to="/admin-chat"
-                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                    className="flex w-full items-center gap-2 rounded p-2"
                   >
                     <MessageCircle />
                     <span className="text-base font-semibold">Admin Chat</span>
@@ -165,7 +222,7 @@ export function AppAdminSidebar() {
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
                     to="/settings"
-                    className="flex items-center gap-2 rounded p-2 hover:bg-gray-200"
+                    className="flex w-full items-center gap-2 rounded p-2"
                   >
                     <Settings />
                     <span className="text-base font-semibold">Settings</span>

@@ -32,6 +32,7 @@ const PaymentStatusCell = ({
         title: "PAYMENT STATUS UPDATE:",
         description: `your payment status is updated to: ${newStatus}`,
         userId: reservation.userId._id,
+        _id: "",
         read: false,
       });
     }

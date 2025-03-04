@@ -47,6 +47,7 @@ export function DataTable<TData, TValue>({
     initialState: {
       columnVisibility: {
         _id: false,
+        userId: false,
         specialRequest: false,
         createdAt: false,
       },
@@ -105,7 +106,7 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
       {/* Scrollable container for the table */}
-      <div className="max-h-[screen] overflow-y-auto">
+      <div className="max-h-screen overflow-y-auto">
         {/* Adjust max-h as needed */}
         <Table>
           <TableHeader className="">
