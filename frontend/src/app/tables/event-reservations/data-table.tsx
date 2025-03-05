@@ -94,7 +94,7 @@ export function DataTable<TData, TValue>({
               <SelectItem value="All">All</SelectItem>
               <SelectItem value="Pending">Pending</SelectItem>
               <SelectItem value="Confirmed">Confirmed</SelectItem>
-              <SelectItem value="Canceled">Canceled</SelectItem>
+              <SelectItem value="Cancelled">Cancelled</SelectItem>
               <SelectItem value="Completed">Completed</SelectItem>
             </SelectContent>
           </Select>

@@ -82,6 +82,8 @@ export const createReservation = async (
       cart,
       specialRequest,
       totalPayment,
+      subtotal: cartTotal,
+      eventFee,
     });
 
     // Save the reservation
@@ -144,11 +146,11 @@ export const updateReservationStatus = async (
 
     // Validate status against the allowed enum values
     if (
-      !["Pending", "Confirmed", "Completed", "Canceled"].includes(eventStatus)
+      !["Pending", "Confirmed", "Completed", "Cancelled"].includes(eventStatus)
     ) {
       return next(
         createError(
-          "Invalid status. Valid statuses are: Pending, Confirmed, Completed, or Canceled.",
+          "Invalid status. Valid statuses are: Pending, Confirmed, Completed, or Cancelled.",
           400
         )
       );
@@ -176,7 +178,6 @@ export const updateReservationStatus = async (
 };
 
 // update a payment status
-// Update a reservation's payment status
 export const updatePaymentStatus = async (
   req: Request,
   res: Response,

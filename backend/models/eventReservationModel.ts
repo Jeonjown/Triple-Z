@@ -30,7 +30,7 @@ const reservationSchema = new mongoose.Schema(
     cart: [cartItemSchema], // Added cart array with menu items
     eventStatus: {
       type: String,
-      enum: ["Pending", "Confirmed", "Completed", "Canceled"],
+      enum: ["Pending", "Confirmed", "Completed", "Cancelled"],
       default: "Pending",
     },
     paymentStatus: {
@@ -39,6 +39,8 @@ const reservationSchema = new mongoose.Schema(
       default: "Not Paid",
     },
     specialRequest: { type: String },
+    eventFee: { type: Number, required: true },
+    subtotal: { type: Number, required: true },
     totalPayment: { type: Number, required: true },
   },
   { timestamps: true }

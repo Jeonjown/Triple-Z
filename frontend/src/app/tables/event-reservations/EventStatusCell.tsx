@@ -40,8 +40,8 @@ const EventStatusCell = ({
         <DropdownMenuItem onClick={() => updateEventStatus("Confirmed")}>
           Confirmed
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateEventStatus("Canceled")}>
-          Canceled
+        <DropdownMenuItem onClick={() => updateEventStatus("Cancelled")}>
+          Cancelled
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => updateEventStatus("Completed")}>
           Completed
