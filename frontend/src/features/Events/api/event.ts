@@ -18,8 +18,11 @@ export interface EventReservationSettings {
   eventMinGuests: number;
   groupReservationLimit: number;
   groupMinDaysPrior: number;
-  groupMaxTables: number;
-  groupAvailableTables: number;
+  groupMaxTablesPerDay: number;
+  groupMaxGuestsPerTable: number;
+  groupMinGuestPerTable: number;
+  groupMinReservation: number;
+  groupMaxReservation: number;
   openingHours: string;
   closingHours: string;
   createdAt: string;
@@ -85,7 +88,7 @@ export const createEventReservation = async (
 };
 export const getEventReservations = async () => {
   try {
-    const response = await api.get("/api/menu/events/event-reservations");
+    const response = await api.get("/api/events/event-reservations");
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -101,7 +104,7 @@ export const updateEventReservationStatus = async (
 ) => {
   try {
     const response: AxiosResponse<string> = await api.patch(
-      `/api/menu/events/event-reservations/event-status`,
+      `/api/events/event-reservations/event-status`,
       {
         eventStatus,
         reservationId,
@@ -123,7 +126,7 @@ export const updateEventReservationPaymentStatus = async (
 ) => {
   try {
     const response: AxiosResponse<string> = await api.patch(
-      `/api/menu/events/event-reservations/payment-status`,
+      `/api/events/event-reservations/payment-status`,
       {
         paymentStatus,
         reservationId,
@@ -143,7 +146,7 @@ export const deleteEventReservation = async (reservationId: string) => {
   try {
     // Pass the reservationId in the request body under the "data" key
     const response: AxiosResponse<string> = await api.delete(
-      `/api/menu/events/event-reservations/`,
+      `/api/events/event-reservations/`,
       { data: { reservationId } },
     );
     return response.data;

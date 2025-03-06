@@ -14,7 +14,6 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { useServiceworker } from "@/notifications/hooks/useServiceWorker";
 import { UseFormReturn } from "react-hook-form";
 import { useCreateReservations } from "../../hooks/useCreateReservations";
-import { useGetReservationSettings } from "../../hooks/useGetReservationSettings";
 import { GroupFormValues } from "../../pages/GroupForm";
 
 interface CartItem {
@@ -34,7 +33,6 @@ type Step3Props = {
 
 const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   const { registerAndSubscribe } = useServiceworker();
-  const { data: settings } = useGetReservationSettings();
   const { mutate } = useCreateReservations();
   const { watch, handleSubmit, reset } = methods;
   const formValues = watch();
@@ -120,7 +118,7 @@ const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   // Calculate total price including event fee
   const calculateTotalPrice = () => {
     const cartTotal = cart.reduce((total, item) => total + item.totalPrice, 0);
-    return cartTotal + (settings?.eventFee ?? 0);
+    return cartTotal;
   };
 
   return (
@@ -157,22 +155,12 @@ const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
             </p>
           </div>
         </div>
-        <div className="mb-4">
-          <span className="font-semibold">Special request:</span>
-          <div className="mt-2 border p-2">
-            {formValues.specialRequest ?? "None"}
-          </div>
-        </div>
         {/* Preorder List */}
         <div className="mb-4">
           <span className="text-gray-600">Preorder List:</span>
-          <div className="mt-2 rounded border">{renderCartItems()}</div>
+          <div className="mt-2 rounded border p-2">{renderCartItems()}</div>
         </div>
         {/* Fees and Total */}
-        <div className="mb-4">
-          <span className="text-gray-600">Event Fee:</span>
-          <p className="font-semibold">₱{settings?.eventFee}</p>
-        </div>
         <div className="text-right text-xl font-semibold">
           Total Price: ₱{calculateTotalPrice().toFixed(2)}
         </div>

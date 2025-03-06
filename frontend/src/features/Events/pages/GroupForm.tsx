@@ -1,12 +1,16 @@
+// GroupForm.tsx
 import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import GroupStep4 from "../components/groups-form/GroupStep4";
 import GroupStep1 from "../components/groups-form/GroupStep1";
 import GroupStep2 from "../components/groups-form/GroupStep2";
 import GroupStep3 from "../components/groups-form/GroupStep3";
+import GroupStep4 from "../components/groups-form/GroupStep4";
+import { useGetReservationSettings } from "../hooks/useGetReservationSettings";
+import { SelectedItem } from "../components/groups-form/EmbeddedMenu";
 
+// Define a type for a cart item
 type CartItem = {
   _id: string;
   title: string;
@@ -15,8 +19,12 @@ type CartItem = {
   image: string;
 };
 
-// Define the Zod schema for your form values
-const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
+// Updated Zod schema generator using the new min/max reservation settings
+const getReservationSchema = (
+  minReservation: number,
+  maxReservation: number,
+  minDaysPrior: number,
+) =>
   z.object({
     fullName: z.string().nonempty("Full Name is required."),
     contactNumber: z.string().nonempty("Contact is required"),
@@ -24,8 +32,8 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
       (val) => Number(val),
       z
         .number()
-        .min(minGuests, `Party size must be at least ${minGuests}`)
-        .max(12, "Maximum party size per groups is 12 "),
+        .min(minReservation, `Party size must be at least ${minReservation}`)
+        .max(maxReservation, `Party size must be at most ${maxReservation}`),
     ),
     date: z
       .string()
@@ -51,57 +59,62 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
         image: z.string().url("Image URL must be a valid URL"),
       }),
     ),
-    specialRequest: z.string().optional(),
   });
 
-// Infer the form data type from the schema
 export type GroupFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 
-const EventForm = () => {
-  // Use settings or fallback to default values
-  const minGuests = 6;
-  const minDaysPrior = 1;
+const GroupForm = () => {
+  // Get settings from your API/hook
+  const { data: settings } = useGetReservationSettings();
 
+  // Use new group reservation settings; fallback values provided if settings not loaded yet.
+  const minReservation = settings ? settings.groupMinReservation : 1;
+  const maxReservation = settings ? settings.groupMaxReservation : 12;
+  const minDaysPrior = settings ? settings.groupMinDaysPrior : 0;
+
+  // Memoize the schema so that it updates when settings change
   const reservationSchema = useMemo(
-    () => getReservationSchema(minGuests, minDaysPrior),
-    [minGuests, minDaysPrior],
+    () => getReservationSchema(minReservation, maxReservation, minDaysPrior),
+    [minReservation, maxReservation, minDaysPrior],
   );
 
-  const [selectedPackageIds, setSelectedPackageIds] = useState<string[]>([]);
+  // State variables for additional steps/values in your multi‐step form
+  const [selectedPackageIds, setSelectedPackageIds] = useState<SelectedItem[]>(
+    [],
+  );
   const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
+
   const nextStep = () => setCurrentStep((prev) => prev + 1);
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
-  // Initialize the form with defaultValues using the current minGuests
+  // Initialize form with default values, using the new minReservation for partySize.
   const methods = useForm<GroupFormValues>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
       fullName: "Jon Stewart Doe",
       contactNumber: "6019521325",
-      partySize: minGuests, // Initial party size is minGuests
+      partySize: minReservation,
       date: "2025-03-08",
       startTime: "10:00 AM",
       endTime: "3:00 PM",
-      specialRequest: "you are my special",
       cart: [],
     },
   });
 
-  // When minGuests changes, update the form's partySize using reset
+  // Reset form when minReservation changes
   useEffect(() => {
     methods.reset({
       fullName: "Jon Stewart Doe",
       contactNumber: "6019521325",
-      partySize: minGuests, // Update partySize to new minGuests
+      partySize: minReservation,
       date: "2025-03-08",
       startTime: "10:00 AM",
       endTime: "3:00 PM",
-      specialRequest: "you are my special",
       cart: [],
     });
-  }, [methods, minGuests]);
+  }, [methods, minReservation]);
 
   const { reset } = methods;
 
@@ -135,9 +148,13 @@ const EventForm = () => {
               </h2>
             )}
 
-            {/* Progress bar and steps here... */}
             {currentStep === 1 && (
-              <GroupStep1 nextStep={nextStep} minGuests={minGuests} />
+              <GroupStep1
+                nextStep={nextStep}
+                minReservation={minReservation}
+                maxReservation={maxReservation}
+                settings={settings}
+              />
             )}
             {currentStep === 2 && (
               <GroupStep2
@@ -167,4 +184,4 @@ const EventForm = () => {
   );
 };
 
-export default EventForm;
+export default GroupForm;

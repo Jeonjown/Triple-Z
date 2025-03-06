@@ -17,7 +17,7 @@ import { useGetReservationSettings } from "@/features/Events/hooks/useGetReserva
 import HourlyTimePicker from "@/features/Events/components/events-form/HourlyTimePicker";
 import { useCreateOrUpdateSettings } from "@/features/Events/hooks/useCreateorUpdateSettings";
 
-// Define validation schema using zod
+// Updated validation schema using zod with all group fields from the Mongoose model
 const formSchema = z.object({
   eventReservationLimit: z.coerce
     .number()
@@ -29,10 +29,16 @@ const formSchema = z.object({
     .number()
     .min(0, { message: "Must be 0 or more" }),
   groupMinDaysPrior: z.coerce.number().min(0, { message: "Must be 0 or more" }),
-  groupMaxTables: z.coerce
+  groupMinReservation: z.coerce
     .number()
-    .min(0, { message: "Must be a positive number" }),
-  groupAvailableTables: z.coerce
+    .min(1, { message: "Must be at least 1" }),
+  groupMaxReservation: z.coerce
+    .number()
+    .min(1, { message: "Must be at least 1" }),
+  groupMaxTablesPerDay: z.coerce
+    .number()
+    .min(0, { message: "Must be 0 or more" }),
+  groupMaxGuestsPerTable: z.coerce
     .number()
     .min(0, { message: "Must be 0 or more" }),
   openingHours: z.string().nonempty({ message: "Required" }),
@@ -55,8 +61,10 @@ const Settings: React.FC = () => {
       eventFee: 0,
       groupReservationLimit: 0,
       groupMinDaysPrior: 0,
-      groupMaxTables: 0,
-      groupAvailableTables: 0,
+      groupMinReservation: 1,
+      groupMaxReservation: 1,
+      groupMaxTablesPerDay: 0,
+      groupMaxGuestsPerTable: 6,
       openingHours: "",
       closingHours: "",
     },
@@ -75,8 +83,10 @@ const Settings: React.FC = () => {
         eventFee: settings.eventFee ?? 0,
         groupReservationLimit: settings.groupReservationLimit ?? 0,
         groupMinDaysPrior: settings.groupMinDaysPrior ?? 0,
-        groupMaxTables: settings.groupMaxTables ?? 0,
-        groupAvailableTables: settings.groupAvailableTables ?? 0,
+        groupMinReservation: settings.groupMinReservation ?? 1,
+        groupMaxReservation: settings.groupMaxReservation ?? 1,
+        groupMaxTablesPerDay: settings.groupMaxTablesPerDay ?? 0,
+        groupMaxGuestsPerTable: settings.groupMaxGuestsPerTable ?? 6,
         openingHours: settings.openingHours
           ? formatTime(settings.openingHours)
           : "",
@@ -223,10 +233,10 @@ const Settings: React.FC = () => {
           />
           <FormField
             control={form.control}
-            name="groupMaxTables"
+            name="groupMinReservation"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Maximum Tables</FormLabel>
+                <FormLabel>Group Minimum Reservation</FormLabel>
                 <FormControl>
                   <Input type="number" {...field} />
                 </FormControl>
@@ -236,10 +246,36 @@ const Settings: React.FC = () => {
           />
           <FormField
             control={form.control}
-            name="groupAvailableTables"
+            name="groupMaxReservation"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Available Group Tables</FormLabel>
+                <FormLabel>Group Maximum Reservation</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="groupMaxTablesPerDay"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Maximum Tables Per Day</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="groupMaxGuestsPerTable"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Maximum Guests Per Table</FormLabel>
                 <FormControl>
                   <Input type="number" {...field} />
                 </FormControl>

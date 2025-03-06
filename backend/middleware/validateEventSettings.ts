@@ -15,8 +15,10 @@ export const validateEventSettings = (
     eventMinGuests,
     groupReservationLimit,
     groupMinDaysPrior,
-    groupMaxTables,
-    groupAvailableTables,
+    groupMinReservation, // new field
+    groupMaxReservation, // new field
+    groupMaxTablesPerDay,
+    groupMaxGuestsPerTable,
     openingHours,
     closingHours,
   } = req.body;
@@ -69,19 +71,44 @@ export const validateEventSettings = (
     });
   }
 
-  // Validate groupMaxTables: must be an integer ≥ 0
-  if (!validator.isInt(groupMaxTables?.toString(), { min: 0 })) {
+  // Validate groupMinReservation: must be an integer ≥ 1
+  if (!validator.isInt(groupMinReservation?.toString(), { min: 1 })) {
     errors.push({
-      field: "groupMaxTables",
-      message: "Group max tables must be 0 or more.",
+      field: "groupMinReservation",
+      message: "Group minimum reservation must be at least 1.",
     });
   }
 
-  // Validate groupAvailableTables: must be an integer ≥ 0
-  if (!validator.isInt(groupAvailableTables?.toString(), { min: 0 })) {
+  // Validate groupMaxReservation: must be an integer ≥ 1
+  if (!validator.isInt(groupMaxReservation?.toString(), { min: 1 })) {
     errors.push({
-      field: "groupAvailableTables",
-      message: "Group available tables must be 0 or more.",
+      field: "groupMaxReservation",
+      message: "Group maximum reservation must be at least 1.",
+    });
+  } else if (
+    validator.isInt(groupMinReservation?.toString(), { min: 1 }) &&
+    parseInt(groupMaxReservation) < parseInt(groupMinReservation)
+  ) {
+    errors.push({
+      field: "groupMaxReservation",
+      message:
+        "Group maximum reservation must be greater than or equal to group minimum reservation.",
+    });
+  }
+
+  // Validate groupMaxTablesPerDay: must be an integer ≥ 0
+  if (!validator.isInt(groupMaxTablesPerDay?.toString(), { min: 0 })) {
+    errors.push({
+      field: "groupMaxTablesPerDay",
+      message: "Group maximum tables per day must be 0 or more.",
+    });
+  }
+
+  // Validate groupMaxGuestsPerTable: must be an integer ≥ 0
+  if (!validator.isInt(groupMaxGuestsPerTable?.toString(), { min: 0 })) {
+    errors.push({
+      field: "groupMaxGuestsPerTable",
+      message: "Group maximum guests per table must be 0 or more.",
     });
   }
 

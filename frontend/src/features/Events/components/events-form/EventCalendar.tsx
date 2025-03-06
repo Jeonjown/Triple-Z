@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import useGetReservations from "../../hooks/useGetReservations";
 import { Calendar } from "@/components/ui/calendar";
+import useGetEventReservations from "../../hooks/useGetReservations";
 
 const EventCalendar = () => {
-  const { data, isPending, isError } = useGetReservations();
+  const { data, isPending, isError } = useGetEventReservations();
   const [reservedDates, setReservedDates] = useState<Date[] | undefined>([]);
-
   const handleSelect = (newSelected: Date[] | undefined) => {
     // Update the selected dates
     setReservedDates(newSelected);
