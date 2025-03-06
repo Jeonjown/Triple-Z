@@ -41,7 +41,6 @@ function App() {
             <AdminSidebarLayout>
               <Routes>
                 {/* Regular Routes */}
-
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/schedule" element={<Schedule />} />
@@ -50,6 +49,10 @@ function App() {
                   element={<EventForm />}
                 />
                 <Route path="/schedule/group-form" element={<GroupForm />} />
+                <Route
+                  path="/schedule/group-form/:userId"
+                  element={<GroupForm />}
+                />
                 <Route path="/menu" element={<Menu />} />
                 <Route
                   path="/menu/categories/:categoryId/subcategories/:subcategoryId"
@@ -82,9 +85,14 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/schedule" element={<Schedule />} />
+
               <Route
                 path="/schedule/event-form/:userId"
                 element={<EventForm />}
+              />
+              <Route
+                path="/schedule/group-form/:userId"
+                element={<GroupForm />}
               />
               <Route path="/schedule/group-form" element={<GroupForm />} />
               <Route path="/menu" element={<Menu />} />

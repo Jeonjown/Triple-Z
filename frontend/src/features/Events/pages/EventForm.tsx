@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import Step2 from "../components/Step2";
-import Step1 from "../components/Step1";
-import Step4 from "../components/Step4";
-import Step3 from "../components/Step3";
 import { useGetReservationSettings } from "../hooks/useGetReservationSettings";
+import EventStep1 from "../components/events-form/EventStep1";
+import EventStep2 from "../components/events-form/EventStep2";
+import EventStep3 from "../components/events-form/EventStep3";
+import EventStep4 from "../components/events-form/EventStep4";
 
 type CartItem = {
   _id: string;
@@ -142,10 +142,10 @@ const EventForm = () => {
 
             {/* Progress bar and steps here... */}
             {currentStep === 1 && (
-              <Step1 nextStep={nextStep} minGuests={minGuests} />
+              <EventStep1 nextStep={nextStep} minGuests={minGuests} />
             )}
             {currentStep === 2 && (
-              <Step2
+              <EventStep2
                 selectedPackageIds={selectedPackageIds}
                 setSelectedPackageIds={setSelectedPackageIds}
                 quantityMap={quantityMap}
@@ -157,14 +157,14 @@ const EventForm = () => {
               />
             )}
             {currentStep === 3 && (
-              <Step3
+              <EventStep3
                 prevStep={prevStep}
                 nextStep={nextStep}
                 methods={methods}
                 cart={cart}
               />
             )}
-            {currentStep === 4 && <Step4 />}
+            {currentStep === 4 && <EventStep4 />}
           </div>
         </form>
       </div>

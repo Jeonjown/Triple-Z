@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createReservation, Reservation } from "../api/event";
+import { createEventReservation, Reservation } from "../api/event";
 import { toast } from "@/hooks/use-toast";
 import { EventFormValues } from "../pages/EventForm";
 import { useParams } from "react-router-dom";
@@ -16,7 +16,7 @@ export const useCreateReservations = () => {
       if (!userId) {
         throw new Error("User ID is required");
       }
-      return createReservation(values, userId);
+      return createEventReservation(values, userId);
     },
     onError: (err: Error) => {
       console.error("Error creating reservation:", err);

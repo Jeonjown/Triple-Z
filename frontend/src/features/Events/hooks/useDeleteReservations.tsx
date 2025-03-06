@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { deleteReservation } from "../api/event";
+import { deleteEventReservation } from "../api/event";
 
 // Custom hook to delete a reservation
 export const useDeleteReservations = () => {
@@ -13,7 +13,8 @@ export const useDeleteReservations = () => {
     string // Input type (reservationId)
   >({
     // mutationFn takes a reservationId and calls the API delete function
-    mutationFn: (reservationId: string) => deleteReservation(reservationId),
+    mutationFn: (reservationId: string) =>
+      deleteEventReservation(reservationId),
     // onSuccess: Invalidate the reservations query so data refreshes, and show a success toast
     onSuccess: (data: string) => {
       console.log("Reservation deleted successfully:", data);

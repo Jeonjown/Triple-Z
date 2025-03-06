@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useGetReservations from "../hooks/useGetReservations";
+import useGetReservations from "../../hooks/useGetReservations";
 import { Calendar } from "@/components/ui/calendar";
 
 const EventCalendar = () => {

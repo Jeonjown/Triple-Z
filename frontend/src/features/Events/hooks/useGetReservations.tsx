@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import { getEventReservations } from "../api/event";
 
-import { getReservations } from "../api/event";
-
-const useGetReservations = () => {
+const useGetEventReservations = () => {
   const { data, isPending, isError, error } = useQuery({
-    queryFn: getReservations,
+    queryFn: getEventReservations,
     queryKey: ["eventReservations"],
     retry: 1,
   });
@@ -12,4 +11,4 @@ const useGetReservations = () => {
   return { data, isPending, isError, error };
 };
 
-export default useGetReservations;
+export default useGetEventReservations;

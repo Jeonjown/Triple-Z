@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useCallback, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
-import { EventFormValues } from "../pages/EventForm";
+import { EventFormValues } from "../../pages/EventForm";
 
 type CartItem = {
   _id: string;
@@ -28,7 +28,7 @@ type Step2Props = {
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
 };
 
-const Step2 = ({
+const EventStep2 = ({
   selectedPackageIds,
   setSelectedPackageIds,
   quantityMap,
@@ -215,4 +215,4 @@ const Step2 = ({
   );
 };
 
-export default Step2;
+export default EventStep2;

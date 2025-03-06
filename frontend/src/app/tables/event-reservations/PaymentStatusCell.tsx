@@ -6,7 +6,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useUpdateReservationPaymentStatus } from "@/features/Events/hooks/useUpdateReservationsPaymentStatus";
+import { useUpdateEventReservationPaymentStatus } from "@/features/Events/hooks/useUpdateReservationsPaymentStatus";
 import { Reservation } from "./columns"; // Adjust the path as needed
 import { useSendNotificationToUser } from "@/notifications/hooks/useSendNotificationToUser";
 
@@ -17,7 +17,7 @@ const PaymentStatusCell = ({
   reservation: Reservation;
 }): JSX.Element => {
   // Call the hook inside the component
-  const { mutate } = useUpdateReservationPaymentStatus();
+  const { mutate } = useUpdateEventReservationPaymentStatus();
   const { mutate: sendNotification } = useSendNotificationToUser();
 
   // Update payment status by calling mutate with reservation id and new status

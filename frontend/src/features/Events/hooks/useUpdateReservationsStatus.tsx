@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateReservationStatus } from "../api/event";
+import { updateEventReservationStatus } from "../api/event";
 import { toast } from "@/hooks/use-toast";
 
 // Define an interface for the update status input
@@ -23,7 +23,7 @@ export const useUpdateReservationStatus = () => {
       eventStatus,
     }: UpdateReservationStatusArgs) => {
       // Call the API function with eventStatus first, then reservationId
-      return updateReservationStatus(eventStatus, reservationId);
+      return updateEventReservationStatus(eventStatus, reservationId);
     },
     onError: (err) => {
       console.error("Error updating reservation:", err);

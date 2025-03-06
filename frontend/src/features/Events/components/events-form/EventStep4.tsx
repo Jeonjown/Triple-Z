@@ -2,7 +2,7 @@ import { CircleCheckBig } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Step 4: Final Thank You Screen
-const Step4 = () => (
+const EventStep4 = () => (
   <>
     <div className="mt-5 flex justify-center">
       <CircleCheckBig className="!size-40 text-green-400" />
@@ -38,4 +38,4 @@ const Step4 = () => (
   </>
 );
 
-export default Step4;
+export default EventStep4;

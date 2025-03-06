@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { EventFormValues } from "../pages/EventForm";
+import { EventFormValues } from "../../pages/EventForm";
 import { useFormContext } from "react-hook-form";
 import ScrollToTop from "@/components/ScrollToTop";
 import HourlyTimePicker from "./HourlyTimePicker";
@@ -11,7 +11,7 @@ type Step1Props = {
   minGuests: number;
 };
 
-const Step1 = ({ nextStep, minGuests }: Step1Props) => {
+const EventStep1 = ({ nextStep, minGuests }: Step1Props) => {
   const {
     setValue,
     register,
@@ -157,4 +157,4 @@ const Step1 = ({ nextStep, minGuests }: Step1Props) => {
   );
 };
 
-export default Step1;
+export default EventStep1;

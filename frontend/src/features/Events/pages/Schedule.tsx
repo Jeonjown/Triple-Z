@@ -62,9 +62,11 @@ const Schedule = () => {
               </ul>
             </CardContent>
             <CardFooter className="mt-auto flex justify-center">
-              <Button variant={"outline"} className="w-full">
-                Select
-              </Button>
+              <Link to={`/schedule/group-form/${user._id}`} className="w-full">
+                <Button variant={"outline"} className="w-full">
+                  Select
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
 

@@ -60,7 +60,7 @@ interface ReservationError {
   error: string;
 }
 
-export const createReservation = async (
+export const createEventReservation = async (
   eventFormValues: EventFormValues,
   userId: string,
 ): Promise<Reservation> => {
@@ -82,7 +82,7 @@ export const createReservation = async (
     throw new Error("An unexpected error occurred");
   }
 };
-export const getReservations = async () => {
+export const getEventReservations = async () => {
   try {
     const response = await api.get("/api/menu/events/reservations");
     return response.data;
@@ -94,7 +94,7 @@ export const getReservations = async () => {
   }
 };
 
-export const updateReservationStatus = async (
+export const updateEventReservationStatus = async (
   eventStatus: string,
   reservationId: string,
 ) => {
@@ -116,7 +116,7 @@ export const updateReservationStatus = async (
   }
 };
 
-export const updateReservationPaymentStatus = async (
+export const updateEventReservationPaymentStatus = async (
   paymentStatus: string,
   reservationId: string,
 ) => {
@@ -138,7 +138,7 @@ export const updateReservationPaymentStatus = async (
   }
 };
 
-export const deleteReservation = async (reservationId: string) => {
+export const deleteEventReservation = async (reservationId: string) => {
   try {
     // Pass the reservationId in the request body under the "data" key
     const response: AxiosResponse<string> = await api.delete(

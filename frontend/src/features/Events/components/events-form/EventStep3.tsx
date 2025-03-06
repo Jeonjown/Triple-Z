@@ -11,10 +11,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { UseFormReturn } from "react-hook-form";
-import { EventFormValues } from "../pages/EventForm";
+import { EventFormValues } from "../../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
-import { useCreateReservations } from "../hooks/useCreateReservations";
-import { useGetReservationSettings } from "../hooks/useGetReservationSettings";
+import { useCreateReservations } from "../../hooks/useCreateReservations";
+import { useGetReservationSettings } from "../../hooks/useGetReservationSettings";
 import { useServiceworker } from "@/notifications/hooks/useServiceWorker";
 
 interface CartItem {
@@ -32,7 +32,7 @@ type Step3Props = {
   cart: CartItem[];
 };
 
-const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
+const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   const { registerAndSubscribe } = useServiceworker();
   const { data: settings } = useGetReservationSettings();
   const { mutate } = useCreateReservations();
@@ -229,4 +229,4 @@ const Step3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   );
 };
 
-export default Step3;
+export default EventStep3;

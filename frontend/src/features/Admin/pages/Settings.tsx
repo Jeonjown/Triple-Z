@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useGetReservationSettings } from "@/features/Events/hooks/useGetReservationSettings";
-import HourlyTimePicker from "@/features/Events/components/HourlyTimePicker";
+import HourlyTimePicker from "@/features/Events/components/events-form/HourlyTimePicker";
 import { useCreateOrUpdateSettings } from "@/features/Events/hooks/useCreateorUpdateSettings";
 
 // Define validation schema using zod

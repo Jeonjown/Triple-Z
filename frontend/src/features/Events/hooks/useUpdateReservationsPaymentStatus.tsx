@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { updateReservationPaymentStatus } from "../api/event";
+import { updateEventReservationPaymentStatus } from "../api/event";
 
 // Define an interface for the update payment status input
 interface UpdateReservationStatusArgs {
@@ -8,7 +8,7 @@ interface UpdateReservationStatusArgs {
   paymentStatus: string;
 }
 
-export const useUpdateReservationPaymentStatus = () => {
+export const useUpdateEventReservationPaymentStatus = () => {
   const queryClient = useQueryClient();
 
   // Define the mutation with correct generics: <TData, TError, TVariables>
@@ -22,7 +22,7 @@ export const useUpdateReservationPaymentStatus = () => {
       paymentStatus,
     }: UpdateReservationStatusArgs) => {
       // Call the API function with paymentStatus first, then reservationId
-      return updateReservationPaymentStatus(paymentStatus, reservationId);
+      return updateEventReservationPaymentStatus(paymentStatus, reservationId);
     },
     onError: (err: Error) => {
       console.error("Error updating payment status:", err);
