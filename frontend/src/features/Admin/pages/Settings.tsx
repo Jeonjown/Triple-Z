@@ -21,16 +21,22 @@ import { useCreateOrUpdateSettings } from "@/features/Events/hooks/useCreateorUp
 const formSchema = z.object({
   eventReservationLimit: z.coerce
     .number()
-    .min(0, { message: "Must be at least 1" }),
-  minDaysPrior: z.coerce.number().min(0, { message: "Must be 0 or more" }),
-  minGuests: z.coerce.number().min(1, { message: "Must be at least 1" }),
+    .min(0, { message: "Must be at least 0" }),
+  eventMinDaysPrior: z.coerce.number().min(0, { message: "Must be 0 or more" }),
+  eventMinGuests: z.coerce.number().min(1, { message: "Must be at least 1" }),
+  eventFee: z.coerce.number().min(0, { message: "Must be a positive fee" }),
   groupReservationLimit: z.coerce
     .number()
     .min(0, { message: "Must be 0 or more" }),
-  maxTables: z.coerce.number().min(0, { message: "Must be a positive number" }),
+  groupMinDaysPrior: z.coerce.number().min(0, { message: "Must be 0 or more" }),
+  groupMaxTables: z.coerce
+    .number()
+    .min(0, { message: "Must be a positive number" }),
+  groupAvailableTables: z.coerce
+    .number()
+    .min(0, { message: "Must be 0 or more" }),
   openingHours: z.string().nonempty({ message: "Required" }),
   closingHours: z.string().nonempty({ message: "Required" }),
-  eventFee: z.coerce.number().min(0, { message: "Must be a positive fee" }),
 });
 
 // Infer TypeScript type from schema
@@ -44,13 +50,15 @@ const Settings: React.FC = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       eventReservationLimit: 0,
-      minDaysPrior: 0,
-      minGuests: 1,
+      eventMinDaysPrior: 0,
+      eventMinGuests: 1,
+      eventFee: 0,
       groupReservationLimit: 0,
-      maxTables: 0,
+      groupMinDaysPrior: 0,
+      groupMaxTables: 0,
+      groupAvailableTables: 0,
       openingHours: "",
       closingHours: "",
-      eventFee: 0,
     },
   });
 
@@ -62,17 +70,19 @@ const Settings: React.FC = () => {
     if (settings) {
       form.reset({
         eventReservationLimit: settings.eventReservationLimit ?? 0,
-        minDaysPrior: settings.minDaysPrior ?? 0,
-        minGuests: settings.minGuests ?? 1,
+        eventMinDaysPrior: settings.eventMinDaysPrior ?? 0,
+        eventMinGuests: settings.eventMinGuests ?? 1,
+        eventFee: settings.eventFee ?? 0,
         groupReservationLimit: settings.groupReservationLimit ?? 0,
-        maxTables: settings.maxTables ?? 1,
+        groupMinDaysPrior: settings.groupMinDaysPrior ?? 0,
+        groupMaxTables: settings.groupMaxTables ?? 0,
+        groupAvailableTables: settings.groupAvailableTables ?? 0,
         openingHours: settings.openingHours
           ? formatTime(settings.openingHours)
           : "",
         closingHours: settings.closingHours
           ? formatTime(settings.closingHours)
           : "",
-        eventFee: settings.eventFee ?? 0,
       });
     }
   }, [settings, form]);
@@ -123,7 +133,7 @@ const Settings: React.FC = () => {
             />
           </div>
 
-          {/* Explicitly defined form fields */}
+          {/* Event Reservation Settings */}
           <h2 className="mb-6 text-xl font-bold">Event Reservation Settings</h2>
           <FormField
             control={form.control}
@@ -140,7 +150,7 @@ const Settings: React.FC = () => {
           />
           <FormField
             control={form.control}
-            name="minDaysPrior"
+            name="eventMinDaysPrior"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Minimum Days Prior The Event</FormLabel>
@@ -153,7 +163,7 @@ const Settings: React.FC = () => {
           />
           <FormField
             control={form.control}
-            name="minGuests"
+            name="eventMinGuests"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Minimum Guests</FormLabel>
@@ -164,7 +174,6 @@ const Settings: React.FC = () => {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="eventFee"
@@ -172,13 +181,10 @@ const Settings: React.FC = () => {
               <FormItem>
                 <FormLabel>Event Fee</FormLabel>
                 <FormControl>
-                  {/* Relative container for positioning the peso sign */}
                   <div className="relative">
-                    {/* Peso sign positioned on the left */}
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                       ₱
                     </span>
-                    {/* Add left padding so the text doesn't overlap with the peso sign */}
                     <Input type="number" {...field} className="pl-6" />
                   </div>
                 </FormControl>
@@ -186,10 +192,38 @@ const Settings: React.FC = () => {
               </FormItem>
             )}
           />
+
+          {/* Group Reservation Settings */}
           <h2 className="mb-6 text-xl font-bold">Group Reservation Settings</h2>
           <FormField
             control={form.control}
-            name="maxTables"
+            name="groupReservationLimit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Group Reservation Daily Limit</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="groupMinDaysPrior"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Group Minimum Days Prior</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="groupMaxTables"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Maximum Tables</FormLabel>
@@ -202,10 +236,10 @@ const Settings: React.FC = () => {
           />
           <FormField
             control={form.control}
-            name="groupReservationLimit"
+            name="groupAvailableTables"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Group Reservation Daily Limit</FormLabel>
+                <FormLabel>Available Group Tables</FormLabel>
                 <FormControl>
                   <Input type="number" {...field} />
                 </FormControl>

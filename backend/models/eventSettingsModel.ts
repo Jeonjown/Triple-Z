@@ -4,13 +4,17 @@ import { reservationDB } from "../db";
 const eventSettingsSchema = new mongoose.Schema(
   {
     eventReservationLimit: { type: Number, required: true },
-    minDaysPrior: { type: Number, required: true, min: 0 },
-    minGuests: { type: Number, required: true, min: 0 },
+    eventMinDaysPrior: { type: Number, required: true, min: 0 },
+    eventFee: { type: Number, required: true },
+    eventMinGuests: { type: Number, required: true, min: 0 },
+
     groupReservationLimit: { type: Number, required: true },
-    maxTables: { type: Number, min: 0 },
+    groupMinDaysPrior: { type: Number, required: true, min: 0 },
+    groupMaxTables: { type: Number, min: 0 },
+    groupAvailableTables: { type: Number, min: 0 },
+
     openingHours: { type: String, required: true },
     closingHours: { type: String, required: true },
-    eventFee: { type: Number, required: true },
   },
   { timestamps: true }
 );

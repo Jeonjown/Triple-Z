@@ -21,6 +21,7 @@ import messageRoutes from "./routes/messageRoutes";
 
 import http from "http";
 import { initSocket } from "./socket/socket";
+import groupReservationRoutes from "./routes/groupReservationRoutes";
 
 const server = express();
 
@@ -46,8 +47,9 @@ server.use("/api/menu", menuRoutes);
 server.use("/api/menu/menu-items", menuItemRoutes);
 server.use("/api/menu/categories", categoryRoutes);
 server.use("/api/menu/categories", subcategoryRoutes);
-server.use("/api/menu/events/reservations", eventReservationRoutes);
-server.use("/api/menu/events/settings", eventSettingsRoutes);
+server.use("/api/menu/events/event-reservations", eventReservationRoutes);
+server.use("/api/menu/events/group-reservations", groupReservationRoutes);
+server.use("/api/events/settings", eventSettingsRoutes);
 server.use("/api/subscriptions", subscriptionRoutes);
 server.use("/api/notifications", notificationRoutes);
 server.use("/api/messages", messageRoutes);

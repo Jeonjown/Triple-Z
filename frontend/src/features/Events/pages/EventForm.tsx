@@ -60,10 +60,11 @@ export type EventFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 
 const EventForm = () => {
   const { data: settings } = useGetReservationSettings();
+  console.log(settings);
 
   // Use settings or fallback to default values
-  const minGuests = settings?.minGuests || defaultMinGuests;
-  const minDaysPrior = settings?.minDaysPrior || defaultMinDaysPrior;
+  const minGuests = settings?.eventMinGuests || defaultMinGuests;
+  const minDaysPrior = settings?.eventMinDaysPrior || defaultMinDaysPrior;
 
   const reservationSchema = useMemo(
     () => getReservationSchema(minGuests, minDaysPrior),

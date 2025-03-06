@@ -12,23 +12,24 @@ const api = axios.create({
 export interface EventReservationSettings {
   _id: string;
   __v: number;
+  eventReservationLimit: number;
+  eventMinDaysPrior: number;
+  eventFee: number;
+  eventMinGuests: number;
+  groupReservationLimit: number;
+  groupMinDaysPrior: number;
+  groupMaxTables: number;
+  groupAvailableTables: number;
+  openingHours: string;
   closingHours: string;
   createdAt: string;
-  eventReservationLimit: number;
-  groupReservationLimit: number;
-  minDaysPrior: number;
-  minGuests: number;
-  maxTables: number;
-  openingHours: string;
   updatedAt: string;
-  eventFee: number;
 }
 
 interface EventReservationSettingsResponse {
   success: boolean;
   data: EventReservationSettings;
 }
-
 interface UserReservation {
   _id: string;
   username: string;
@@ -67,7 +68,7 @@ export const createEventReservation = async (
   try {
     console.log("from request:", eventFormValues);
     const response: AxiosResponse<Reservation> = await api.post(
-      `/api/menu/events/reservations/${userId}`,
+      `/api/menu/events/event-reservations/${userId}`,
       eventFormValues,
     );
     return response.data;
@@ -84,7 +85,7 @@ export const createEventReservation = async (
 };
 export const getEventReservations = async () => {
   try {
-    const response = await api.get("/api/menu/events/reservations");
+    const response = await api.get("/api/menu/events/event-reservations");
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -100,7 +101,7 @@ export const updateEventReservationStatus = async (
 ) => {
   try {
     const response: AxiosResponse<string> = await api.patch(
-      `/api/menu/events/reservations/event-status`,
+      `/api/menu/events/event-reservations/event-status`,
       {
         eventStatus,
         reservationId,
@@ -122,7 +123,7 @@ export const updateEventReservationPaymentStatus = async (
 ) => {
   try {
     const response: AxiosResponse<string> = await api.patch(
-      `/api/menu/events/reservations/payment-status`,
+      `/api/menu/events/event-reservations/payment-status`,
       {
         paymentStatus,
         reservationId,
@@ -142,7 +143,7 @@ export const deleteEventReservation = async (reservationId: string) => {
   try {
     // Pass the reservationId in the request body under the "data" key
     const response: AxiosResponse<string> = await api.delete(
-      `/api/menu/events/reservations/`,
+      `/api/menu/events/event-reservations/`,
       { data: { reservationId } },
     );
     return response.data;
@@ -160,7 +161,7 @@ export const getEventReservationSettings =
   async (): Promise<EventReservationSettings> => {
     try {
       const response: AxiosResponse<EventReservationSettingsResponse> =
-        await api.get(`/api/menu/events/settings`);
+        await api.get(`/api/events/settings`);
 
       return response.data.data; // ✅ Ensure we return the nested 'data' object
     } catch (error) {
@@ -179,7 +180,7 @@ export const createOrUpdateEventSettings = async (
   try {
     // Use POST (or PUT) to send the settings data to your endpoint
     const response: AxiosResponse<EventReservationSettingsResponse> =
-      await api.post(`/api/menu/events/settings`, settings);
+      await api.post(`/api/events/settings`, settings);
 
     // Return the nested data property from the response
     return response.data.data;

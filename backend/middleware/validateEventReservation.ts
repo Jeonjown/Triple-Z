@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import { EventReservation } from "../models/eventReservationModel";
 import { EventSettings } from "../models/eventSettingsModel";
+import { createError } from "../utils/createError";
 
 /**
  * Middleware to validate an event reservation request.
  * - Checks if a reservation date is provided.
- * - Retrieves event settings to determine the minimum days in advance (minDaysPrior)
+ * - Retrieves event settings to determine the minimum days in advance (eventMinDaysPrior)
  *   and maximum allowed reservations per month (eventReservationLimit).
- * - Validates that the reservation date is at least minDaysPrior days ahead.
+ * - Validates that the reservation date is at least eventMinDaysPrior days ahead.
  * - Ensures that the monthly reservations count is below eventReservationLimit.
  * - Prevents duplicate reservations on the same date.
  */
@@ -20,11 +21,7 @@ export const validateEventReservation = async (
     // 1. Ensure a reservation date is provided.
     const { date } = req.body;
     if (!date) {
-      res.status(400).json({
-        success: false,
-        message: "Reservation date is required.",
-      });
-      return;
+      return next(createError("Reservation date is required.", 400));
     }
 
     // 2. Convert the provided date to a Date object.
@@ -34,26 +31,23 @@ export const validateEventReservation = async (
     // 3. Retrieve event settings.
     const settings = await EventSettings.findOne();
     if (!settings) {
-      res.status(500).json({
-        success: false,
-        message: "Event settings not configured.",
-      });
-      return;
+      return next(createError("Event settings not configured.", 500));
     }
 
-    // 4. Calculate the minimum valid date using settings.minDaysPrior.
+    // 4. Calculate the minimum valid date using settings.eventMinDaysPrior.
     const minValidDate = new Date(now);
-    minValidDate.setDate(now.getDate() + settings.minDaysPrior);
+    minValidDate.setDate(now.getDate() + settings.eventMinDaysPrior);
 
     if (reservationDate < minValidDate) {
-      res.status(400).json({
-        success: false,
-        message: `Reservations must be made at least ${settings.minDaysPrior} days in advance.`,
-      });
-      return;
+      return next(
+        createError(
+          `Reservations must be made at least ${settings.eventMinDaysPrior} days in advance.`,
+          400
+        )
+      );
     }
 
-    // 5. Calculate start and end of the month for the reservation date.
+    // 5. Calculate the start and end of the month for the reservation date.
     const startOfMonth = new Date(
       reservationDate.getFullYear(),
       reservationDate.getMonth(),
@@ -75,11 +69,12 @@ export const validateEventReservation = async (
     });
 
     if (reservationsCount >= settings.eventReservationLimit) {
-      res.status(400).json({
-        success: false,
-        message: `Only ${settings.eventReservationLimit} reservations are allowed per month.`,
-      });
-      return;
+      return next(
+        createError(
+          `Only ${settings.eventReservationLimit} reservations are allowed per month.`,
+          400
+        )
+      );
     }
 
     // 7. Check for an existing reservation on the exact same date.
@@ -87,16 +82,12 @@ export const validateEventReservation = async (
       date: reservationDate,
     });
     if (existingReservation) {
-      res.status(400).json({
-        success: false,
-        message: "This date has already been reserved.",
-      });
-      return;
+      return next(createError("This date has already been reserved.", 400));
     }
 
     // 8. If all validations pass, move to the next middleware/controller.
     next();
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    next(createError(error.message || "Internal Server Error", 500));
   }
 };
