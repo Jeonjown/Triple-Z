@@ -6,32 +6,29 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { Reservation } from "./columns"; // Adjust the path as needed
+import { GroupReservation } from "@/features/Events/api/group";
+import { useUpdateGroupReservationPaymentStatus } from "@/features/Events/hooks/useUpdateGroupReservationPaymentStatus";
 import { useSendNotificationToUser } from "@/notifications/hooks/useSendNotificationToUser";
-import { useUpdateEventReservationPaymentStatus } from "@/features/Events/hooks/useUpdateEventReservationsPaymentStatus";
 
-// Component for updating payment status via a dropdown
 const PaymentStatusCell = ({
   reservation,
 }: {
-  reservation: Reservation;
+  reservation: GroupReservation;
 }): JSX.Element => {
-  // Call the hook inside the component
-  const { mutate } = useUpdateEventReservationPaymentStatus();
+  const { mutate } = useUpdateGroupReservationPaymentStatus();
   const { mutate: sendNotification } = useSendNotificationToUser();
 
-  // Update payment status by calling mutate with reservation id and new status
   const updatePaymentStatus = (newStatus: string) => {
     mutate({
       reservationId: reservation._id,
       paymentStatus: newStatus,
     });
 
+    // Fixed: use userId instead of user
     if (reservation.userId._id) {
       sendNotification({
         title: "PAYMENT STATUS UPDATE:",
-        description: `your payment status is updated to: ${newStatus}`,
+        description: `Your payment status has been updated to: ${newStatus}`,
         userId: reservation.userId._id,
         _id: "",
         read: false,

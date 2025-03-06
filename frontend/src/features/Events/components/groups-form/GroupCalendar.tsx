@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import useGetReservations from "../../hooks/useGetReservations";
 import { Calendar } from "@/components/ui/calendar";
+import useGetGroupReservations from "../../hooks/useGetGroupReservations";
 
 const GroupCalendar = () => {
-  const { data, isPending, isError } = useGetReservations();
+  const { data, isPending, isError } = useGetGroupReservations();
   const [reservedDates, setReservedDates] = useState<Date[] | undefined>([]);
 
   const handleSelect = (newSelected: Date[] | undefined) => {
@@ -11,6 +11,7 @@ const GroupCalendar = () => {
     setReservedDates(newSelected);
   };
 
+  console.log(data);
   // Update reservedDates when data changes
   useEffect(() => {
     if (data && data.reservations) {

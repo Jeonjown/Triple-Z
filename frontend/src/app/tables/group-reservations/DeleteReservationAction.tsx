@@ -10,7 +10,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { useDeleteEventReservations } from "@/features/Events/hooks/useDeleteEventReservations";
+
+import { useDeleteGroupReservation } from "@/features/Events/hooks/useDeleteGroupReservation";
 
 interface DeleteReservationActionProps {
   reservationId: string;
@@ -20,7 +21,7 @@ const DeleteReservationAction = ({
   reservationId,
 }: DeleteReservationActionProps): JSX.Element => {
   // Use the hook inside the component
-  const { mutate } = useDeleteEventReservations();
+  const { mutate } = useDeleteGroupReservation();
 
   // Delete handler using the hook's mutate function
   const handleDelete = () => {

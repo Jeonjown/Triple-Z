@@ -13,9 +13,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useGetReservationSettings } from "@/features/Events/hooks/useGetReservationSettings";
 import HourlyTimePicker from "@/features/Events/components/events-form/HourlyTimePicker";
 import { useCreateOrUpdateSettings } from "@/features/Events/hooks/useCreateorUpdateSettings";
+import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 
 // Updated validation schema using zod with all group fields from the Mongoose model
 const formSchema = z.object({
@@ -50,7 +50,7 @@ type SettingsFormValues = z.infer<typeof formSchema>;
 
 const Settings: React.FC = () => {
   const { mutate } = useCreateOrUpdateSettings();
-  const { data: settings } = useGetReservationSettings();
+  const { data: settings } = useGetEventReservationSettings();
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),

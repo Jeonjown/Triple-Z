@@ -8,7 +8,7 @@ interface UpdateReservationStatusArgs {
   eventStatus: string;
 }
 
-export const useUpdateReservationStatus = () => {
+export const useUpdateEventReservationStatus = () => {
   const queryClient = useQueryClient();
 
   // Use a specific type for the mutation input

@@ -1,4 +1,4 @@
-import useGetReservations from "@/features/Events/hooks/useGetReservations";
+import useGetReservations from "@/features/Events/hooks/useGetEventReservations";
 import LoadingPage from "@/pages/LoadingPage";
 import { columns, Reservation } from "./columns";
 import { DataTable } from "./data-table";

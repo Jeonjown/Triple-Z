@@ -13,8 +13,9 @@ import {
 import ScrollToTop from "@/components/ScrollToTop";
 import { useServiceworker } from "@/notifications/hooks/useServiceWorker";
 import { UseFormReturn } from "react-hook-form";
-import { useCreateReservations } from "../../hooks/useCreateReservations";
+
 import { GroupFormValues } from "../../pages/GroupForm";
+import { useCreateGroupReservation } from "../../hooks/useCreateGroupReservation";
 
 interface CartItem {
   _id: string;
@@ -33,7 +34,7 @@ type Step3Props = {
 
 const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   const { registerAndSubscribe } = useServiceworker();
-  const { mutate } = useCreateReservations();
+  const { mutate } = useCreateGroupReservation();
   const { watch, handleSubmit, reset } = methods;
   const formValues = watch();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -49,6 +50,7 @@ const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
 
   // Submit form and process mutation
   const onSubmit = (data: GroupFormValues) => {
+    console.log(data);
     mutate(data, {
       onSuccess: () => {
         nextStep(); // Advance only after success
@@ -62,6 +64,7 @@ const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
 
   // Trigger form submission
   const handleCheckout = () => {
+    console.log("clicked");
     handleSubmit(onSubmit)();
   };
 

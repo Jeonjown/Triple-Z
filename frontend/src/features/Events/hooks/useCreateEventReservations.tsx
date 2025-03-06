@@ -4,7 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import { EventFormValues } from "../pages/EventForm";
 import { useParams } from "react-router-dom";
 
-export const useCreateReservations = () => {
+export const useCreateEventReservations = () => {
   const queryClient = useQueryClient();
   const { userId } = useParams();
   const { mutate, isPending, isError, error } = useMutation<

@@ -42,7 +42,6 @@ const GroupStep2 = ({
     setValue,
   } = useFormContext<EventFormValues>();
   const { data } = useFetchAllMenuItems();
-  console.log(data);
 
   // Update the cart whenever data, selected items, or quantities change.
   const updateCart = useCallback(() => {

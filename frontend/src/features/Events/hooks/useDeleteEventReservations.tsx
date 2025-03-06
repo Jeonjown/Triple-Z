@@ -3,7 +3,7 @@ import { toast } from "@/hooks/use-toast";
 import { deleteEventReservation } from "../api/event";
 
 // Custom hook to delete a reservation
-export const useDeleteReservations = () => {
+export const useDeleteEventReservations = () => {
   const queryClient = useQueryClient();
 
   // Define the mutation: TData is string (returned message), TError is Error, TVariables is string (reservationId)

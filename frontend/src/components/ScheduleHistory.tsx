@@ -1,5 +1,5 @@
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
-import useGetReservations from "@/features/Events/hooks/useGetReservations";
+import useGetReservations from "@/features/Events/hooks/useGetEventReservations";
 import { format } from "date-fns";
 import { Copy } from "lucide-react";
 import {

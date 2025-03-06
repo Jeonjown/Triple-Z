@@ -13,8 +13,8 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { EventFormValues } from "../../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
-import { useCreateReservations } from "../../hooks/useCreateReservations";
-import { useGetReservationSettings } from "../../hooks/useGetReservationSettings";
+import { useCreateEventReservations } from "../../hooks/useCreateEventReservations";
+import { useGetEventReservationSettings } from "../../hooks/useGetEventReservationSettings";
 import { useServiceworker } from "@/notifications/hooks/useServiceWorker";
 
 interface CartItem {
@@ -34,8 +34,8 @@ type Step3Props = {
 
 const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   const { registerAndSubscribe } = useServiceworker();
-  const { data: settings } = useGetReservationSettings();
-  const { mutate } = useCreateReservations();
+  const { data: settings } = useGetEventReservationSettings();
+  const { mutate } = useCreateEventReservations();
   const { watch, handleSubmit, reset } = methods;
   const formValues = watch();
   const [dialogOpen, setDialogOpen] = useState(false);

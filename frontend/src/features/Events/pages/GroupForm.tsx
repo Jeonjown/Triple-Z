@@ -7,8 +7,8 @@ import GroupStep1 from "../components/groups-form/GroupStep1";
 import GroupStep2 from "../components/groups-form/GroupStep2";
 import GroupStep3 from "../components/groups-form/GroupStep3";
 import GroupStep4 from "../components/groups-form/GroupStep4";
-import { useGetReservationSettings } from "../hooks/useGetReservationSettings";
 import { SelectedItem } from "../components/groups-form/EmbeddedMenu";
+import { useGetEventReservationSettings } from "../hooks/useGetEventReservationSettings";
 
 // Define a type for a cart item
 type CartItem = {
@@ -49,7 +49,6 @@ const getReservationSchema = (
       ),
     startTime: z.string().nonempty("Start Time is required"),
     endTime: z.string().nonempty("End Time is required"),
-    eventType: z.string(),
     cart: z.array(
       z.object({
         _id: z.string(),
@@ -65,7 +64,7 @@ export type GroupFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 
 const GroupForm = () => {
   // Get settings from your API/hook
-  const { data: settings } = useGetReservationSettings();
+  const { data: settings } = useGetEventReservationSettings();
 
   // Use new group reservation settings; fallback values provided if settings not loaded yet.
   const minReservation = settings ? settings.groupMinReservation : 1;

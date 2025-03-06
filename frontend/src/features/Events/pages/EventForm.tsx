@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useGetReservationSettings } from "../hooks/useGetReservationSettings";
+import { useGetEventReservationSettings } from "../hooks/useGetEventReservationSettings";
 import EventStep1 from "../components/events-form/EventStep1";
 import EventStep2 from "../components/events-form/EventStep2";
 import EventStep3 from "../components/events-form/EventStep3";
@@ -59,7 +59,7 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
 export type EventFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 
 const EventForm = () => {
-  const { data: settings } = useGetReservationSettings();
+  const { data: settings } = useGetEventReservationSettings();
   console.log(settings);
 
   // Use settings or fallback to default values

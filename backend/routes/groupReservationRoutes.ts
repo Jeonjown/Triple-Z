@@ -1,7 +1,30 @@
+// groupReservationRoutes.ts
 import { Router } from "express";
+import {
+  createGroupReservation,
+  deleteGroupReservation,
+  getGroupReservations,
+  updateGroupReservationStatus,
+  updateGroupPaymentStatus,
+} from "../controllers/groupReservationController";
+import { verifyAdminToken } from "../middleware/verifyAdminToken";
+import { verifyToken } from "../middleware/verifyToken";
 
 const router = Router();
 
-router.get("/available-tables");
+// Get all group reservations
+router.get("/", getGroupReservations);
+
+// Create a new group reservation (userId in URL)
+router.post("/:userId", verifyToken, createGroupReservation);
+
+// Delete a group reservation (admin only)
+router.delete("/", verifyAdminToken, deleteGroupReservation);
+
+// Update group reservation status (admin only)
+router.patch("/event-status", verifyAdminToken, updateGroupReservationStatus);
+
+// Update group reservation payment status (admin only)
+router.patch("/payment-status", verifyAdminToken, updateGroupPaymentStatus);
 
 export default router;

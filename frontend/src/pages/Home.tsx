@@ -18,13 +18,13 @@ import {
   MousePointerClick,
   ReceiptText,
 } from "lucide-react";
-import { useGetReservationSettings } from "@/features/Events/hooks/useGetReservationSettings";
+import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 
 import UserChat from "@/features/Chat/components/UserChat";
 
 const Home = () => {
   const [itemsToShow, setItemsToShow] = useState(6);
-  const { data: settings } = useGetReservationSettings();
+  const { data: settings } = useGetEventReservationSettings();
 
   // Adjust item count based on screen size
   useEffect(() => {

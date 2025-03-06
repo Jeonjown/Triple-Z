@@ -6,20 +6,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { GroupReservation } from "./columns";
+import { useUpdateGroupReservationStatus } from "@/features/Events/hooks/useUpdateGroupReservationStatus ";
 
-import { Reservation } from "./columns";
-import { useUpdateEventReservationStatus } from "@/features/Events/hooks/useUpdateEventReservationsStatus";
-
-// Component for updating event status via a dropdown
 const EventStatusCell = ({
   reservation,
 }: {
-  reservation: Reservation;
+  reservation: GroupReservation;
 }): JSX.Element => {
-  const { mutate } = useUpdateEventReservationStatus();
+  const { mutate } = useUpdateGroupReservationStatus();
 
-  // Function to update event status
-  const updateEventStatus = (newStatus: string) => {
+  const updateStatus = (newStatus: string) => {
     mutate({
       reservationId: reservation._id,
       eventStatus: newStatus,
@@ -35,16 +32,16 @@ const EventStatusCell = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         <DropdownMenuLabel>Status</DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => updateEventStatus("Pending")}>
+        <DropdownMenuItem onClick={() => updateStatus("Pending")}>
           Pending
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateEventStatus("Confirmed")}>
+        <DropdownMenuItem onClick={() => updateStatus("Confirmed")}>
           Confirmed
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateEventStatus("Cancelled")}>
+        <DropdownMenuItem onClick={() => updateStatus("Cancelled")}>
           Cancelled
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateEventStatus("Completed")}>
+        <DropdownMenuItem onClick={() => updateStatus("Completed")}>
           Completed
         </DropdownMenuItem>
       </DropdownMenuContent>

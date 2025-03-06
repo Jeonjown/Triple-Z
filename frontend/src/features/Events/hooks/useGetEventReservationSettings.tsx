@@ -4,7 +4,7 @@ import {
   getEventReservationSettings,
 } from "../api/event";
 
-export const useGetReservationSettings = () => {
+export const useGetEventReservationSettings = () => {
   const { data, isPending, isError } = useQuery<EventReservationSettings>({
     queryKey: ["reservationSettings"],
     queryFn: getEventReservationSettings,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
-import useGetEventReservations from "../../hooks/useGetReservations";
+import useGetEventReservations from "../../hooks/useGetEventReservations";
 
 const EventCalendar = () => {
   const { data, isPending, isError } = useGetEventReservations();
