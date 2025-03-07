@@ -22,6 +22,7 @@ import messageRoutes from "./routes/messageRoutes";
 import http from "http";
 import { initSocket } from "./socket/socket";
 import groupReservationRoutes from "./routes/groupReservationRoutes";
+import emailRoutes from "./routes/emailRoutes";
 
 const server = express();
 
@@ -53,6 +54,7 @@ server.use("/api/events/settings", eventSettingsRoutes);
 server.use("/api/subscriptions", subscriptionRoutes);
 server.use("/api/notifications", notificationRoutes);
 server.use("/api/messages", messageRoutes);
+server.use("/api/mail", emailRoutes);
 
 server.use(
   (err: ResponseError, req: Request, res: Response, next: NextFunction) => {
