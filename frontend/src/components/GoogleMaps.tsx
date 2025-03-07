@@ -1,4 +1,5 @@
 import { AdvancedMarker, APIProvider, Map } from "@vis.gl/react-google-maps";
+
 const containerStyle = {
   width: "100%",
   height: "400px",
@@ -7,10 +8,13 @@ const containerStyle = {
 const position = { lat: 14.538346625289835, lng: 121.08015422830742 };
 
 const GoogleMaps = () => {
+  const mapId = import.meta.env.VITE_GOOGLE_MAP_ID;
+  const apiKey = import.meta.env.VITE_GOOGLE_MAP_API_KEY;
+
   return (
-    <APIProvider apiKey={"AIzaSyCguQ2HPsiLR8EmuakVPV8wyftrrX-KlsE"}>
+    <APIProvider apiKey={apiKey}>
       <div style={containerStyle}>
-        <Map defaultCenter={position} defaultZoom={30} mapId="904c23d6cb9a6c8">
+        <Map defaultCenter={position} defaultZoom={30} mapId={mapId}>
           <AdvancedMarker position={position} />
         </Map>
       </div>
