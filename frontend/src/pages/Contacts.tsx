@@ -43,20 +43,19 @@ const Contacts: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [resultMsg, setResultMsg] = useState("");
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
   // Handle form submission
   const onSubmit = async (data: ContactFormData) => {
     setIsLoading(true);
     setResultMsg("");
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/mail/send-email",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        },
-      );
+      const response = await fetch(`${API_URL}/api/mail/send-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
       const result = await response.text();
       setResultMsg(result);
     } catch (error) {
