@@ -43,7 +43,8 @@
     "whatwg-url": "^14.0.0"
   },
   "scripts": {
-    "start": "nodemon server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "nodemon server.ts",
+    "start": "node dist/server.js"
   }
 }
