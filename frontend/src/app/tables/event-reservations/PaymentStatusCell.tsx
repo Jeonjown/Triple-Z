@@ -8,8 +8,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Reservation } from "./columns"; // Adjust the path as needed
-import { useSendNotificationToUser } from "@/notifications/hooks/useSendNotificationToUser";
+
 import { useUpdateEventReservationPaymentStatus } from "@/features/Events/hooks/useUpdateEventReservationsPaymentStatus";
+import { useNotificationSender } from "@/notifications/hooks/useSendNotificationSender";
 
 // Component for updating payment status via a dropdown
 const PaymentStatusCell = ({
@@ -19,7 +20,7 @@ const PaymentStatusCell = ({
 }): JSX.Element => {
   // Call the hook inside the component
   const { mutate } = useUpdateEventReservationPaymentStatus();
-  const { mutate: sendNotification } = useSendNotificationToUser();
+  const { sendNotification } = useNotificationSender(reservation.userId._id);
 
   // Update payment status by calling mutate with reservation id and new status
   const updatePaymentStatus = (newStatus: string) => {
@@ -30,11 +31,11 @@ const PaymentStatusCell = ({
 
     if (reservation.userId._id) {
       sendNotification({
-        title: "PAYMENT STATUS UPDATE:",
-        description: `your payment status is updated to: ${newStatus}`,
         userId: reservation.userId._id,
-        _id: "",
-        read: false,
+        title: "Reservation Status Updated",
+        description: `Your reservation status has been updated to ${newStatus}.`,
+        // Update the redirect URL as needed.
+        redirectUrl: "/profile",
       });
     }
   };

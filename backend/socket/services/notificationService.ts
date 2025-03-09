@@ -1,37 +1,20 @@
-export interface Notification {
-  id: string;
-  roomId: string;
-  message: string;
-  // Additional fields can be added here if needed
-  createdAt: Date;
-}
+import { INotification, Notification } from "../../models/notificationsModel";
 
-// In-memory store for notifications (simulate database)
-const notifications: Notification[] = [];
+export const saveNotificationToDB = async (notificationData: INotification) => {
+  const { title, description, userId, redirectUrl } = notificationData;
 
-// Function to save a notification
-export const saveNotification = async (
-  notificationData: Omit<Notification, "id" | "createdAt">
-): Promise<Notification> => {
-  // Generate a unique id and set creation time
-  const id = generateUniqueId();
-  const createdAt = new Date();
+  // Validate required fields
+  if (!title || !description || !userId || !redirectUrl) {
+    throw new Error(
+      "Missing required fields: title, description, userId, and redirectUrl are all required."
+    );
+  }
 
-  // Create the new notification object
-  const newNotification: Notification = {
-    id,
-    createdAt,
-    ...notificationData,
-  };
-
-  // Simulate saving the notification
-  notifications.push(newNotification);
-
-  // Return the saved notification
-  return newNotification;
-};
-
-// Helper function to generate a unique identifier
-const generateUniqueId = (): string => {
-  return Math.random().toString(36).substring(2, 15);
+  try {
+    const createdNotification = await Notification.create(notificationData);
+    return createdNotification;
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    throw error;
+  }
 };

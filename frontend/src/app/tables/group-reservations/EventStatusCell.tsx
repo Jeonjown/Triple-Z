@@ -1,3 +1,4 @@
+// src/components/EventStatusCell.tsx
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,20 +8,45 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { GroupReservation } from "./columns";
+
+import { useNotificationSender } from "@/notifications/hooks/useSendNotificationSender";
 import { useUpdateGroupReservationStatus } from "@/features/Events/hooks/useUpdateGroupReservationStatus ";
+
+interface EventStatusCellProps {
+  reservation: GroupReservation;
+}
 
 const EventStatusCell = ({
   reservation,
-}: {
-  reservation: GroupReservation;
-}): JSX.Element => {
+}: EventStatusCellProps): JSX.Element => {
   const { mutate } = useUpdateGroupReservationStatus();
 
+  // Initialize notification sender for the user associated with the reservation.
+  console.log(reservation.userId._id);
+  const { sendNotification } = useNotificationSender(reservation.userId._id);
+
   const updateStatus = (newStatus: string) => {
-    mutate({
-      reservationId: reservation._id,
-      eventStatus: newStatus,
-    });
+    mutate(
+      {
+        reservationId: reservation._id,
+        eventStatus: newStatus,
+      },
+      {
+        onSuccess: () => {
+          // After updating the status, send a notification to the user.
+          sendNotification({
+            userId: reservation.userId._id,
+            title: "Reservation Status Updated",
+            description: `Your reservation status has been updated to ${newStatus}.`,
+            // Update the redirect URL as needed.
+            redirectUrl: "/profile",
+          });
+        },
+        onError: (error) => {
+          console.error("Error updating reservation status", error);
+        },
+      },
+    );
   };
 
   return (

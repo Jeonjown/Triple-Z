@@ -112,7 +112,7 @@ export const createNotification = async (
 ) => {
   try {
     // Await the promise to resolve and get the response
-    const response = await api.post("/api/notifications", notificationData);
+    const response = await api.post("/api/notifications/", notificationData);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -132,7 +132,7 @@ export const getNotificationsForUser = async (
 ): Promise<NotificationData[]> => {
   try {
     // POST request with userId in the body
-    const response = await api.post(`/api/notifications/get`, { userId });
+    const response = await api.post(`/api/notifications/`, { userId });
     return response.data.notifications;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -144,5 +144,19 @@ export const getNotificationsForUser = async (
       };
     }
     throw { statusCode: 500, message: "An unexpected error occurred" };
+  }
+};
+
+export const markNotificationAsRead = async (
+  notificationId: string,
+): Promise<void> => {
+  if (!notificationId) {
+    throw new Error("notificationId is undefined");
+  }
+  try {
+    await api.patch(`/api/notifications/${notificationId}/mark-read`);
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+    throw error;
   }
 };

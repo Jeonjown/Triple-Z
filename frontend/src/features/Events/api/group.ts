@@ -17,7 +17,7 @@ interface ReservationError {
 
 export interface GroupReservation {
   _id: string;
-  user: {
+  userId: {
     _id: string;
     username: string;
     email: string;

@@ -1,13 +1,18 @@
+// socket.ts
 import { Server as SocketIOServer } from "socket.io";
 import {
   saveAdminMessage,
   saveUserMessage,
   SocketMessage,
 } from "./services/messageService";
-import { saveNotification } from "./services/notificationService";
+import { saveNotificationToDB } from "./services/notificationService";
+
+// Declare io so it can be used in other modules.
+export let io: SocketIOServer;
 
 export const initSocket = (httpServer: any) => {
-  const io = new SocketIOServer(httpServer, {
+  // Initialize the global io variable.
+  io = new SocketIOServer(httpServer, {
     cors: {
       origin: ["http://localhost:5173", "https://triple-z.vercel.app"],
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
@@ -17,13 +22,25 @@ export const initSocket = (httpServer: any) => {
 
   io.on("connection", (socket) => {
     console.log(`New client connected: ${socket.id}`);
-
     socket.on("join-room", (roomId: string, callback) => {
       socket.join(roomId);
       console.log(`Socket ${socket.id} joined room ${roomId}`);
-      // Acknowledge the room has been joined
       if (callback) {
         callback({ status: "joined" });
+      }
+    });
+    socket.on("send-notification", async (notificationData) => {
+      console.log(notificationData);
+      try {
+        // Save the notification to the DB and capture the saved object
+        const savedNotification = await saveNotificationToDB(notificationData);
+
+        // Emit the saved notification (which includes _id) to the user
+        io.to(notificationData.userId).emit("notification", savedNotification);
+
+        console.log(`Notification sent to ${notificationData.userId}`);
+      } catch (error) {
+        console.error("Error sending notification:", error);
       }
     });
 
@@ -32,21 +49,18 @@ export const initSocket = (httpServer: any) => {
         const savedMessage = await saveUserMessage(messageData);
         console.log("Message saved:", savedMessage);
 
-        // Room-specific broadcast
         io.to(messageData.roomId).emit("receive-message", savedMessage);
-        // Global broadcast for admin room list updates
-        io.emit("new-user-message", savedMessage); // Add this line
+        io.emit("new-user-message", savedMessage);
       } catch (error: any) {
         console.error("Error saving message:", error);
       }
     });
-    // In your admin-message handler
+
     socket.on("admin-message", async (messageData: SocketMessage) => {
       try {
         const savedMessage = await saveAdminMessage(messageData);
         console.log("Admin message saved:", savedMessage);
 
-        // Send different events for user and admin messages
         io.emit("new-admin-message", savedMessage);
         io.to(messageData.roomId).emit("receive-message", savedMessage);
       } catch (error: any) {
@@ -57,20 +71,6 @@ export const initSocket = (httpServer: any) => {
     socket.on("leave-room", (roomId: string) => {
       socket.leave(roomId);
       console.log(`Socket ${socket.id} left room ${roomId}`);
-    });
-
-    socket.on("send-notification", async (notificationData: any) => {
-      try {
-        const savedNotification = await saveNotification(notificationData);
-        console.log("Notification saved:", savedNotification);
-        // Emit the notification to a specific room or user
-        io.to(notificationData.roomId).emit(
-          "receive-notification",
-          savedNotification
-        );
-      } catch (error: any) {
-        console.error("Error saving notification:", error);
-      }
     });
   });
 };

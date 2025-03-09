@@ -37,15 +37,12 @@ const EventCalendar = () => {
           // Disable the calendar visually and prevent interaction
           disabled={true}
         />
-        <div className="mt-2 flex justify-evenly">
+        <div className="mt-2 flex justify-center">
           <div className="flex space-x-1">
             <p className="text-xs">Reserved Dates: </p>
             <div className="h-4 w-4 rounded bg-primary"></div>
           </div>
-          <div className="flex space-x-2">
-            <p className="text-xs">Today:</p>
-            <div className="h-4 w-4 rounded bg-secondary"></div>
-          </div>
+          <div className="flex space-x-2"></div>
         </div>
       </div>
     </>

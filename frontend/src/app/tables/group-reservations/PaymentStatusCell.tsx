@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { GroupReservation } from "@/features/Events/api/group";
 import { useUpdateGroupReservationPaymentStatus } from "@/features/Events/hooks/useUpdateGroupReservationPaymentStatus";
-import { useSendNotificationToUser } from "@/notifications/hooks/useSendNotificationToUser";
+import { useNotificationSender } from "@/notifications/hooks/useSendNotificationSender";
 
 const PaymentStatusCell = ({
   reservation,
@@ -16,7 +16,7 @@ const PaymentStatusCell = ({
   reservation: GroupReservation;
 }): JSX.Element => {
   const { mutate } = useUpdateGroupReservationPaymentStatus();
-  const { mutate: sendNotification } = useSendNotificationToUser();
+  const { sendNotification } = useNotificationSender(reservation.userId._id);
 
   const updatePaymentStatus = (newStatus: string) => {
     mutate({
@@ -24,14 +24,13 @@ const PaymentStatusCell = ({
       paymentStatus: newStatus,
     });
 
-    // Fixed: use userId instead of user
     if (reservation.userId._id) {
       sendNotification({
-        title: "PAYMENT STATUS UPDATE:",
-        description: `Your payment status has been updated to: ${newStatus}`,
         userId: reservation.userId._id,
-        _id: "",
-        read: false,
+        title: "Reservation Status Updated",
+        description: `Your reservation status has been updated to ${newStatus}.`,
+        // Update the redirect URL as needed.
+        redirectUrl: "/profile",
       });
     }
   };

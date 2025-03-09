@@ -23,7 +23,7 @@ export const sendEmail = (req: Request, res: Response): void => {
     subject: "New Contact Form Submission",
     text: `Full Name: ${fullName}\nContacts: ${contacts}\nEmail: ${email}\nMessage: ${message}`,
   };
-
+  console.log(email);
   console.log("BUSINESS_EMAIL:", process.env.BUSINESS_EMAIL);
   console.log("BUSINESS_EMAIL_PASS:", process.env.BUSINESS_EMAIL_PASS);
 
