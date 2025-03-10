@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useServiceworker } from "@/notifications/hooks/useServiceWorker";
+import { useServiceworker } from "@/features/Notifications/hooks/useServiceWorker";
 import { playPingSound } from "@/utils/playPingSound";
 
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");

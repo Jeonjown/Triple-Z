@@ -11,7 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import ScrollToTop from "@/components/ScrollToTop";
-import { useServiceworker } from "@/notifications/hooks/useServiceWorker";
+import { useServiceworker } from "@/features/Notifications/hooks/useServiceWorker";
 import { UseFormReturn } from "react-hook-form";
 
 import { GroupFormValues } from "../../pages/GroupForm";

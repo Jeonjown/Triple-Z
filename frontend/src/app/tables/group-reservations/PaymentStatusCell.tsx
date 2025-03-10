@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { GroupReservation } from "@/features/Events/api/group";
 import { useUpdateGroupReservationPaymentStatus } from "@/features/Events/hooks/useUpdateGroupReservationPaymentStatus";
-import { useNotificationSender } from "@/notifications/hooks/useSendNotificationSender";
+import { useNotificationSender } from "@/features/Notifications/hooks/useSendNotificationSender";
 
 const PaymentStatusCell = ({
   reservation,

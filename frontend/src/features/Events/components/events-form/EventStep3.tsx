@@ -15,7 +15,7 @@ import { EventFormValues } from "../../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useCreateEventReservations } from "../../hooks/useCreateEventReservations";
 import { useGetEventReservationSettings } from "../../hooks/useGetEventReservationSettings";
-import { useServiceworker } from "@/notifications/hooks/useServiceWorker";
+import { useServiceworker } from "@/features/Notifications/hooks/useServiceWorker";
 
 interface CartItem {
   _id: string;

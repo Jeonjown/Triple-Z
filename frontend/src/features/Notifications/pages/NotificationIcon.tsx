@@ -6,7 +6,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "../../../components/ui/dropdown-menu";
 import { FaBell } from "react-icons/fa";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { useNavigate } from "react-router-dom";
@@ -14,9 +14,9 @@ import { useNavigate } from "react-router-dom";
 import {
   useNotificationReceiver,
   MyNotification,
-} from "@/notifications/hooks/useNotificationReceiver";
-import { useNotifications } from "@/notifications/hooks/useNotification";
-import { useMarkNotificationAsRead } from "@/notifications/hooks/useMarkNotificationasRead";
+} from "@/features/Notifications/hooks/useNotificationReceiver";
+import { useNotifications } from "@/features/Notifications/hooks/useNotification";
+import { useMarkNotificationAsRead } from "@/features/Notifications/hooks/useMarkNotificationasRead";
 
 const NotificationIcon = () => {
   const { user } = useAuthStore();

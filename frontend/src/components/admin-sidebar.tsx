@@ -8,6 +8,7 @@ import {
   MessageCircle,
   ChevronRight,
   CalendarDays,
+  Images,
 } from "lucide-react";
 
 import {
@@ -108,6 +109,19 @@ export function AppAdminSidebar() {
                   >
                     <Pizza />
                     <span className="text-base font-semibold">Manage Menu</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="[&>svg]:size-5">
+                  <Link
+                    to="/manage-blogs"
+                    className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
+                  >
+                    <Images />
+                    <span className="text-base font-semibold">
+                      Manage Blogs
+                    </span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

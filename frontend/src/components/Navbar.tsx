@@ -1,6 +1,6 @@
 import Logo from "./Logo";
 import ProfileIcon from "./ProfileIcon";
-import NotificationIcon from "./NotificationIcon";
+import NotificationIcon from "../features/Notifications/pages/NotificationIcon";
 import NavLinks from "./NavLinks";
 import HamburgerIcon from "./HamburgerIcon";
 import HamburgerMenu from "./HamburgerMenu";

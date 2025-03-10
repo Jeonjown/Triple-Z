@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { GroupReservation } from "./columns";
 
-import { useNotificationSender } from "@/notifications/hooks/useSendNotificationSender";
+import { useNotificationSender } from "@/features/Notifications/hooks/useSendNotificationSender";
 import { useUpdateGroupReservationStatus } from "@/features/Events/hooks/useUpdateGroupReservationStatus ";
 
 interface EventStatusCellProps {

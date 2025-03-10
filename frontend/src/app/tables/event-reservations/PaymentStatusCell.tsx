@@ -10,7 +10,7 @@ import {
 import { Reservation } from "./columns"; // Adjust the path as needed
 
 import { useUpdateEventReservationPaymentStatus } from "@/features/Events/hooks/useUpdateEventReservationsPaymentStatus";
-import { useNotificationSender } from "@/notifications/hooks/useSendNotificationSender";
+import { useNotificationSender } from "@/features/Notifications/hooks/useSendNotificationSender";
 
 // Component for updating payment status via a dropdown
 const PaymentStatusCell = ({

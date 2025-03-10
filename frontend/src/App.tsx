@@ -31,6 +31,46 @@ function App() {
   const { user } = useAuthStore();
   const isAdmin = user?.role === "admin";
 
+  // Step 1: Common routes for all users.
+  const commonRoutes = (
+    <>
+      <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/schedule" element={<Schedule />} />
+      <Route path="/schedule/event-form/:userId" element={<EventForm />} />
+      <Route path="/schedule/group-form" element={<GroupForm />} />
+      <Route path="/schedule/group-form/:userId" element={<GroupForm />} />
+      <Route path="/menu" element={<Menu />} />
+      <Route
+        path="/menu/categories/:categoryId/subcategories/:subcategoryId"
+        element={<Menu />}
+      />
+      <Route path="/menu/:menuItemId" element={<MenuItem />} />
+      <Route path="/menu/order-checkout" element={<OrderCheckout />} />
+      <Route path="/contacts" element={<Contacts />} />
+      <Route path="/blogs" element={<Blogs />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+    </>
+  );
+
+  // Step 2: Admin-only routes.
+  const adminRoutes = (
+    <>
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/manage-users" element={<ManageUsers />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/reports" element={<Reports />} />
+      <Route path="/manage-menu" element={<ManageMenu />} />
+      <Route path="/manage-events" element={<ManageEvents />} />
+      <Route path="/manage-blogs" element={<ManageEvents />} />
+      <Route path="/manage-groups" element={<ManageGroups />} />
+      <Route path="/admin-chat" element={<AdminChat />} />
+    </>
+  );
+
+  // Step 3: Render routes conditionally based on user's role.
   return (
     <Router>
       <ScrollToTop />
@@ -41,78 +81,14 @@ function App() {
           {isAdmin ? (
             <AdminSidebarLayout>
               <Routes>
-                {/* Regular Routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/schedule" element={<Schedule />} />
-                <Route
-                  path="/schedule/event-form/:userId"
-                  element={<EventForm />}
-                />
-                <Route path="/schedule/group-form" element={<GroupForm />} />
-                <Route
-                  path="/schedule/group-form/:userId"
-                  element={<GroupForm />}
-                />
-                <Route path="/menu" element={<Menu />} />
-                <Route
-                  path="/menu/categories/:categoryId/subcategories/:subcategoryId"
-                  element={<Menu />}
-                />
-                <Route path="/menu/:menuItemId" element={<MenuItem />} />
-                <Route
-                  path="/menu/order-checkout"
-                  element={<OrderCheckout />}
-                />
-                <Route path="/contacts" element={<Contacts />} />
-                <Route path="/blogs" element={<Blogs />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/login" element={<Login />} />
-                {/* Admin Routes */}
-
-                <Route path="/admin-dashboard" element={<AdminDashboard />} />
-                <Route path="/manage-users" element={<ManageUsers />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/manage-menu" element={<ManageMenu />} />
-                <Route path="/manage-events" element={<ManageEvents />} />
-                <Route path="/manage-groups" element={<ManageGroups />} />
-                <Route path="/admin-chat" element={<AdminChat />} />
+                {commonRoutes}
+                {adminRoutes}
               </Routes>
             </AdminSidebarLayout>
           ) : (
-            <Routes>
-              {/* Regular Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/schedule" element={<Schedule />} />
-
-              <Route
-                path="/schedule/event-form/:userId"
-                element={<EventForm />}
-              />
-              <Route
-                path="/schedule/group-form/:userId"
-                element={<GroupForm />}
-              />
-              <Route path="/schedule/group-form" element={<GroupForm />} />
-              <Route path="/menu" element={<Menu />} />
-              <Route
-                path="/menu/categories/:categoryId/subcategories/:subcategoryId"
-                element={<Menu />}
-              />
-              <Route path="/menu/order-checkout" element={<OrderCheckout />} />
-              <Route path="/menu/:menuItemId" element={<MenuItem />} />
-              <Route path="/contacts" element={<Contacts />} />
-              <Route path="/blogs" element={<Blogs />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/login" element={<Login />} />
-            </Routes>
+            <Routes>{commonRoutes}</Routes>
           )}
         </div>
-
         <Footer />
       </main>
     </Router>

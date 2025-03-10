@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Reservation } from "./columns";
 import { useUpdateEventReservationStatus } from "@/features/Events/hooks/useUpdateEventReservationsStatus";
-import { useNotificationSender } from "@/notifications/hooks/useSendNotificationSender";
+import { useNotificationSender } from "@/features/Notifications/hooks/useSendNotificationSender";
 
 const EventStatusCell = ({
   reservation,

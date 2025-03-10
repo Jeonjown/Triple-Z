@@ -30,16 +30,16 @@ const NavLinks = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="mt-2 max-h-60 overflow-auto">
-              <DropdownMenuItem>
-                <NavLink to={"/schedule"} className={"font-semibold"}>
+              <NavLink to={"/schedule"} className={"font-semibold"}>
+                <DropdownMenuItem className="hover:cursor-pointer">
                   Make a Schedule
-                </NavLink>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <NavLink to={"/blogs"} className={"font-semibold"}>
+                </DropdownMenuItem>
+              </NavLink>
+              <NavLink to={"/blogs"} className={"font-semibold"}>
+                <DropdownMenuItem className="hover:cursor-pointer">
                   Blogs
-                </NavLink>
-              </DropdownMenuItem>
+                </DropdownMenuItem>
+              </NavLink>
             </DropdownMenuContent>
           </DropdownMenu>
         </li>

@@ -3,7 +3,7 @@ import { MessageCircle } from "lucide-react";
 import { io } from "socket.io-client";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { v4 as uuid } from "uuid"; // Import uuid for generating unique IDs
-import { useSendNotificationToAdmin } from "@/notifications/hooks/useSendNotificationToAdmins";
+import { useSendNotificationToAdmin } from "@/features/Notifications/hooks/useSendNotificationToAdmins";
 import { useMessagesForRoom } from "../hooks/useMessagesForRoom";
 
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
