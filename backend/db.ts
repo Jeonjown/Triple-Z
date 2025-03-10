@@ -3,18 +3,20 @@ import dotenv from "dotenv";
 
 dotenv.config(); // Load environment variables
 
-// Ensure the Mongo URI is available
+// Ensure the Mongo URI is available for all required databases
 if (
   !process.env.MONGO_URI_MENU_DB ||
   !process.env.MONGO_URI_USER_DB ||
   !process.env.MONGO_URI_RESERVATION_DB ||
+  !process.env.MONGO_URI_SUBSCRIPTION_DB ||
   !process.env.MONGO_URI_NOTIFICATION_DB ||
-  !process.env.MONGO_URI_MESSAGE_DB
+  !process.env.MONGO_URI_MESSAGE_DB ||
+  !process.env.MONGO_URI_BLOG_DB
 ) {
   throw new Error("Mongo URI for one or more DBs is missing!");
 }
 
-// Separate connections for user, menu, reservation, subscription, notification, and message databases
+// Separate connections for user, menu, reservation, subscription, notification, message, and blog databases
 export const userDB = mongoose.createConnection(process.env.MONGO_URI_USER_DB!);
 export const menuDB = mongoose.createConnection(process.env.MONGO_URI_MENU_DB!);
 export const reservationDB = mongoose.createConnection(
@@ -29,6 +31,7 @@ export const notificationDB = mongoose.createConnection(
 export const messageDB = mongoose.createConnection(
   process.env.MONGO_URI_MESSAGE_DB!
 );
+export const blogDB = mongoose.createConnection(process.env.MONGO_URI_BLOG_DB!);
 
 // Connection handling for menuDB
 menuDB.once("open", () => console.log("Menu DB connected successfully"));
@@ -67,3 +70,7 @@ messageDB.once("open", () => console.log("Message DB connected successfully"));
 messageDB.on("error", (err) =>
   console.error("Error connecting to Message DB:", err)
 );
+
+// Connection handling for blogDB
+blogDB.once("open", () => console.log("Blog DB connected successfully"));
+blogDB.on("error", (err) => console.error("Error connecting to Blog DB:", err));

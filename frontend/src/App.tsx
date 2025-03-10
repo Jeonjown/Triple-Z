@@ -15,7 +15,7 @@ import ManageMenu from "./features/Menu/pages/ManageMenu";
 import OrderCheckout from "./features/Menu/pages/OrderCheckout";
 import ManageUsers from "./features/Users/pages/ManageUsers";
 import About from "./pages/About";
-import Blogs from "./pages/Blogs";
+import Blogs from "./features/Blogs/pages/Blogs";
 import Contacts from "./pages/Contacts";
 import Profile from "./pages/Profile";
 import Menu from "./features/Menu/pages/Menu";
@@ -26,12 +26,15 @@ import AdminDashboard from "./features/Admin/pages/AdminDashboard";
 import ManageEvents from "./features/Events/pages/ManageEvents";
 import AdminChat from "./features/Chat/components/AdminChat";
 import ManageGroups from "./features/Events/pages/ManageGroups";
+import ManageBlogs from "./features/Blogs/pages/ManageBlogs";
+import BlogPosts from "./features/Blogs/pages/BlogPosts";
+import AdminBlog from "./features/Blogs/pages/AdminBlog";
 
 function App() {
   const { user } = useAuthStore();
   const isAdmin = user?.role === "admin";
 
-  // Step 1: Common routes for all users.
+  //Common routes for all users.
   const commonRoutes = (
     <>
       <Route path="/" element={<Home />} />
@@ -49,13 +52,14 @@ function App() {
       <Route path="/menu/order-checkout" element={<OrderCheckout />} />
       <Route path="/contacts" element={<Contacts />} />
       <Route path="/blogs" element={<Blogs />} />
+      <Route path="/blogs/:id" element={<BlogPosts />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
     </>
   );
 
-  // Step 2: Admin-only routes.
+  // Admin-only routes.
   const adminRoutes = (
     <>
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
@@ -64,7 +68,8 @@ function App() {
       <Route path="/reports" element={<Reports />} />
       <Route path="/manage-menu" element={<ManageMenu />} />
       <Route path="/manage-events" element={<ManageEvents />} />
-      <Route path="/manage-blogs" element={<ManageEvents />} />
+      <Route path="/manage-blogs" element={<ManageBlogs />} />
+      <Route path="/manage-blogs/:id" element={<AdminBlog />} />
       <Route path="/manage-groups" element={<ManageGroups />} />
       <Route path="/admin-chat" element={<AdminChat />} />
     </>
