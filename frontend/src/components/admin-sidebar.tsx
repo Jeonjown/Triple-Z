@@ -3,12 +3,12 @@ import {
   LayoutDashboard,
   UsersRound,
   Settings,
-  Pizza,
   X,
   MessageCircle,
   ChevronRight,
   CalendarDays,
   Images,
+  Coffee,
 } from "lucide-react";
 
 import {
@@ -102,12 +102,12 @@ export function AppAdminSidebar() {
 
               {/* Manage Menu */}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild className="[&>svg]:size-5">
+                <SidebarMenuButton asChild className="[&>svg]:size-6">
                   <Link
                     to="/manage-menu"
                     className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
                   >
-                    <Pizza />
+                    <Coffee />
                     <span className="text-base font-semibold">Manage Menu</span>
                   </Link>
                 </SidebarMenuButton>
