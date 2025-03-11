@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
+import { Link } from "react-router-dom";
 
 const BeOurGuest = () => {
   const { data: settings } = useGetEventReservationSettings();
@@ -22,7 +23,7 @@ const BeOurGuest = () => {
         {/* Image Section (left on large, top on mobile) */}
         <div className="flex w-full justify-center lg:w-1/2">
           <img
-            src="events-img.png"
+            src="be-our-guest-photo.png"
             alt="events image"
             className="w-64 sm:w-80 lg:w-auto"
           />
@@ -98,9 +99,11 @@ const BeOurGuest = () => {
             </div>
           </div>
           <div>
-            <Button size="lg" className="mx-[30%] mt-10 block w-48">
-              Book Now!
-            </Button>
+            <Link to="/schedule">
+              <Button size="lg" className="mx-[30%] mt-10 block w-48">
+                Book Now!
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -112,12 +115,13 @@ const BeOurGuest = () => {
           </p>
           <p className="mt-5 text-xl">You deserve a good time with friends.</p>
           <p className="mt-5 font-semibold">
-            {" "}
             MON-FRI {settings?.openingHours} - {settings?.closingHours}
           </p>
-          <Button size="lg" className="mt-10">
-            Book Now!
-          </Button>
+          <Link to="/schedule">
+            <Button size="lg" className="mx-auto mt-10 block w-48 lg:mx-[40%]">
+              Book Now!
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

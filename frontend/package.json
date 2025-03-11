@@ -39,6 +39,8 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "embla-carousel-autoplay": "^8.5.2",
+    "embla-carousel-class-names": "^8.5.2",
+    "embla-carousel-fade": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
     "formik": "^2.4.6",
     "lucide-react": "^0.475.0",

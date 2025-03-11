@@ -79,7 +79,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <main className="mt-24 flex min-h-screen w-full flex-col">
+      <main className="mb-20 mt-24 flex min-h-screen w-full flex-col">
         <Toaster />
         <Navbar />
         <div className="flex-grow">
@@ -94,8 +94,8 @@ function App() {
             <Routes>{commonRoutes}</Routes>
           )}
         </div>
-        <Footer />
       </main>
+      <Footer />
     </Router>
   );
 }

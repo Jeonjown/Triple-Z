@@ -1,5 +1,6 @@
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
 
 const Banner = () => {
   const { data: settings } = useGetEventReservationSettings();
@@ -35,12 +36,14 @@ const Banner = () => {
             <h3 className="my-5 text-base text-[#DFA593] sm:text-lg">
               MON-FRI {settings?.openingHours} - {settings?.closingHours}
             </h3>
-            <Button
-              size="lg"
-              className="w-36 font-heading text-lg font-extralight sm:w-44"
-            >
-              Book Now!
-            </Button>
+            <Link to="/schedule">
+              <Button
+                size="lg"
+                className="w-36 font-heading text-lg font-extralight sm:w-44"
+              >
+                Book Now!
+              </Button>
+            </Link>
           </div>
           <div className="z-10 flex w-full items-center justify-center">
             <img
