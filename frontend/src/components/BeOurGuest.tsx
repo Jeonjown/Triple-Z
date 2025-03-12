@@ -11,11 +11,11 @@ const BeOurGuest = () => {
   return (
     <section className="relative min-h-screen px-4 py-10 lg:flex lg:items-center lg:justify-center">
       {/* Background Image */}
-      <img
+      {/* <img
         src="BookNow-bg-1.png"
         alt="background"
         className="absolute inset-0 z-[-1] h-full w-full object-cover"
-      />
+      /> */}
 
       <div className="container mx-auto flex flex-col items-center gap-8 px-4 lg:flex-row lg:items-center">
         {/* Image Section */}
