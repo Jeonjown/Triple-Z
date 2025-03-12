@@ -66,7 +66,7 @@ const BlogCarousel: React.FC = () => {
   }
 
   return (
-    <section className="flex min-h-screen flex-col items-center justify-center p-4 md:p-10">
+    <section className="mt-20 flex min-h-screen flex-col items-center justify-center p-4 md:p-10">
       {/* Responsive heading and subheading */}
       <div className="text-center">
         <h2 className="text-base font-semibold text-primary md:text-lg">
