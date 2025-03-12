@@ -29,7 +29,6 @@ export const useNotificationSender = (userId: string) => {
     });
 
     socketInstance.on("connect", () => {
-      console.log("Connected with id:", socketInstance.id);
       // Join a room using the userId and use our defined type
       socketInstance.emit("join-room", userId, (response: JoinRoomResponse) => {
         console.log("Join-room response:", response);

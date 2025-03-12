@@ -16,7 +16,6 @@ webpush.setVapidDetails(`mailto:${email}`, publicKey, privateKey);
 // Save the subscription dynamically.
 export const subscribe = async (req: Request, res: Response): Promise<void> => {
   const subscriptionData = req.body;
-  console.log("Subscription Data:", subscriptionData);
 
   if (
     !subscriptionData.userId ||
@@ -93,7 +92,6 @@ export const sendNotificationToAll = async (
         console.error(`Error sending notification for ${sub.endpoint}:`, error);
         if (error.statusCode === 410) {
           await Subscription.deleteOne({ endpoint: sub.endpoint });
-          console.log(`Subscription removed: ${sub.endpoint}`);
         }
       }
     });
@@ -128,7 +126,6 @@ export const sendNotification = async (
         console.error(`Error sending notification for ${sub.endpoint}:`, error);
         if (error.statusCode === 410) {
           await Subscription.deleteOne({ endpoint: sub.endpoint });
-          console.log(`Subscription removed: ${sub.endpoint}`);
         }
       }
     });
@@ -180,7 +177,6 @@ export const sendNotificationToAdmin = async (req: Request, res: Response) => {
             // If the subscription is no longer valid, remove it.
             if (error.statusCode === 410) {
               await Subscription.deleteOne({ endpoint: sub.endpoint });
-              console.log(`Subscription removed: ${sub.endpoint}`);
             }
           }
         });

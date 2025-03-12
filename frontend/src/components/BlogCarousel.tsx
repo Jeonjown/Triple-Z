@@ -9,19 +9,40 @@ import { Card } from "./ui/card";
 import Autoplay from "embla-carousel-autoplay";
 import { useGetAllBlogPosts } from "@/features/Blogs/hooks/useGetAllBlogPosts";
 import { BlogPost } from "@/features/Blogs/api/blogs";
-
 import { Link } from "react-router-dom";
 import Fade from "embla-carousel-fade";
+
 const BlogCarousel: React.FC = () => {
   // Fetch blog posts using your hook
   const { data, isPending, isError, error } = useGetAllBlogPosts();
 
-  // Manage carousel API and slide state
-  const [api, setApi] = useState<CarouselApi>();
+  // Manage carousel API and slide state with explicit types
+  const [api, setApi] = useState<CarouselApi | undefined>(undefined);
   const [, setCurrent] = useState<number>(0);
   const [, setCount] = useState<number>(0);
-  // Always group 3 posts per slide
-  const groupSize = 3;
+
+  // State to control number of photos per slide (groupSize)
+  const [groupSize, setGroupSize] = useState<number>(3);
+
+  // Update groupSize based on window width
+  useEffect(() => {
+    const updateGroupSize = () => {
+      if (window.innerWidth < 768) {
+        // Mobile: show 1 photo per slide
+        setGroupSize(1);
+      } else if (window.innerWidth < 1024) {
+        // Tablet: show 2 photos per slide
+        setGroupSize(2);
+      } else {
+        // Desktop: show 3 photos per slide
+        setGroupSize(3);
+      }
+    };
+
+    updateGroupSize(); // Initial check
+    window.addEventListener("resize", updateGroupSize);
+    return () => window.removeEventListener("resize", updateGroupSize);
+  }, []);
 
   // Update carousel slide count and current slide index when API is available
   useEffect(() => {
@@ -36,7 +57,7 @@ const BlogCarousel: React.FC = () => {
   if (isError)
     return <div>Error: {error?.message || "An error occurred."}</div>;
 
-  // Group blog posts into chunks of 3
+  // Group blog posts into chunks based on groupSize
   const chunkedPosts: BlogPost[][] = [];
   if (data) {
     for (let i = 0; i < data.length; i += groupSize) {
@@ -45,12 +66,13 @@ const BlogCarousel: React.FC = () => {
   }
 
   return (
-    <div className="my-10 w-full p-4 md:p-10">
+    <section className="flex min-h-screen flex-col items-center justify-center p-4 md:p-10">
+      {/* Responsive heading and subheading */}
       <div className="text-center">
-        <h2 className="text-xs font-semibold text-primary md:text-sm">
+        <h2 className="text-base font-semibold text-primary md:text-lg">
           TRIPLE Z COFFEE SHOP
         </h2>
-        <p className="font-heading text-xl md:text-2xl lg:text-3xl">
+        <p className="font-heading text-3xl md:text-4xl">
           Your Perfect Event Destination
         </p>
       </div>
@@ -58,21 +80,23 @@ const BlogCarousel: React.FC = () => {
         opts={{ align: "start", loop: true }}
         plugins={[Autoplay({ delay: 4000 }), Fade()]}
         setApi={setApi}
-        className="mt-5 w-full"
+        className="mt-5 w-full flex-grow"
       >
-        <CarouselContent className="-ml-4">
+        <CarouselContent className="-ml-4 h-full">
           {chunkedPosts.map((group, index) => (
-            // Each CarouselItem is a slide with 3 posts
-            <CarouselItem key={index} className="pl-4">
-              <div className="flex flex-row items-stretch gap-4">
+            <CarouselItem key={index} className="h-full pl-4">
+              <div className="flex h-full flex-col items-stretch gap-4 md:flex-row">
                 {group.map((post) => (
-                  // Each card is wrapped in a Link to its specific blog page
                   <Link
                     to={`/blogs/${post._id}`}
                     key={post._id}
-                    className="flex w-1/3"
+                    // Use conditional width: on tablet, use 50% width if groupSize is 2; else 33.33% for 3
+                    className={`flex h-full w-full ${
+                      groupSize === 3 ? "md:w-1/3" : "md:w-1/2"
+                    }`}
                   >
-                    <Card className="flex h-full flex-col">
+                    {/* Card height scales relative to viewport */}
+                    <Card className="flex h-[65vh] w-full flex-col">
                       <img
                         src={post.image}
                         alt={post.title}
@@ -86,7 +110,7 @@ const BlogCarousel: React.FC = () => {
           ))}
         </CarouselContent>
       </Carousel>
-    </div>
+    </section>
   );
 };
 

@@ -25,8 +25,6 @@ const EventPackages: React.FC = () => {
   const { selectedIndex, scrollSnaps, onDotButtonClick, updateSelectedIndex } =
     useDotButton(api || undefined);
 
-  // Removed tweenOpacity: no opacity changes applied
-
   // Register and cleanup carousel event listeners (only updating selected index)
   useEffect(() => {
     if (!api) return;
@@ -49,12 +47,12 @@ const EventPackages: React.FC = () => {
     data?.filter((item) => item.subcategoryName === "Event Meals") || [];
 
   return (
-    <section className="my-10 w-full">
+    <section className="flex min-h-screen w-full flex-col justify-center">
       <div className="text-center">
-        <h2 className="text-xs font-semibold text-primary md:text-sm">
+        <h2 className="text-base font-semibold text-primary md:text-lg">
           EVENT PACKAGES
         </h2>
-        <p className="font-heading text-xl md:text-2xl lg:text-3xl">
+        <p className="font-heading text-3xl md:text-4xl">
           Explore Our Event Packages
         </p>
       </div>
@@ -67,12 +65,12 @@ const EventPackages: React.FC = () => {
           setApi={setApi}
           className="mt-5 w-full"
         >
-          <CarouselContent style={{ gap: "30px" }}>
+          <CarouselContent style={{ gap: "10px" }}>
             {eventMeals.map((meal) => (
               // Responsive item: 60% width on small screens, 33.33% on LG screens
               <CarouselItem
                 key={meal._id}
-                className="flex-shrink-0 basis-[60%] lg:basis-1/3"
+                className="flex-shrink-0 basis-[80%] lg:basis-1/3"
               >
                 <Card className="h-full w-full border-none shadow-none">
                   <img

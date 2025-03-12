@@ -165,9 +165,6 @@ export const editMenuItem = async (menuItemData: MenuItemData) => {
     // Append category and subcategory to the form
     formData.append("category", menuItemData.category);
     formData.append("subcategory", menuItemData.subcategory);
-    console.log("from editMenu request function : ");
-    console.log("category", menuItemData.category);
-    console.log("subcategory", menuItemData.subcategory);
 
     // Append item fields like title, basePrice, and description
     formData.append("title", menuItemData.item.title);

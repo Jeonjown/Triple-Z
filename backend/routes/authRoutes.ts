@@ -30,7 +30,6 @@ router.post("/jwt-login", validateEmail, validatePassword, jwtLogin);
 //GOOGLE AUTH
 router.get("/google", (req: Request, res: Response, next: NextFunction) => {
   const redirectUri = req.query.redirect_uri as string; // Get redirect URI
-  console.log("Google Auth Initiated - Redirect URI:", redirectUri);
   req.query.redirect_uri = redirectUri;
   passport.authenticate("google", {
     scope: ["email", "profile"],

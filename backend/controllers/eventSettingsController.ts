@@ -8,8 +8,6 @@ export const createOrUpdateEventSettings = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  console.log("Received request body:", req.body);
-
   try {
     const eventSettings = await EventSettings.findOneAndUpdate({}, req.body, {
       new: true,

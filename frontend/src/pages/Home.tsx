@@ -10,15 +10,17 @@ import VisitTripleZ from "@/components/VisitTripleZ";
 const Home = () => {
   return (
     <>
-      <Banner />
-      <BlogCarousel />
-      <BeOurGuest />
-      {/* <FeaturedProducts /> */}
-      <EventPackages />
-      {/* <BestSellers /> */}
-      <Story />
-      <VisitTripleZ />
-      <UserChat />
+      <div className="flex flex-col gap-10">
+        <Banner />
+        <BlogCarousel />
+        <BeOurGuest />
+        {/* <FeaturedProducts /> */}
+        <EventPackages />
+        {/* <BestSellers /> */}
+        <Story />
+        <VisitTripleZ />
+        <UserChat />
+      </div>
     </>
   );
 };

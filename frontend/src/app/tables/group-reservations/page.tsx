@@ -13,9 +13,6 @@ const GroupReservationsTable = () => {
     return <LoadingPage />;
   }
 
-  console.log("Columns:", columns);
-  console.log("Group Reservations:", groupReservations);
-
   return <DataTable columns={columns} data={data} />;
 };
 

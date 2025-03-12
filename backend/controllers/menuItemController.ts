@@ -18,7 +18,6 @@ export const getItem = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    console.log(id);
 
     // ✅ Validate ObjectId
     if (!Types.ObjectId.isValid(id)) {
@@ -277,10 +276,6 @@ export const updateMenuItem = async (
       category,
       subcategory,
     } = req.body;
-
-    console.log("Received from frontend:");
-    console.log("FILE: ", req.file);
-    console.log("BODY: ", req.body);
 
     // Fetch the existing menu item
     const oldItem = await MenuItem.findById(itemId);
