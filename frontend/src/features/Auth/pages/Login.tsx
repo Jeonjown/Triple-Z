@@ -52,7 +52,11 @@ const Login = ({ text = "Welcome Back!", destination = "/" }: LoginProps) => {
     const redirectUri = encodeURIComponent(
       `${window.location.origin}${destination}`,
     );
-
+    if (!navigator.cookieEnabled) {
+      alert(
+        "Cookies are disabled in your browser. Please enable cookies to signup.",
+      );
+    }
     window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google?redirect_uri=${redirectUri}`;
   };
 
