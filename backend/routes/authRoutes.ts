@@ -46,7 +46,7 @@ router.get(
       res.cookie("auth_token", token, {
         httpOnly: true,
         secure: true,
-        sameSite: "none",
+        sameSite: "lax",
         maxAge: 259200000,
       });
     } // ✅ Close the if block properly
