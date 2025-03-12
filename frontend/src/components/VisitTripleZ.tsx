@@ -3,11 +3,6 @@ import { FC } from "react";
 import { Button } from "./ui/button"; // Import your own Button component
 import { Link } from "react-router-dom";
 
-/**
- * This component creates a layout similar to the screenshot:
- * - Left column: Heading, subheading, description, and button (centered on mobile)
- * - Right column: A map or an image (iframe in this example)
- */
 const VisitTripleZ: FC = () => {
   return (
     <section className="mx-auto my-20 max-w-7xl px-4 sm:px-6 lg:px-8">

@@ -47,7 +47,7 @@ const EventPackages: React.FC = () => {
     data?.filter((item) => item.subcategoryName === "Event Meals") || [];
 
   return (
-    <section className="flex min-h-screen w-full flex-col justify-center">
+    <section className="flex min-h-screen flex-col justify-center">
       <div className="text-center">
         <h2 className="text-base font-semibold text-primary md:text-lg">
           EVENT PACKAGES
@@ -65,7 +65,7 @@ const EventPackages: React.FC = () => {
           setApi={setApi}
           className="mt-5 w-full"
         >
-          <CarouselContent style={{ gap: "10px" }}>
+          <CarouselContent className="">
             {eventMeals.map((meal) => (
               // Responsive item: 60% width on small screens, 33.33% on LG screens
               <CarouselItem

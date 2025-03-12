@@ -10,7 +10,7 @@ import VisitTripleZ from "@/components/VisitTripleZ";
 const Home = () => {
   return (
     <>
-      <div className="flex flex-col gap-10">
+      <div className="overflow-x-hidden">
         <Banner />
         <BlogCarousel />
         <BeOurGuest />

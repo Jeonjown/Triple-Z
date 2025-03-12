@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Story: FC = () => {
   return (
-    <section className="flex w-full flex-col md:flex-row">
+    <section className="flex flex-col md:flex-row">
       {/* Image container taking equal space */}
       <div className="flex-1">
         <img
