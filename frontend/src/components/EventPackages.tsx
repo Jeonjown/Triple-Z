@@ -67,10 +67,9 @@ const EventPackages: React.FC = () => {
         >
           <CarouselContent className="">
             {eventMeals.map((meal) => (
-              // Responsive item: 60% width on small screens, 33.33% on LG screens
               <CarouselItem
                 key={meal._id}
-                className="flex-shrink-0 basis-[80%] lg:basis-1/3"
+                className="flex-shrink-0 basis-[60%] lg:basis-1/3"
               >
                 <Card className="h-full w-full border-none shadow-none">
                   <img
