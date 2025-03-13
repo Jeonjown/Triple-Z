@@ -79,10 +79,11 @@ export const createEventReservation = async (
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError<ReservationError>;
-      // Use the "message" field from the error response if available.
+      const axiosError = error as AxiosError;
       throw new Error(
-        axiosError.response?.data?.message || "An error occurred",
+        axiosError.response?.data?.message ||
+          axiosError.response?.data?.error ||
+          "An error occurred",
       );
     }
     throw new Error("An unexpected error occurred");
@@ -137,8 +138,10 @@ export const updateEventReservationPaymentStatus = async (
     );
     return response.data;
   } catch (error) {
+    console.log(error);
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<ReservationError>;
+      console.log(error);
       throw new Error(axiosError.response?.data?.error || "An error occurred");
     }
     throw new Error("An unexpected error occurred");
