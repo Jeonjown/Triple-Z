@@ -64,7 +64,7 @@ const EventCalendar = () => {
         <h2 className="mb-2 text-center text-2xl font-bold text-primary">
           Event Reservation View
         </h2>
-        <div className="mb-4">
+        <div className="mb-4 border">
           <Calendar
             mode="multiple"
             selected={reservedDates}
@@ -73,6 +73,16 @@ const EventCalendar = () => {
             className="mx-auto hover:cursor-not-allowed"
             disabled={true}
           />
+          <div className="mx-5 mb-5 flex justify-center space-x-4">
+            <div className="flex space-x-1">
+              <p className="text-xs text-gray-600">Today:</p>
+              <div className="h-4 w-4 rounded border bg-muted"></div>
+            </div>
+            <div className="flex space-x-1">
+              <p className="text-xs text-gray-600">Booked:</p>
+              <div className="h-4 w-4 rounded bg-primary"></div>
+            </div>
+          </div>
         </div>
         <div className="mb-6 flex justify-between px-2">
           <div className="flex flex-col items-center">
@@ -83,16 +93,7 @@ const EventCalendar = () => {
               {remainingReservations}
             </p>
           </div>
-          <div className="flex justify-center space-x-4">
-            <div className="flex space-x-1">
-              <p className="text-xs text-gray-600">Today:</p>
-              <div className="h-4 w-4 rounded border bg-muted"></div>
-            </div>
-            <div className="flex space-x-1">
-              <p className="text-xs text-gray-600">Booked:</p>
-              <div className="h-4 w-4 rounded bg-primary"></div>
-            </div>
-          </div>
+
           <div className="flex flex-col items-center">
             <p className="text-xs font-semibold">Earliest Booking Date</p>
             <p className="text-xs">prior the event</p>

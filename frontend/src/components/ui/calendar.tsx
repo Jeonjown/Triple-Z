@@ -16,7 +16,7 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("mx-auto w-full border p-8", className)}
+      className={cn("mx-auto w-full p-8", className)}
       classNames={{
         // Always use vertical stacking with consistent vertical spacing
         months:
@@ -38,7 +38,7 @@ function Calendar({
         cell: "flex-1 aspect-square text-center p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "w-full h-full p-0 font-normal text-lg aria-selected:opacity-100",
+          "w-full h-full p-0 font-normal text-sm md:text-lg aria-selected:opacity-100",
         ),
         day_range_end: "day-range-end",
         day_selected:
