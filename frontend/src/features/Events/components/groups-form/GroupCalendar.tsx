@@ -11,7 +11,6 @@ const GroupCalendar = () => {
     setReservedDates(newSelected);
   };
 
-  console.log(data);
   // Update reservedDates when data changes
   useEffect(() => {
     if (data && data.reservations) {

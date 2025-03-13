@@ -17,6 +17,7 @@ export const createGroupReservation = async (
       return next(createError("UserId is required in URL params", 400));
     }
 
+    // Destructure the required fields from the request body.
     const {
       date,
       fullName,
@@ -27,7 +28,7 @@ export const createGroupReservation = async (
       cart,
     } = req.body;
 
-    // Validate required fields
+    // Validate required fields.
     if (
       !date ||
       !fullName ||
@@ -41,7 +42,7 @@ export const createGroupReservation = async (
       return next(createError("Missing required fields", 400));
     }
 
-    // Fetch the user to ensure it exists
+    // Verify that the user exists.
     const user = await User.findById(userId);
     if (!user) {
       return next(
@@ -49,23 +50,16 @@ export const createGroupReservation = async (
       );
     }
 
-    // Calculate the total price of the cart
+    // Calculate the total cart value using each cart item's totalPrice.
     const cartTotal = cart.reduce(
       (sum: number, item: { totalPrice: number }) => sum + item.totalPrice,
       0
     );
 
-    // Fetch settings to retrieve the fee
-    const eventSettings = await EventSettings.findOne();
-    if (!eventSettings) {
-      return next(createError("Event settings not found", 500));
-    }
-    const eventFee = eventSettings.eventFee;
+    // Removed event fee: totalPayment is now just the cart total.
+    const totalPayment = cartTotal;
 
-    // Calculate the overall total payment (cart total + fee)
-    const totalPayment = cartTotal + eventFee;
-
-    // Create the group reservation document
+    // Create a new group reservation with the updated structure.
     const newReservation = new GroupReservation({
       userId,
       fullName,
@@ -76,14 +70,12 @@ export const createGroupReservation = async (
       endTime,
       cart,
       subtotal: cartTotal,
-      eventFee,
       totalPayment,
     });
 
-    // Save the reservation
     await newReservation.save();
 
-    // Populate the user field for the response
+    // Populate the user field for the response.
     const populatedReservation = await GroupReservation.findById(
       newReservation._id
     ).populate("userId", "username email", User);

@@ -1,4 +1,3 @@
-// GroupForm.tsx
 import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,16 +9,19 @@ import GroupStep4 from "../components/groups-form/GroupStep4";
 import { SelectedItem } from "../components/groups-form/EmbeddedMenu";
 import { useGetEventReservationSettings } from "../hooks/useGetEventReservationSettings";
 
-// Define a type for a cart item
-type CartItem = {
+// Unified CartItem type
+export type CartItem = {
   _id: string;
   title: string;
   quantity: number;
+  price: number;
   totalPrice: number;
   image: string;
+  size?: string;
 };
 
-// Updated Zod schema generator using the new min/max reservation settings
+// Updated Zod schema generator using new settings
+
 const getReservationSchema = (
   minReservation: number,
   maxReservation: number,
@@ -54,8 +56,10 @@ const getReservationSchema = (
         _id: z.string(),
         title: z.string(),
         quantity: z.number().min(1, "Quantity must be at least 1"),
+        price: z.number().min(0, "Price cannot be negative"),
         totalPrice: z.number().min(0, "Total Price cannot be negative"),
         image: z.string().url("Image URL must be a valid URL"),
+        size: z.string().optional(),
       }),
     ),
   });
@@ -63,21 +67,18 @@ const getReservationSchema = (
 export type GroupFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 
 const GroupForm = () => {
-  // Get settings from your API/hook
   const { data: settings } = useGetEventReservationSettings();
 
-  // Use new group reservation settings; fallback values provided if settings not loaded yet.
   const minReservation = settings ? settings.groupMinReservation : 1;
   const maxReservation = settings ? settings.groupMaxReservation : 12;
   const minDaysPrior = settings ? settings.groupMinDaysPrior : 0;
 
-  // Memoize the schema so that it updates when settings change
   const reservationSchema = useMemo(
     () => getReservationSchema(minReservation, maxReservation, minDaysPrior),
     [minReservation, maxReservation, minDaysPrior],
   );
 
-  // State variables for additional steps/values in your multi‐step form
+  // Multi-step form state
   const [selectedPackageIds, setSelectedPackageIds] = useState<SelectedItem[]>(
     [],
   );
@@ -88,7 +89,6 @@ const GroupForm = () => {
   const nextStep = () => setCurrentStep((prev) => prev + 1);
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
-  // Initialize form with default values, using the new minReservation for partySize.
   const methods = useForm<GroupFormValues>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
@@ -102,7 +102,6 @@ const GroupForm = () => {
     },
   });
 
-  // Reset form when minReservation changes
   useEffect(() => {
     methods.reset({
       fullName: "Jon Stewart Doe",
@@ -146,7 +145,6 @@ const GroupForm = () => {
                 Thank you for your reservation!
               </h2>
             )}
-
             {currentStep === 1 && (
               <GroupStep1
                 nextStep={nextStep}

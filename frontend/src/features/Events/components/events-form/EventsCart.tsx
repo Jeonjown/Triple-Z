@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,23 +11,58 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { RiShoppingBag3Fill } from "react-icons/ri";
-import { useCartStore } from "../stores/useCartStore";
-import { Link } from "react-router-dom";
+// Import the unified CartItem type from GroupForm.tsx
+import { CartItem } from "../../pages/EventForm";
 
-const Cart = () => {
-  const { cart, updateQuantity, removeFromCart } = useCartStore();
-  console.log(cart);
+interface GroupsCartProps {
+  cart: CartItem[];
+  updateQuantity: (id: string, newQuantity: number) => void;
+  removeFromCart: (id: string) => void;
+  tooltipTrigger: number;
+}
 
-  // Compute total price
-  const totalPrice = cart.reduce(
-    (total, item) => total + item.price * item.quantity,
+const EventsCart: React.FC<GroupsCartProps> = ({
+  cart,
+  updateQuantity,
+  removeFromCart,
+  tooltipTrigger,
+}) => {
+  // Calculate overall cart total
+  const totalCartPrice = cart.reduce(
+    (total, item) => total + item.totalPrice,
     0,
   );
+
+  // Manage tooltip state for "Item added!"
+  const [showTooltip, setShowTooltip] = useState(false);
+  const didMount = useRef(false);
+
+  useEffect(() => {
+    // If tooltipTrigger is 0, do nothing
+    if (tooltipTrigger === 0) return;
+
+    // Skip initial mount
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
+
+    // Show tooltip then hide after 300ms
+    setShowTooltip(true);
+    const timer = setTimeout(() => setShowTooltip(false), 300);
+    return () => clearTimeout(timer);
+  }, [tooltipTrigger]);
+
   return (
     <Drawer>
       <DrawerTrigger>
-        <div className="fixed bottom-10 right-10">
-          <RiShoppingBag3Fill className="size-12 rounded-full bg-secondary p-2 text-primary hover:scale-105 hover:cursor-pointer" />
+        <div className="fixed bottom-10 right-10 z-30">
+          {showTooltip && (
+            <div className="absolute -top-8 left-1/2 w-32 -translate-x-1/2 rounded border bg-white px-2 py-1 text-center text-sm text-text shadow-lg">
+              Item added!
+            </div>
+          )}
+          <RiShoppingBag3Fill className="size-16 rounded-full bg-secondary p-2 text-primary hover:scale-105 hover:cursor-pointer" />
           {cart.length > 0 && (
             <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
               {cart.length}
@@ -44,7 +80,7 @@ const Cart = () => {
           ) : (
             cart.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className="mb-4 flex items-center justify-between border-b pb-2"
               >
                 <img
@@ -54,29 +90,31 @@ const Cart = () => {
                 />
                 <div className="flex-1 px-4">
                   <h3 className="text-sm font-semibold">{item.title}</h3>
-                  <p className="text-xs">₱{item.price}</p>
+                  <p className="text-xs">
+                    Unit Price: ₱{item.price.toFixed(2)}
+                  </p>
+                  {item.size && <p className="text-xs">Size: {item.size}</p>}
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     className="rounded-lg border px-2 py-1 text-sm hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={() =>
-                      updateQuantity(item.id, Math.max(1, item.quantity - 1))
+                      updateQuantity(item._id, Math.max(1, item.quantity - 1))
                     }
-                    disabled={item.quantity === 1} // Disable when quantity is 1
+                    disabled={item.quantity === 1}
                   >
                     -
                   </button>
-
                   <span className="text-sm">{item.quantity}</span>
                   <button
                     className="rounded-lg border px-2 py-1 text-sm hover:bg-gray-200"
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    onClick={() => updateQuantity(item._id, item.quantity + 1)}
                   >
                     +
                   </button>
                   <button
                     className="ml-2 text-xs text-red-500 hover:text-red-700"
-                    onClick={() => removeFromCart(item.id)}
+                    onClick={() => removeFromCart(item._id)}
                   >
                     Remove
                   </button>
@@ -85,15 +123,11 @@ const Cart = () => {
             ))
           )}
         </div>
-
         <DrawerFooter className="border-t bg-white p-4">
           <div className="text-center font-bold">
-            Total: ₱{totalPrice.toFixed(2)}
+            Total: ₱{totalCartPrice.toFixed(2)}
           </div>
           <div className="flex w-full flex-col items-center gap-2">
-            <Button asChild className="w-full max-w-sm">
-              <Link to={"/menu/order-checkout"}>Checkout</Link>
-            </Button>
             <DrawerClose className="w-full max-w-sm">
               <Button variant={"outline"} className="w-full">
                 Close
@@ -106,4 +140,4 @@ const Cart = () => {
   );
 };
 
-export default Cart;
+export default EventsCart;

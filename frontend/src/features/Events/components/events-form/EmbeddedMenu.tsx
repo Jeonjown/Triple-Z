@@ -5,6 +5,7 @@ import LoadingPage from "@/pages/LoadingPage";
 import { Search, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useFormContext } from "react-hook-form";
 
 // Interfaces for menu structure
 interface Subcategory {
@@ -55,10 +56,13 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     isPending: boolean;
   };
 
-  // Initialize the toast function
+  // Initialize toast
   const { toast } = useToast();
 
-  // State for category, subcategory and other UI controls
+  // Get register method from react-hook-form for specialRequest field
+  const { register } = useFormContext();
+
+  // State for selected category/subcategory and UI controls
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null,
   );
@@ -71,18 +75,25 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // Set default category and subcategory when menu loads
+  // Filter to only use the "Packages" category (case-insensitive)
+  const packagesCategory = menuData?.categories.find(
+    (cat) => cat.category.toLowerCase() === "packages",
+  );
+
+  // Set default category/subcategory using the Packages category
   useEffect(() => {
-    if (menuData?.categories?.length) {
-      const defaultCategory = menuData.categories[0];
-      setSelectedCategoryId(defaultCategory._id);
-      if (defaultCategory.subcategories?.length) {
-        setSelectedSubcategoryId(defaultCategory.subcategories[0]._id);
+    if (packagesCategory) {
+      setSelectedCategoryId(packagesCategory._id);
+      if (
+        packagesCategory.subcategories &&
+        packagesCategory.subcategories.length > 0
+      ) {
+        setSelectedSubcategoryId(packagesCategory.subcategories[0]._id);
       } else {
         setSelectedSubcategoryId(null);
       }
     }
-  }, [menuData]);
+  }, [packagesCategory]);
 
   // Fetch items based on selected category/subcategory
   const { data: items, isPending: itemsPending } = useFetchItemsByCategories(
@@ -90,7 +101,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     selectedSubcategoryId ?? "",
   ) as { data?: MenuItem[]; isPending: boolean };
 
-  // Filter items using the search query
+  // Filter items by search query
   const filteredItems = (items || []).filter((item) =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
@@ -105,7 +116,6 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     let sizeId: string | undefined = undefined;
     let price: number | null = item.basePrice; // Default to basePrice
 
-    // If item requires size selection, determine the selected size and its price
     if (item.requiresSizeSelection && item.sizes.length > 0) {
       sizeId = selectedSizes[item._id] || item.sizes[0]._id;
       if (!selectedSizes[item._id]) {
@@ -117,12 +127,10 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
       }
     }
 
-    // Trigger the callback if provided
     if (onAddToCart) {
       onAddToCart(item, sizeId);
     }
 
-    // Display the toast with the item title and price
     toast({
       title: "Added to Cart",
       description: `${item.title} for ₱${price} was added to your cart.`,
@@ -130,93 +138,61 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     });
   };
 
-  // Render a loading state if data is still fetching
+  // Loading state
   if (menuPending || itemsPending) return <LoadingPage />;
-  if (!menuData?.categories) return <></>;
+  if (!packagesCategory) return <></>;
 
   return (
     <div className="mt-5 flex w-full flex-col rounded-md md:flex-row md:border md:p-5">
-      {/* Mobile Sidebar Dropdown */}
+      {/* Mobile Sidebar: Render only Packages subcategories */}
       <div className="block md:hidden">
         <div className="fixed left-0 top-24 z-10 w-full bg-white p-3 shadow-md">
           <button
+            type="button"
             className="w-full rounded-md bg-primary p-2 text-white"
             onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
           >
-            {isMobileSidebarOpen ? "Close Menu" : "Select Category"}
+            {isMobileSidebarOpen ? "Close Menu" : "Select Subcategory"}
           </button>
-          {isMobileSidebarOpen && (
+          {isMobileSidebarOpen && packagesCategory.subcategories && (
             <div className="mt-2 animate-fadeIn rounded-md border bg-white p-3 shadow-lg transition-opacity duration-300 ease-in-out">
-              {menuData.categories.map((category) => (
-                <div key={category._id} className="mb-3">
-                  <h2 className="font-bold text-primary">
-                    {category.category}
-                  </h2>
-                  {category.subcategories?.map((subcategory) => (
-                    <button
-                      key={subcategory._id}
-                      onClick={() => {
-                        setSelectedCategoryId(category._id);
-                        setSelectedSubcategoryId(subcategory._id);
-                        setIsMobileSidebarOpen(false);
-                      }}
-                      className="block p-1 hover:font-bold"
-                    >
-                      {subcategory.subcategory}
-                    </button>
-                  ))}
-                </div>
+              {packagesCategory.subcategories.map((subcategory) => (
+                <button
+                  key={subcategory._id}
+                  onClick={() => {
+                    setSelectedSubcategoryId(subcategory._id);
+                    setIsMobileSidebarOpen(false);
+                  }}
+                  className="block p-1 hover:font-bold"
+                >
+                  {subcategory.subcategory}
+                </button>
               ))}
             </div>
           )}
         </div>
       </div>
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar: Render only Packages subcategories */}
       <div className="hidden w-full md:block md:w-1/4 md:border-r">
-        <h3 className="mb-2 text-xl font-bold">Categories</h3>
-        {menuData.categories.map((category) => (
-          <div key={category._id} className="mb-2">
-            <button
-              type="button"
-              className={`w-full rounded-md px-3 py-2 text-left transition duration-200 ${
-                selectedCategoryId === category._id
-                  ? "bg-gray-100 font-bold text-primary"
-                  : "text-gray-700 hover:bg-gray-50"
-              }`}
-              onClick={() => {
-                setSelectedCategoryId(category._id);
-                if (
-                  category.subcategories &&
-                  category.subcategories.length > 0
-                ) {
-                  setSelectedSubcategoryId(category.subcategories[0]._id);
-                } else {
-                  setSelectedSubcategoryId(null);
-                }
-              }}
-            >
-              {category.category}
-            </button>
-            {selectedCategoryId === category._id && category.subcategories && (
-              <div className="ml-4 mt-1 space-y-1">
-                {category.subcategories.map((subcat) => (
-                  <button
-                    key={subcat._id}
-                    type="button"
-                    className={`w-full rounded-md px-2 py-1 text-left transition duration-200 ${
-                      selectedSubcategoryId === subcat._id
-                        ? "bg-gray-100 font-semibold text-secondary"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                    onClick={() => setSelectedSubcategoryId(subcat._id)}
-                  >
-                    {subcat.subcategory}
-                  </button>
-                ))}
-              </div>
-            )}
+        <h3 className="mb-2 text-xl font-bold">Packages</h3>
+        {packagesCategory.subcategories && (
+          <div className="ml-4 mt-1 space-y-1">
+            {packagesCategory.subcategories.map((subcat) => (
+              <button
+                key={subcat._id}
+                type="button"
+                className={`w-full rounded-md px-2 py-1 text-left transition duration-200 ${
+                  selectedSubcategoryId === subcat._id
+                    ? "bg-gray-100 font-semibold text-primary"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+                onClick={() => setSelectedSubcategoryId(subcat._id)}
+              >
+                {subcat.subcategory}
+              </button>
+            ))}
           </div>
-        ))}
+        )}
       </div>
       {/* Menu Items */}
       <div className="w-full p-4 md:w-3/4">
@@ -287,6 +263,18 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
               </div>
             </div>
           ))}
+        </div>
+        {/* Special Request Text Area */}
+        <div className="mt-6">
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Special Request
+          </label>
+          <textarea
+            {...register("specialRequest")}
+            placeholder="Any special requests?"
+            className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            rows={4}
+          ></textarea>
         </div>
       </div>
     </div>

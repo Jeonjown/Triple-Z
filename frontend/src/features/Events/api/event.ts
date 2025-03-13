@@ -33,6 +33,7 @@ interface EventReservationSettingsResponse {
   success: boolean;
   data: EventReservationSettings;
 }
+
 interface UserReservation {
   _id: string;
   username: string;
@@ -60,6 +61,7 @@ export interface Reservation {
   updatedAt: string;
   __v: number;
 }
+
 interface ReservationError {
   error: string;
 }
@@ -71,7 +73,7 @@ export const createEventReservation = async (
   try {
     console.log("from request:", eventFormValues);
     const response: AxiosResponse<Reservation> = await api.post(
-      `/api/menu/events/event-reservations/${userId}`,
+      `/api/events/event-reservations/${userId}`,
       eventFormValues,
     );
     return response.data;
@@ -86,6 +88,7 @@ export const createEventReservation = async (
     throw new Error("An unexpected error occurred");
   }
 };
+
 export const getEventReservations = async () => {
   try {
     const response = await api.get("/api/events/event-reservations");
@@ -144,7 +147,6 @@ export const updateEventReservationPaymentStatus = async (
 
 export const deleteEventReservation = async (reservationId: string) => {
   try {
-    // Pass the reservationId in the request body under the "data" key
     const response: AxiosResponse<string> = await api.delete(
       `/api/events/event-reservations/`,
       { data: { reservationId } },
@@ -159,14 +161,12 @@ export const deleteEventReservation = async (reservationId: string) => {
   }
 };
 
-//EVENT RESERVATIONS SETTINGS
 export const getEventReservationSettings =
   async (): Promise<EventReservationSettings> => {
     try {
       const response: AxiosResponse<EventReservationSettingsResponse> =
         await api.get(`/api/events/settings`);
-
-      return response.data.data; // ✅ Ensure we return the nested 'data' object
+      return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError<ReservationError>;
@@ -177,15 +177,13 @@ export const getEventReservationSettings =
       throw new Error("An unexpected error occurred");
     }
   };
+
 export const createOrUpdateEventSettings = async (
   settings: Partial<EventReservationSettings>,
 ): Promise<EventReservationSettings> => {
   try {
-    // Use POST (or PUT) to send the settings data to your endpoint
     const response: AxiosResponse<EventReservationSettingsResponse> =
       await api.post(`/api/events/settings`, settings);
-
-    // Return the nested data property from the response
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

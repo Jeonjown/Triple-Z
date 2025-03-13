@@ -93,7 +93,10 @@ export const getGroupReservations = async (): Promise<GroupReservation[]> => {
     return response.data.reservations;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || "An error occurred");
+      const axiosError = error as AxiosError<ReservationError>;
+      throw new Error(
+        axiosError.response?.data?.message || "An error occurred",
+      );
     }
     throw new Error("An unexpected error occurred");
   }

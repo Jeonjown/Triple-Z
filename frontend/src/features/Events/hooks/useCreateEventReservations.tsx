@@ -7,8 +7,9 @@ import { useParams } from "react-router-dom";
 export const useCreateEventReservations = () => {
   const queryClient = useQueryClient();
   const { userId } = useParams();
+
   const { mutate, isPending, isError, error } = useMutation<
-    Reservation, // Return type on success
+    Reservation, // Success type
     Error, // Error type
     EventFormValues // Input type
   >({
@@ -22,7 +23,7 @@ export const useCreateEventReservations = () => {
       console.error("Error creating reservation:", err);
       toast({
         title: "Error creating reservation",
-        description: err.message, // Use the error message provided by the API
+        description: err.message, // Display the error message returned by the API
         variant: "destructive",
       });
     },

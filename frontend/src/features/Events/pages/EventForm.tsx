@@ -7,19 +7,27 @@ import EventStep1 from "../components/events-form/EventStep1";
 import EventStep2 from "../components/events-form/EventStep2";
 import EventStep3 from "../components/events-form/EventStep3";
 import EventStep4 from "../components/events-form/EventStep4";
+import { ProgressBar } from "@/components/ProgressBar";
+// Import the SelectedItem type from EmbeddedMenu
+import { SelectedItem } from "../components/events-form/EmbeddedMenu";
 
-type CartItem = {
+// ─── Unified CartItem type (single source of truth) ────────────────────────────
+// Now includes 'price' and optional 'size'
+export type CartItem = {
   _id: string;
   title: string;
   quantity: number;
+  price: number;
   totalPrice: number;
   image: string;
+  size?: string;
 };
 
 const defaultMinGuests = 24;
 const defaultMinDaysPrior = 14;
 
-// Define the Zod schema for your form values
+// ─── Updated Zod Schema ─────────────────────────────────────────────────────────
+// Added 'price' and optional 'size' to the cart schema.
 const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
   z.object({
     fullName: z.string().nonempty("Full Name is required."),
@@ -34,9 +42,22 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
       .refine(
         (val) => {
           const selectedDate = new Date(val);
+          // Create a date-only version (time set to midnight)
+          const selectedDateOnly = new Date(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth(),
+            selectedDate.getDate(),
+          );
           const minDate = new Date();
           minDate.setDate(minDate.getDate() + minDaysPrior);
-          return selectedDate >= minDate;
+          const minDateOnly = new Date(
+            minDate.getFullYear(),
+            minDate.getMonth(),
+            minDate.getDate(),
+          );
+          console.log("Selected date (date-only):", selectedDateOnly);
+          console.log("Computed min date (date-only):", minDateOnly);
+          return selectedDateOnly >= minDateOnly;
         },
         { message: `Date must be at least ${minDaysPrior} days in advance` },
       ),
@@ -48,8 +69,10 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
         _id: z.string(),
         title: z.string(),
         quantity: z.number().min(1, "Quantity must be at least 1"),
+        price: z.number().min(0, "Price cannot be negative"),
         totalPrice: z.number().min(0, "Total Price cannot be negative"),
         image: z.string().url("Image URL must be a valid URL"),
+        size: z.string().optional(),
       }),
     ),
     specialRequest: z.string().optional(),
@@ -59,32 +82,42 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
 export type EventFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 
 const EventForm = () => {
+  // Get settings from backend (fallback to default values)
   const { data: settings } = useGetEventReservationSettings();
-  console.log(settings);
-
-  // Use settings or fallback to default values
   const minGuests = settings?.eventMinGuests || defaultMinGuests;
   const minDaysPrior = settings?.eventMinDaysPrior || defaultMinDaysPrior;
 
+  // Create the Zod schema using current settings
   const reservationSchema = useMemo(
     () => getReservationSchema(minGuests, minDaysPrior),
     [minGuests, minDaysPrior],
   );
 
-  const [selectedPackageIds, setSelectedPackageIds] = useState<string[]>([]);
+  // Local state for multi-step form
+  // Change selectedPackageIds type from string[] to SelectedItem[]
+  const [selectedPackageIds, setSelectedPackageIds] = useState<SelectedItem[]>(
+    [],
+  );
   const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
   const nextStep = () => setCurrentStep((prev) => prev + 1);
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
-  // Initialize the form with defaultValues using the current minGuests
+  const steps = [
+    { step: 1, label: "Details" },
+    { step: 2, label: "Packages" },
+    { step: 3, label: "Confirm" },
+    { step: 4, label: "Thank You" },
+  ];
+
+  // Initialize the form with default values. Note the empty cart array.
   const methods = useForm<EventFormValues>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
       fullName: "Jon Stewart Doe",
       contactNumber: "6019521325",
-      partySize: minGuests, // Initial party size is minGuests
+      partySize: minGuests,
       date: "2025-03-08",
       startTime: "10:00 AM",
       endTime: "3:00 PM",
@@ -94,12 +127,12 @@ const EventForm = () => {
     },
   });
 
-  // When minGuests changes, update the form's partySize using reset
+  // When minGuests changes, reset the form.
   useEffect(() => {
     methods.reset({
       fullName: "Jon Stewart Doe",
       contactNumber: "6019521325",
-      partySize: minGuests, // Update partySize to new minGuests
+      partySize: minGuests,
       date: "2025-03-08",
       startTime: "10:00 AM",
       endTime: "3:00 PM",
@@ -110,7 +143,6 @@ const EventForm = () => {
   }, [methods, minGuests]);
 
   const { reset } = methods;
-
   const onSubmit = (data: EventFormValues) => {
     console.log("Form Submitted from main:", data);
     reset();
@@ -140,8 +172,7 @@ const EventForm = () => {
                 Thank you for your reservation!
               </h2>
             )}
-
-            {/* Progress bar and steps here... */}
+            <ProgressBar currentStep={currentStep} steps={steps} />
             {currentStep === 1 && (
               <EventStep1 nextStep={nextStep} minGuests={minGuests} />
             )}

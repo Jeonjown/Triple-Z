@@ -1,6 +1,4 @@
-// Step 3 Component
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,6 +19,7 @@ interface CartItem {
   _id: string;
   title: string;
   quantity: number;
+  price: number;
   totalPrice: number;
   image: string;
 }
@@ -49,7 +48,15 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     return `${month}-${day}-${year}`;
   };
 
-  // Submit form and process mutation
+  // Calculate total price including event fee.
+  // Cart total is the sum of each cart item's totalPrice.
+  // We then add the event fee from settings (or 0 if not available).
+  const calculateTotalPrice = () => {
+    const cartTotal = cart.reduce((total, item) => total + item.totalPrice, 0);
+    return cartTotal + (settings?.eventFee ?? 0);
+  };
+
+  // Handle form submission and mutation
   const onSubmit = (data: EventFormValues) => {
     mutate(data, {
       onSuccess: () => {
@@ -67,19 +74,15 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     handleSubmit(onSubmit)();
   };
 
-  // New function: Checks notification permission before opening the dialog.
+  // Check for notification subscription before proceeding
   const handleCheckoutFlow = async () => {
     try {
-      // First, if notifications are already granted...
       if (Notification.permission === "granted") {
-        // Get any existing service worker registration.
         const registration = await navigator.serviceWorker.getRegistration("/");
         if (registration) {
-          // Check if a push subscription already exists.
           const existingSubscription =
             await registration.pushManager.getSubscription();
           if (existingSubscription) {
-            // If subscription exists, proceed directly.
             handleCheckout();
             return;
           }
@@ -88,14 +91,12 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     } catch (error) {
       console.error("Error checking subscription:", error);
     }
-    // If not granted or no subscription, open the dialog.
     setDialogOpen(true);
   };
 
   // Render cart items
   const renderCartItems = () => {
     if (cart.length === 0) return <div>No items in your cart.</div>;
-
     return cart.map((item) => (
       <div
         key={item._id}
@@ -108,7 +109,9 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         />
         <div>
           <div className="font-semibold">{item.title}</div>
-          <div className="text-sm text-gray-600">Quantity: {item.quantity}</div>
+          <div className="text-sm text-gray-600">
+            {item.quantity} x ₱{item.price.toFixed(2)}
+          </div>
           <div className="text-sm text-gray-600">
             Total: ₱{item.totalPrice.toFixed(2)}
           </div>
@@ -117,16 +120,9 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     ));
   };
 
-  // Calculate total price including event fee
-  const calculateTotalPrice = () => {
-    const cartTotal = cart.reduce((total, item) => total + item.totalPrice, 0);
-    return cartTotal + (settings?.eventFee ?? 0);
-  };
-
   return (
     <>
       <ScrollToTop />
-      {/* Confirmation Card */}
       <div className="mx-auto mt-8 w-full rounded-lg bg-white p-6 md:border">
         <h2 className="mb-10 text-center text-2xl font-semibold">
           Confirm Your Details
@@ -167,12 +163,10 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
             {formValues.specialRequest ?? "None"}
           </div>
         </div>
-        {/* Preorder List */}
         <div className="mb-4">
           <span className="text-gray-600">Preorder List:</span>
-          <div className="mt-2 rounded border">{renderCartItems()}</div>
+          <div className="mt-2 rounded border p-2">{renderCartItems()}</div>
         </div>
-        {/* Fees and Total */}
         <div className="mb-4">
           <span className="text-gray-600">Event Fee:</span>
           <p className="font-semibold">₱{settings?.eventFee}</p>
@@ -182,24 +176,21 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         </div>
       </div>
 
-      {/* Navigation Buttons */}
       <div className="mt-6 flex max-w-full gap-4">
         <Button type="button" onClick={prevStep} className="flex-1">
           Previous
         </Button>
-        {/* Use the new handler here */}
         <Button type="button" onClick={handleCheckoutFlow} className="flex-1">
           Checkout
         </Button>
       </div>
 
-      {/* shadcn Dialog Box for Notification Preference */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Enable Notifications?</DialogTitle>
             <DialogDescription>
-              Would you like to receive push notification for order updates in
+              Would you like to receive push notifications for order updates on
               this device?
             </DialogDescription>
           </DialogHeader>
