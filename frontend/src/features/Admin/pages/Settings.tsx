@@ -16,8 +16,9 @@ import { Button } from "@/components/ui/button";
 import HourlyTimePicker from "@/features/Events/components/events-form/HourlyTimePicker";
 import { useCreateOrUpdateSettings } from "@/features/Events/hooks/useCreateorUpdateSettings";
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
+import DisableScroll from "@/utils/DisableScroll";
 
-// Updated validation schema using zod with all group fields from the Mongoose model
+// Updated validation schema including the new eventMinPackageOrder field.
 const formSchema = z.object({
   eventReservationLimit: z.coerce
     .number()
@@ -25,6 +26,9 @@ const formSchema = z.object({
   eventMinDaysPrior: z.coerce.number().min(0, { message: "Must be 0 or more" }),
   eventMinGuests: z.coerce.number().min(1, { message: "Must be at least 1" }),
   eventFee: z.coerce.number().min(0, { message: "Must be a positive fee" }),
+  eventMinPackageOrder: z.coerce
+    .number()
+    .min(0, { message: "Must be at least 0" }),
   groupReservationLimit: z.coerce
     .number()
     .min(0, { message: "Must be 0 or more" }),
@@ -43,9 +47,9 @@ const formSchema = z.object({
     .min(0, { message: "Must be 0 or more" }),
   openingHours: z.string().nonempty({ message: "Required" }),
   closingHours: z.string().nonempty({ message: "Required" }),
+  eventTermsofService: z.string().optional(),
 });
 
-// Infer TypeScript type from schema
 type SettingsFormValues = z.infer<typeof formSchema>;
 
 const Settings: React.FC = () => {
@@ -59,6 +63,7 @@ const Settings: React.FC = () => {
       eventMinDaysPrior: 0,
       eventMinGuests: 1,
       eventFee: 0,
+      eventMinPackageOrder: 0,
       groupReservationLimit: 0,
       groupMinDaysPrior: 0,
       groupMinReservation: 1,
@@ -67,13 +72,12 @@ const Settings: React.FC = () => {
       groupMaxGuestsPerTable: 6,
       openingHours: "",
       closingHours: "",
+      eventTermsofService: "",
     },
   });
 
-  // Format time string by removing a leading zero
   const formatTime = (time: string): string => time.replace(/^0/, "");
 
-  // Reset form with fetched settings values
   useEffect(() => {
     if (settings) {
       form.reset({
@@ -81,6 +85,7 @@ const Settings: React.FC = () => {
         eventMinDaysPrior: settings.eventMinDaysPrior ?? 0,
         eventMinGuests: settings.eventMinGuests ?? 1,
         eventFee: settings.eventFee ?? 0,
+        eventMinPackageOrder: settings.eventMinPackageOrder ?? 0,
         groupReservationLimit: settings.groupReservationLimit ?? 0,
         groupMinDaysPrior: settings.groupMinDaysPrior ?? 0,
         groupMinReservation: settings.groupMinReservation ?? 1,
@@ -93,6 +98,7 @@ const Settings: React.FC = () => {
         closingHours: settings.closingHours
           ? formatTime(settings.closingHours)
           : "",
+        eventTermsofService: settings.eventTermsofService || "",
       });
     }
   }, [settings, form]);
@@ -101,6 +107,8 @@ const Settings: React.FC = () => {
     console.log("form submitted: ", values);
     mutate(values);
   };
+
+  <DisableScroll />;
 
   return (
     <div className="mx-auto max-w-lg p-4">
@@ -202,6 +210,20 @@ const Settings: React.FC = () => {
               </FormItem>
             )}
           />
+          {/* New Event Minimum Package Order Field */}
+          <FormField
+            control={form.control}
+            name="eventMinPackageOrder"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Minimum Package Order for Event</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {/* Group Reservation Settings */}
           <h2 className="mb-6 text-xl font-bold">Group Reservation Settings</h2>
@@ -278,6 +300,26 @@ const Settings: React.FC = () => {
                 <FormLabel>Maximum Guests Per Table</FormLabel>
                 <FormControl>
                   <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* New Terms of Service Field */}
+          <FormField
+            control={form.control}
+            name="eventTermsofService"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Terms of Service</FormLabel>
+                <FormControl>
+                  <textarea
+                    {...field}
+                    placeholder="Enter terms of service..."
+                    className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    rows={4}
+                  ></textarea>
                 </FormControl>
                 <FormMessage />
               </FormItem>

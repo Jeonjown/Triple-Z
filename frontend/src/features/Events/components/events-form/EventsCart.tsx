@@ -11,7 +11,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { RiShoppingBag3Fill } from "react-icons/ri";
-// Import the unified CartItem type from GroupForm.tsx
+// Import the unified CartItem type from your EventForm
 import { CartItem } from "../../pages/EventForm";
 
 interface GroupsCartProps {
@@ -105,7 +105,19 @@ const EventsCart: React.FC<GroupsCartProps> = ({
                   >
                     -
                   </button>
-                  <span className="text-sm">{item.quantity}</span>
+                  <input
+                    type="number"
+                    value={item.quantity}
+                    onChange={(e) => {
+                      const newVal = parseInt(e.target.value, 10);
+                      if (!isNaN(newVal) && newVal >= 1 && newVal <= 99) {
+                        updateQuantity(item._id, newVal);
+                      }
+                    }}
+                    min="1"
+                    max="99"
+                    className="w-16 rounded border text-center"
+                  />
                   <button
                     className="rounded-lg border px-2 py-1 text-sm hover:bg-gray-200"
                     onClick={() => updateQuantity(item._id, item.quantity + 1)}

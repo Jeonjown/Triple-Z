@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,7 +37,9 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   const { mutate } = useCreateEventReservations();
   const { watch, handleSubmit, reset } = methods;
   const formValues = watch();
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [notifDialogOpen, setNotifDialogOpen] = useState(false);
+  const [tosDialogOpen, setTosDialogOpen] = useState(false);
+  const [acceptedTOS, setAcceptedTOS] = useState(false);
 
   // Format date as MM-DD-YYYY
   const formatDate = (date: Date) => {
@@ -49,18 +51,16 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   };
 
   // Calculate total price including event fee.
-  // Cart total is the sum of each cart item's totalPrice.
-  // We then add the event fee from settings (or 0 if not available).
   const calculateTotalPrice = () => {
     const cartTotal = cart.reduce((total, item) => total + item.totalPrice, 0);
     return cartTotal + (settings?.eventFee ?? 0);
   };
 
-  // Handle form submission and mutation
+  // Submit form and process mutation
   const onSubmit = (data: EventFormValues) => {
     mutate(data, {
       onSuccess: () => {
-        nextStep(); // Advance only after success
+        nextStep();
         reset();
       },
       onError: (error) => {
@@ -74,8 +74,13 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     handleSubmit(onSubmit)();
   };
 
-  // Check for notification subscription before proceeding
+  // First, check if TOS is accepted. If not, open the TOS dialog.
+  // If accepted, check for push subscription.
   const handleCheckoutFlow = async () => {
+    if (!acceptedTOS) {
+      setTosDialogOpen(true);
+      return;
+    }
     try {
       if (Notification.permission === "granted") {
         const registration = await navigator.serviceWorker.getRegistration("/");
@@ -91,7 +96,7 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     } catch (error) {
       console.error("Error checking subscription:", error);
     }
-    setDialogOpen(true);
+    setNotifDialogOpen(true);
   };
 
   // Render cart items
@@ -174,18 +179,43 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         <div className="text-right text-xl font-semibold">
           Total Price: ₱{calculateTotalPrice().toFixed(2)}
         </div>
+        {/* TOS acceptance checkbox */}
+        <div className="mx-auto mt-4 flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={acceptedTOS}
+            onChange={(e) => setAcceptedTOS(e.target.checked)}
+            className="h-4 w-4 bg-primary"
+          />
+          <span className="text-sm">
+            I agree to Triple Z's{" "}
+            <button
+              type="button"
+              className="text-blue-500 underline"
+              onClick={() => setTosDialogOpen(true)}
+            >
+              Terms of Service
+            </button>
+          </span>
+        </div>
       </div>
 
       <div className="mt-6 flex max-w-full gap-4">
         <Button type="button" onClick={prevStep} className="flex-1">
           Previous
         </Button>
-        <Button type="button" onClick={handleCheckoutFlow} className="flex-1">
+        <Button
+          type="button"
+          onClick={handleCheckoutFlow}
+          className="flex-1"
+          disabled={!acceptedTOS}
+        >
           Checkout
         </Button>
       </div>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {/* Notification Dialog (existing) */}
+      <Dialog open={notifDialogOpen} onOpenChange={setNotifDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Enable Notifications?</DialogTitle>
@@ -198,7 +228,7 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
             <Button
               variant="outline"
               onClick={() => {
-                setDialogOpen(false);
+                setNotifDialogOpen(false);
                 handleCheckout();
               }}
             >
@@ -206,12 +236,34 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
             </Button>
             <Button
               onClick={async () => {
-                setDialogOpen(false);
+                setNotifDialogOpen(false);
                 await registerAndSubscribe();
                 handleCheckout();
               }}
             >
               Yes, subscribe me
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Terms of Service Dialog */}
+      <Dialog open={tosDialogOpen} onOpenChange={setTosDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-center">Terms of Service</DialogTitle>
+            <DialogDescription style={{ whiteSpace: "pre-wrap" }}>
+              {settings?.eventTermsofService || "No Terms of Service provided."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setAcceptedTOS(true);
+                setTosDialogOpen(false);
+              }}
+            >
+              I Accept
             </Button>
           </DialogFooter>
         </DialogContent>

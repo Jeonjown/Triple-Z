@@ -5,6 +5,7 @@ import EmbeddedMenu, { MenuItem, SelectedItem } from "./EmbeddedMenu";
 import ScrollToTop from "@/components/ScrollToTop";
 import EventsCart from "./EventsCart"; // Your custom cart component
 import { CartItem, EventFormValues } from "../../pages/EventForm";
+import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 
 type Step2Props = {
   nextStep: () => void;
@@ -38,6 +39,7 @@ const EventStep2: React.FC<Step2Props> = ({
     setTooltipTrigger(0);
   }, []);
 
+  // Function to add an item to cart
   const addToCart = (item: MenuItem, sizeId?: string) => {
     const key = sizeId ? `${item._id}_${sizeId}` : item._id;
     const exists = selectedPackageIds.find((s) => s.key === key);
@@ -91,6 +93,15 @@ const EventStep2: React.FC<Step2Props> = ({
     setValue("cart", cart);
   }, [cart, setValue]);
 
+  // Get settings to read the required minimum package order.
+  const { data: settings } = useGetEventReservationSettings();
+
+  // Calculate the total number of packages ordered.
+  const totalPackagesOrdered = cart.reduce(
+    (sum, item) => sum + item.quantity,
+    0,
+  );
+
   return (
     <>
       <ScrollToTop />
@@ -132,10 +143,24 @@ const EventStep2: React.FC<Step2Props> = ({
         <Button type="button" onClick={prevStep} className="w-full">
           Previous
         </Button>
-        <Button type="button" onClick={nextStep} className="w-full">
+        <Button
+          type="button"
+          onClick={nextStep}
+          className="w-full"
+          disabled={
+            settings
+              ? totalPackagesOrdered < settings.eventMinPackageOrder
+              : false
+          }
+        >
           Next
         </Button>
       </div>
+      {settings && totalPackagesOrdered < settings.eventMinPackageOrder && (
+        <p className="mt-2 text-xs text-red-500">
+          Minimum package order of {settings.eventMinPackageOrder} is required.
+        </p>
+      )}
       {errors.cart && (
         <p className="mt-2 text-xs text-red-500">{errors.cart.message}</p>
       )}

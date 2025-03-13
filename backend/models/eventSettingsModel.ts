@@ -3,17 +3,17 @@ import { reservationDB } from "../db";
 
 const eventSettingsSchema = new mongoose.Schema(
   {
-    // For individual event reservations:
+    // For  event reservations:
     eventReservationLimit: { type: Number, required: true },
     eventMinDaysPrior: { type: Number, required: true, min: 0 },
     eventFee: { type: Number, required: true },
     eventMinGuests: { type: Number, required: true, min: 1 },
+    eventTermsofService: { type: String },
+    eventMinPackageOrder: { type: Number, required: true, default: 0 },
 
     // For group reservations:
-    // Group reservation must be between groupMinReservation and groupMaxReservation guests.
     groupMinReservation: { type: Number, required: true, min: 1 },
     groupMaxReservation: { type: Number, required: true },
-    // Each table can hold up to groupMaxGuestsPerTable guests (default 6).
     groupMaxGuestsPerTable: { type: Number, required: true, default: 6 },
     groupMinDaysPrior: { type: Number, required: true, min: 0 },
     groupReservationLimit: { type: Number, required: true },
