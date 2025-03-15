@@ -25,7 +25,7 @@ const BlogPosts: React.FC = () => {
       <Button variant="outline" onClick={() => navigate(-1)} className="mb-4">
         Back
       </Button>
-      <Card className="mx-auto w-full max-w-4xl border-none">
+      <Card className="mx-auto w-full max-w-4xl border-none shadow-none">
         <img
           src={blogPost?.image}
           alt={`Image for ${blogPost?.title}`}

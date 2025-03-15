@@ -48,7 +48,7 @@ const Blogs: React.FC = () => {
         {blogPosts?.map((post) => (
           <Card
             key={post._id}
-            className="border-none transition-transform hover:border"
+            className="border-none shadow-none transition-transform"
           >
             <CardHeader>
               <img
