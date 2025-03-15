@@ -21,29 +21,29 @@ const BlogPosts: React.FC = () => {
   if (isError) return <div>Error: {error?.message}</div>;
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto px-4 py-4 sm:px-6 lg:px-8">
       <Button variant="outline" onClick={() => navigate(-1)} className="mb-4">
         Back
       </Button>
-      <Card className="shadow-lg">
-        <CardHeader className="px-6 py-4">
-          <CardTitle className="text-3xl font-bold">
+      <Card className="mx-auto w-full max-w-4xl border-none">
+        <img
+          src={blogPost?.image}
+          alt={`Image for ${blogPost?.title}`}
+          className="h-auto w-full object-cover"
+        />
+        <CardHeader className="mt-5 px-4 py-4 sm:px-6 md:px-8">
+          <CardTitle className="text-2xl font-bold sm:text-3xl">
             {blogPost?.title}
           </CardTitle>
-          <CardDescription className="text-sm text-gray-500">
+          <CardDescription className="text-xs text-gray-500 sm:text-sm">
             {blogPost?.eventType} •{" "}
             {blogPost?.createdAt
               ? new Date(blogPost.createdAt).toLocaleDateString()
               : "No date"}
           </CardDescription>
         </CardHeader>
-        <img
-          src={blogPost?.image}
-          alt={`Image for ${blogPost?.title}`}
-          className="w-full object-cover"
-        />
-        <CardContent className="px-6 py-4">
-          <p className="text-lg">{blogPost?.content}</p>
+        <CardContent className="px-4 py-4 sm:px-6 md:px-8">
+          <p className="whitespace-pre-line">{blogPost?.content}</p>
         </CardContent>
       </Card>
     </div>

@@ -1,4 +1,3 @@
-// ManageBlogs.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetAllBlogPosts } from "../hooks/useGetAllBlogPosts";
@@ -46,17 +45,17 @@ const ManageBlogs: React.FC = () => {
   const [newContent, setNewContent] = useState<string>("");
   const [newImage, setNewImage] = useState<File | null>(null);
 
-  // State for deletion dialog (using ShadCN dialog)
+  // State for deletion dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [deletingBlogId, setDeletingBlogId] = useState<string | null>(null);
 
   // Open create modal
-  const handleAddPost = () => {
+  const handleAddPost = (): void => {
     setIsCreateModalOpen(true);
   };
 
   // Prepare edit state
-  const handleEdit = (blog: BlogPost) => {
+  const handleEdit = (blog: BlogPost): void => {
     setEditingBlog(blog);
     setEditTitle(blog.title);
     setEditEventType(blog.eventType);
@@ -65,13 +64,13 @@ const ManageBlogs: React.FC = () => {
   };
 
   // Trigger deletion dialog
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: string): void => {
     setDeletingBlogId(id);
     setDeleteDialogOpen(true);
   };
 
-  // Confirm deletion in dialog
-  const confirmDelete = () => {
+  // Confirm deletion
+  const confirmDelete = (): void => {
     if (deletingBlogId) {
       deleteBlogPost({ blogId: deletingBlogId });
       setDeletingBlogId(null);
@@ -80,7 +79,7 @@ const ManageBlogs: React.FC = () => {
   };
 
   // Submit updated blog post
-  const handleUpdateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (!editingBlog) return;
 
@@ -96,7 +95,7 @@ const ManageBlogs: React.FC = () => {
   };
 
   // Submit new blog post
-  const handleCreateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", newTitle);
@@ -121,48 +120,37 @@ const ManageBlogs: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4">
-      {/* Header */}
-      <header className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Blog Posts (Admin)</h1>
+      {/* Header with consistent styling */}
+      <header className="mb-6 flex justify-between text-center">
+        <h1 className="text-3xl font-bold">Manage Blog Posts</h1>
         <Button onClick={handleAddPost}>Add Post</Button>
       </header>
 
-      {/* Blog posts grid */}
-      <main className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Grid layout matching Blogs component */}
+      <main className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {blogPosts?.map((post) => (
-          <Card key={post._id} className="shadow-sm">
-            <img
-              src={post.image}
-              alt={`Image for ${post.title}`}
-              className="w-full object-cover"
-            />
-            <CardHeader className="px-4 py-2">
-              <CardTitle className="text-xl font-semibold">
+          <Card
+            key={post._id}
+            className="border-none transition-transform hover:border"
+          >
+            <CardHeader>
+              <img
+                src={post.image}
+                alt={`Image for ${post.title}`}
+                className="h-48 w-full object-cover"
+              />
+            </CardHeader>
+            <CardContent className="px-10 py-2 text-center sm:text-left">
+              <CardTitle className="mt-1 text-lg font-semibold">
                 {post.title}
               </CardTitle>
-              <CardDescription className="text-sm text-gray-500">
+              <CardDescription className="text-xs uppercase tracking-wide text-gray-500">
                 {post.eventType} •{" "}
                 {post.createdAt
                   ? new Date(post.createdAt).toLocaleDateString()
                   : "No date"}
               </CardDescription>
-            </CardHeader>
-            <CardContent className="px-4 py-2">
-              <div className="flex justify-between">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEdit(post)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDeleteClick(post._id)}
-                >
-                  Delete
-                </Button>
+              <div className="mt-4 flex justify-between">
                 <Button
                   variant="default"
                   size="sm"
@@ -170,13 +158,29 @@ const ManageBlogs: React.FC = () => {
                 >
                   View
                 </Button>
+                <div className="space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(post)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteClick(post._id)}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </main>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog with updated styling */}
       {deleteDialogOpen && (
         <Dialog
           open={deleteDialogOpen}
@@ -184,7 +188,7 @@ const ManageBlogs: React.FC = () => {
             if (!open) setDeleteDialogOpen(false);
           }}
         >
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-h-[80vh] max-w-4xl overflow-auto">
             <DialogHeader>
               <DialogTitle>Delete Blog Post</DialogTitle>
               <DialogDescription>
@@ -210,10 +214,10 @@ const ManageBlogs: React.FC = () => {
         </Dialog>
       )}
 
-      {/* Edit Blog Post Modal */}
+      {/* Edit Blog Post Modal with centered file upload */}
       {editingBlog && (
         <Dialog open={true} onOpenChange={() => setEditingBlog(null)}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-h-[80vh] max-w-4xl overflow-auto">
             <DialogHeader>
               <DialogTitle>Edit Blog Post</DialogTitle>
               <DialogDescription>
@@ -265,24 +269,24 @@ const ManageBlogs: React.FC = () => {
                   id="edit-content"
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
-                  className="mt-1 block w-full rounded border px-3 py-2"
+                  className="mt-1 block h-80 w-full rounded border px-3 py-2"
                   rows={4}
                   required
                 />
               </div>
-              {/* Image input */}
-              <div>
-                <p className="text-sm">Current Image:</p>
+              {/* Centered File Upload */}
+              <div className="flex flex-col items-center">
+                <p className="text-center text-sm">Current Image:</p>
                 {typeof editImage === "string" && (
                   <img
                     src={editImage}
                     alt="Current"
-                    className="mb-2 h-32 w-32 object-cover"
+                    className="mx-auto mb-2 w-1/2 object-cover"
                   />
                 )}
                 <label
                   htmlFor="edit-image"
-                  className="block text-sm font-medium"
+                  className="mt-5 block text-center text-sm font-medium"
                 >
                   Upload New Image (optional)
                 </label>
@@ -295,7 +299,7 @@ const ManageBlogs: React.FC = () => {
                       setEditImage(e.target.files[0]);
                     }
                   }}
-                  className="mt-1 block w-full"
+                  className="mx-auto mt-2 block w-1/2 p-1"
                 />
               </div>
               <div className="flex justify-end space-x-2">
@@ -316,10 +320,10 @@ const ManageBlogs: React.FC = () => {
         </Dialog>
       )}
 
-      {/* Create Blog Post Modal */}
+      {/* Create Blog Post Modal with centered file upload */}
       {isCreateModalOpen && (
         <Dialog open={true} onOpenChange={() => setIsCreateModalOpen(false)}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-h-[80vh] max-w-4xl overflow-auto">
             <DialogHeader>
               <DialogTitle>Create Blog Post</DialogTitle>
               <DialogDescription>
@@ -376,11 +380,11 @@ const ManageBlogs: React.FC = () => {
                   required
                 />
               </div>
-              {/* Image input */}
-              <div>
+              {/* Centered File Upload */}
+              <div className="flex flex-col items-center">
                 <label
                   htmlFor="new-image"
-                  className="block text-sm font-medium"
+                  className="block p-1 text-center text-sm font-medium"
                 >
                   Upload Image
                 </label>
@@ -393,7 +397,7 @@ const ManageBlogs: React.FC = () => {
                       setNewImage(e.target.files[0]);
                     }
                   }}
-                  className="mt-1 block w-full"
+                  className="mx-auto mt-1 block w-1/2"
                   required
                 />
               </div>

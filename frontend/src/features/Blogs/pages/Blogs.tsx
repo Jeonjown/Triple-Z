@@ -1,9 +1,16 @@
 import React from "react";
 import { useGetAllBlogPosts } from "../hooks/useGetAllBlogPosts";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 const Blogs: React.FC = () => {
   const { data: blogPosts, isPending, isError, error } = useGetAllBlogPosts();
@@ -17,7 +24,7 @@ const Blogs: React.FC = () => {
     return (
       <div className="container mx-auto grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3">
         {[...Array(6)].map((_, index) => (
-          <Skeleton key={index} className="h-48 w-full rounded" />
+          <Skeleton key={index} className="h-48 w-full" />
         ))}
       </div>
     );
@@ -41,28 +48,33 @@ const Blogs: React.FC = () => {
         {blogPosts?.map((post) => (
           <Card
             key={post._id}
-            className="cursor-pointer transition-transform hover:scale-105"
-            onClick={() => handleBlogClick(post._id)}
+            className="border-none transition-transform hover:border"
           >
             <CardHeader>
               <img
                 src={post.image}
                 alt={post.title}
-                className="h-40 w-full rounded object-cover"
+                className="h-48 w-full object-cover"
               />
             </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-xs uppercase tracking-wide text-gray-500">
-                {post.eventType}
-              </p>
-              <CardTitle className="mt-2 text-lg font-semibold">
+            {/* On mobile, center text; on larger screens, left align */}
+            <CardContent className="px-10 py-2 text-center sm:text-left">
+              <CardTitle className="mt-1 text-lg font-semibold">
                 {post.title}
               </CardTitle>
-              <p className="mt-2 text-sm text-gray-500">
+              <CardDescription className="text-xs uppercase tracking-wide text-gray-500">
+                {post.eventType} •{" "}
                 {post.createdAt
                   ? new Date(post.createdAt).toLocaleDateString()
                   : "No date"}
-              </p>
+              </CardDescription>
+              <p className="mt-4 line-clamp-2 text-xs">{post.content}</p>
+              <Button
+                onClick={() => handleBlogClick(post._id)}
+                className="mx-auto mt-4 rounded hover:text-white sm:mx-0"
+              >
+                Read Now
+              </Button>
             </CardContent>
           </Card>
         ))}
