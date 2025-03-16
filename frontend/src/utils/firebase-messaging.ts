@@ -1,10 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
-// Vite automatically loads env variables starting with VITE_ into import.meta.env
-
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  apiKey: "AIzaSyCo3eo8pg4VVfU30IBhFk08WITMiC9ltg8",
   authDomain: "triple-z-8c154.firebaseapp.com",
   projectId: "triple-z-8c154",
   storageBucket: "triple-z-8c154.firebasestorage.app",
