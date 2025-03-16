@@ -3,7 +3,7 @@ import { MessageCircle } from "lucide-react";
 import { io } from "socket.io-client";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { v4 as uuid } from "uuid"; // Import uuid for generating unique IDs
-import { useSendNotificationToAdmin } from "@/features/Notifications/hooks/useSendNotificationToAdmins";
+// import { useSendNotificationToAdmin } from "@/features/Notifications/hooks/useSendNotificationToAdmins";
 import { useMessagesForRoom } from "../hooks/useMessagesForRoom";
 
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
@@ -40,7 +40,7 @@ const UserChat: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
-  const { mutate } = useSendNotificationToAdmin();
+  // const { mutate } = useSendNotificationToAdmin();
 
   // Update local messages state when chat history is loaded
   useEffect(() => {
@@ -87,10 +87,10 @@ const UserChat: React.FC = () => {
     console.log(newMessage);
     setInput("");
     socket.emit("send-message", newMessage);
-    mutate({
-      title: "New Message Received",
-      description: `User ${user?._id || roomId} sent: "${newMessage.text}"`,
-    });
+    // mutate({
+    //   title: "New Message Received",
+    //   description: `User ${user?._id || roomId} sent: "${newMessage.text}"`,
+    // });
   };
 
   if (user?.role === "admin") return null;

@@ -2,18 +2,28 @@ import { useQueryClient } from "@tanstack/react-query";
 import { logout } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/useAuthStore";
-import { useServiceworker } from "@/features/Notifications/hooks/useServiceWorker";
+import { useFCMAdminToken } from "@/features/Notifications/push-notification/useFCMAdminToken";
+import { useFCMToken } from "@/features/Notifications/push-notification/useFCMToken";
 
 export const useLogout = () => {
-  const { unsubscribe } = useServiceworker();
   const { logout: logoutStore } = useAuthStore();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  queryClient.invalidateQueries({ queryKey: ["users"] });
+  const { requestAdminUnsubscribe } = useFCMAdminToken();
+  const { deleteCurrentToken } = useFCMToken();
+
   const logoutUser = async () => {
-    await unsubscribe();
+    try {
+      // Unsubscribe the admin device from notifications
+      await requestAdminUnsubscribe();
+    } catch (error) {
+      console.error("Error during admin unsubscribe:", error);
+    }
+    // Delete the current FCM token so that a new one is generated on next login
+    await deleteCurrentToken();
     logoutStore();
-    logout();
+    await logout();
+    queryClient.invalidateQueries({ queryKey: ["users"] });
     navigate("/");
   };
 

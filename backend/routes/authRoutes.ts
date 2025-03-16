@@ -18,6 +18,7 @@ router.post("/logout", logoutUser);
 
 router.get("/check-auth", verifyToken, checkAuth);
 //JWT
+
 router.post(
   "/jwt-signup",
   validateUsername,

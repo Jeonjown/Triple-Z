@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useServiceworker } from "@/features/Notifications/hooks/useServiceWorker";
+
 import { playPingSound } from "@/utils/playPingSound";
 
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
@@ -34,7 +34,6 @@ export interface Message {
 
 const AdminChat: React.FC = () => {
   const { user } = useAuthStore();
-  const { registerAndSubscribe } = useServiceworker();
   const [roomId, setRoomId] = useState<string>("");
   const [joined, setJoined] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -264,7 +263,6 @@ const AdminChat: React.FC = () => {
             <Button
               onClick={async () => {
                 setDialogOpen(false);
-                await registerAndSubscribe();
               }}
             >
               OK

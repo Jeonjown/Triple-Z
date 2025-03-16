@@ -15,7 +15,6 @@ import menuItemRoutes from "./routes/menuItemRoutes";
 import subcategoryRoutes from "./routes/subcategoryRoutes";
 import eventReservationRoutes from "./routes/eventReservationRoutes";
 import eventSettingsRoutes from "./routes/eventSettingsRoutes";
-import subscriptionRoutes from "./routes/subscriptionRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
 import messageRoutes from "./routes/messageRoutes";
 
@@ -24,6 +23,8 @@ import { initSocket } from "./socket/socket";
 import groupReservationRoutes from "./routes/groupReservationRoutes";
 import emailRoutes from "./routes/emailRoutes";
 import blogRoutes from "./routes/blogRoutes";
+import pushNotificationRoutes from "./routes/pushNotificationRoutes";
+import subscriptionRoutes from "./routes/subscriptionRoutes";
 
 const server = express();
 
@@ -52,11 +53,12 @@ server.use("/api/menu/categories", subcategoryRoutes);
 server.use("/api/events/event-reservations", eventReservationRoutes);
 server.use("/api/events/group-reservations", groupReservationRoutes);
 server.use("/api/events/settings", eventSettingsRoutes);
-server.use("/api/subscriptions", subscriptionRoutes);
 server.use("/api/notifications", notificationRoutes);
+server.use("/api/push-notifications", pushNotificationRoutes);
 server.use("/api/messages", messageRoutes);
 server.use("/api/mail", emailRoutes);
 server.use("/api/blogs", blogRoutes);
+server.use("/api/subscriptions", subscriptionRoutes);
 
 server.use(
   (err: ResponseError, req: Request, res: Response, next: NextFunction) => {

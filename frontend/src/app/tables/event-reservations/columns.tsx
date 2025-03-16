@@ -1,21 +1,10 @@
-import { Column, ColumnDef, ColumnMeta } from "@tanstack/react-table";
+import { Column, ColumnDef, ColumnMeta, Row } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/ui/DataTableColumnHeader";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-import { MoreHorizontal } from "lucide-react";
 import { formatDate } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import EventStatusCell from "./EventStatusCell";
 import PaymentStatusCell from "./PaymentStatusCell";
-import DeleteReservationAction from "./DeleteReservationAction";
+import ViewCart from "./ViewCart";
 
 // Module augmentation for custom meta type
 declare module "@tanstack/react-table" {
@@ -26,7 +15,7 @@ declare module "@tanstack/react-table" {
   }
 }
 
-// Reservation-related interfaces
+// Updated Reservation-related interfaces
 export interface User {
   _id: string;
   username: string;
@@ -57,6 +46,9 @@ export interface Reservation {
   specialRequest: string;
   createdAt: string;
   updatedAt: string;
+  totalPayment: number;
+  eventFee: number;
+  subtotal: number;
   __v: number;
 }
 
@@ -67,6 +59,7 @@ export type MyColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
 
 // --- Columns Definition ---
 export const columns: MyColumnDef<Reservation>[] = [
+  // Checkbox column for row selection
   {
     id: "select",
     header: ({ table }) => (
@@ -75,20 +68,23 @@ export const columns: MyColumnDef<Reservation>[] = [
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value: boolean) =>
+          table.toggleAllPageRowsSelected(!!value)
+        }
         aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
         aria-label="Select row"
       />
     ),
     enableSorting: false,
     enableHiding: false,
   },
+  // User Id column
   {
     id: "userId",
     accessorFn: (row: Reservation) => row.userId._id,
@@ -97,31 +93,33 @@ export const columns: MyColumnDef<Reservation>[] = [
     ),
     meta: { title: "userId" },
   },
+  // Transaction Id column
   {
     accessorKey: "_id",
     header: "Transaction Id",
   },
+  // Created At column with formatted date and time
   {
     accessorKey: "createdAt",
     header: "Created At",
     cell: ({ row }) => {
       const rawCreatedAt: string = row.getValue<string>("createdAt");
-      // Convert the string to a Date object and format it to "MM-dd-yyyy"
       return formatDate(new Date(rawCreatedAt), "MM-dd-yyyy h:mm a");
     },
   },
+  // Event Status column
   {
     accessorKey: "eventStatus",
     header: "Status",
-    // Use the EventStatusCell component instead of inline code
     cell: ({ row }) => <EventStatusCell reservation={row.original} />,
   },
-
+  // Payment Status column
   {
     accessorKey: "paymentStatus",
     header: "Payment",
     cell: ({ row }) => <PaymentStatusCell reservation={row.original} />,
   },
+  // Total Payment column
   {
     accessorKey: "totalPayment",
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
@@ -132,12 +130,14 @@ export const columns: MyColumnDef<Reservation>[] = [
       return `₱${value.toLocaleString()}`;
     },
   },
+  // Full Name column
   {
     accessorKey: "fullName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Full Name" />
     ),
   },
+  // Email column using the user's email from userId
   {
     id: "email",
     accessorFn: (row: Reservation) => row.userId.email,
@@ -146,6 +146,7 @@ export const columns: MyColumnDef<Reservation>[] = [
     ),
     meta: { title: "Email" },
   },
+  // Contact Number column
   {
     accessorKey: "contactNumber",
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
@@ -153,60 +154,39 @@ export const columns: MyColumnDef<Reservation>[] = [
     ),
     meta: { title: "Contact No." },
   },
+  // Party Size column
   {
     accessorKey: "partySize",
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="Party Size" />
     ),
   },
+  // Merged Date & Time column with date on top and time below
   {
-    accessorKey: "date",
+    id: "dateTime",
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
-      <DataTableColumnHeader column={column} title="Date" />
+      <DataTableColumnHeader column={column} title="Date & Time" />
     ),
-    cell: ({ row }) => {
-      const rawDate = row.getValue<string>("date");
-      return formatDate(new Date(rawDate), "MM-dd-yyyy");
+    cell: ({ row }: { row: Row<Reservation> }) => {
+      const { date, startTime, endTime } = row.original;
+      const formattedDate = formatDate(new Date(date), "MM-dd-yyyy");
+      return (
+        <>
+          <div className="text-center">{formattedDate}</div>
+          <div className="text-xs text-gray-500">{`${startTime} - ${endTime}`}</div>
+        </>
+      );
     },
   },
-  {
-    id: "timeRange",
-    header: "Time Range",
-    accessorFn: (row: Reservation) => `${row.startTime} - ${row.endTime}`,
-  },
+  // Special Request column
   {
     accessorKey: "specialRequest",
     header: "Special Request",
   },
+  // Actions column with dropdown menu including View Cart option
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
-      const reservation = row.original;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(reservation._id)}
-            >
-              Copy reservation ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            {/* Use the DeleteReservationAction component */}
-            <DeleteReservationAction reservationId={reservation._id} />
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <ViewCart reservation={row.original} />,
   },
 ];

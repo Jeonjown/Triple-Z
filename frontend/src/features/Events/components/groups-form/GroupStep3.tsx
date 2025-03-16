@@ -9,7 +9,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import ScrollToTop from "@/components/ScrollToTop";
-import { useServiceworker } from "@/features/Notifications/hooks/useServiceWorker";
 import { UseFormReturn } from "react-hook-form";
 import { CartItem, GroupFormValues } from "../../pages/GroupForm";
 import { useCreateGroupReservation } from "../../hooks/useCreateGroupReservation";
@@ -22,7 +21,6 @@ type Step3Props = {
 };
 
 const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
-  const { registerAndSubscribe } = useServiceworker();
   const { mutate } = useCreateGroupReservation();
   const { watch, handleSubmit, reset } = methods;
   const formValues = watch();
@@ -55,25 +53,6 @@ const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
 
   const handleCheckout = () => {
     handleSubmit(onSubmit)();
-  };
-
-  const handleCheckoutFlow = async () => {
-    try {
-      if (Notification.permission === "granted") {
-        const registration = await navigator.serviceWorker.getRegistration("/");
-        if (registration) {
-          const existingSubscription =
-            await registration.pushManager.getSubscription();
-          if (existingSubscription) {
-            handleCheckout();
-            return;
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error checking subscription:", error);
-    }
-    setDialogOpen(true);
   };
 
   // Renders cart items and adds unit price display.
@@ -158,7 +137,7 @@ const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         <Button type="button" onClick={prevStep} className="flex-1">
           Previous
         </Button>
-        <Button type="button" onClick={handleCheckoutFlow} className="flex-1">
+        <Button type="button" className="flex-1">
           Checkout
         </Button>
       </div>
@@ -184,7 +163,6 @@ const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
             <Button
               onClick={async () => {
                 setDialogOpen(false);
-                await registerAndSubscribe();
                 handleCheckout();
               }}
             >

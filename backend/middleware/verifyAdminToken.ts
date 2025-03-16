@@ -17,6 +17,9 @@ export const verifyAdminToken = (
     const secretKey = process.env.JWT_SECRET;
     const decoded = jwt.verify(token, secretKey as string) as JwtPayload;
 
+    console.log(token);
+    console.log(decoded);
+
     if (!token) {
       return next(createError("Token is missing", 401));
     }

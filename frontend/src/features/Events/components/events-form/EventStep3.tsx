@@ -13,7 +13,6 @@ import { EventFormValues } from "../../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useCreateEventReservations } from "../../hooks/useCreateEventReservations";
 import { useGetEventReservationSettings } from "../../hooks/useGetEventReservationSettings";
-import { useServiceworker } from "@/features/Notifications/hooks/useServiceWorker";
 
 interface CartItem {
   _id: string;
@@ -32,7 +31,6 @@ type Step3Props = {
 };
 
 const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
-  const { registerAndSubscribe } = useServiceworker();
   const { data: settings } = useGetEventReservationSettings();
   const { mutate } = useCreateEventReservations();
   const { watch, handleSubmit, reset } = methods;
@@ -72,31 +70,6 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   // Trigger form submission
   const handleCheckout = () => {
     handleSubmit(onSubmit)();
-  };
-
-  // First, check if TOS is accepted. If not, open the TOS dialog.
-  // If accepted, check for push subscription.
-  const handleCheckoutFlow = async () => {
-    if (!acceptedTOS) {
-      setTosDialogOpen(true);
-      return;
-    }
-    try {
-      if (Notification.permission === "granted") {
-        const registration = await navigator.serviceWorker.getRegistration("/");
-        if (registration) {
-          const existingSubscription =
-            await registration.pushManager.getSubscription();
-          if (existingSubscription) {
-            handleCheckout();
-            return;
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error checking subscription:", error);
-    }
-    setNotifDialogOpen(true);
   };
 
   // Render cart items
@@ -206,7 +179,7 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         </Button>
         <Button
           type="button"
-          onClick={handleCheckoutFlow}
+          onClick={() => setNotifDialogOpen(true)}
           className="flex-1"
           disabled={!acceptedTOS}
         >
@@ -214,7 +187,7 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         </Button>
       </div>
 
-      {/* Notification Dialog (existing) */}
+      {/* Notification Dialog */}
       <Dialog open={notifDialogOpen} onOpenChange={setNotifDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -237,7 +210,7 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
             <Button
               onClick={async () => {
                 setNotifDialogOpen(false);
-                await registerAndSubscribe();
+
                 handleCheckout();
               }}
             >

@@ -1,4 +1,8 @@
+// App.tsx
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+// Import your layouts, pages, hooks, etc.
 import AdminSidebarLayout from "./app/Layout";
 import Navbar from "./components/Navbar";
 import ScrollToTop from "./components/ScrollToTop";
@@ -29,12 +33,52 @@ import ManageGroups from "./features/Events/pages/ManageGroups";
 import ManageBlogs from "./features/Blogs/pages/ManageBlogs";
 import BlogPosts from "./features/Blogs/pages/BlogPosts";
 import AdminBlog from "./features/Blogs/pages/AdminBlog";
+import { useFCMToken } from "./features/Notifications/push-notification/useFCMToken";
+import { useFCMAdminToken } from "./features/Notifications/push-notification/useFCMAdminToken";
 
-function App() {
+function App(): JSX.Element {
+  // Retrieve authenticated user info from your store
   const { user } = useAuthStore();
-  const isAdmin = user?.role === "admin";
+  const isAdmin: boolean = user?.role === "admin";
 
-  //Common routes for all users.
+  // Get FCM hooks for regular users and admins
+  const { requestToken } = useFCMToken();
+  const { requestAdminToken } = useFCMAdminToken();
+
+  // Subscribe to FCM token based on user role
+  useEffect(() => {
+    if (isAdmin) {
+      requestAdminToken();
+    } else {
+      requestToken();
+    }
+  }, [isAdmin, requestAdminToken, requestToken]);
+
+  // Listen for background notifications via BroadcastChannel
+  useEffect(() => {
+    // Create a new BroadcastChannel
+    const channel: BroadcastChannel = new BroadcastChannel(
+      "notification_channel",
+    );
+
+    // When a message is received, play the notification sound
+    channel.onmessage = (event: MessageEvent<{ key: unknown }>) => {
+      console.log("Received background notification:", event.data);
+
+      // Create an audio object to play sound
+      const audio: HTMLAudioElement = new Audio("/notification-sound.mp3");
+      audio.play().catch((error: Error) => {
+        console.error("Audio play failed:", error);
+      });
+    };
+
+    // Cleanup: close the channel on unmount
+    return () => {
+      channel.close();
+    };
+  }, []);
+
+  // Define common routes for all users
   const commonRoutes = (
     <>
       <Route path="/" element={<Home />} />
@@ -59,7 +103,7 @@ function App() {
     </>
   );
 
-  // Admin-only routes.
+  // Define admin-only routes
   const adminRoutes = (
     <>
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
@@ -75,7 +119,6 @@ function App() {
     </>
   );
 
-  // Step 3: Render routes conditionally based on user's role.
   return (
     <Router>
       <ScrollToTop />
@@ -84,6 +127,7 @@ function App() {
         <Navbar />
         <div className="flex-grow">
           {isAdmin ? (
+            // For admin users, wrap routes inside AdminSidebarLayout
             <AdminSidebarLayout>
               <Routes>
                 {commonRoutes}
@@ -91,6 +135,7 @@ function App() {
               </Routes>
             </AdminSidebarLayout>
           ) : (
+            // For non-admin users, use common routes only
             <Routes>{commonRoutes}</Routes>
           )}
         </div>
