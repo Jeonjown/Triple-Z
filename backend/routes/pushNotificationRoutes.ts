@@ -1,6 +1,6 @@
 // src/routes/notificationRoutes.ts
 import { Router } from "express";
-import { sendPushNotificationController } from "../controllers/pushnotificationController";
+import { sendPushNotificationController } from "../controllers/pushNotificationController";
 
 const router = Router();
 
