@@ -11,21 +11,47 @@ const firebaseConfig = {
     measurementId: "G-8P99XDWE8P"
 };
 
-const app = firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-    // Show notification through service worker
-    const notificationTitle = payload.notification?.title || 'New Notification';
+    console.log("Received background message:", payload);
+
+    const notificationTitle = payload.data?.title || 'New Notification';
     const notificationOptions = {
-        body: payload.notification?.body,
-        icon: '/triple-z-logo.png',
-        badge: '/triple-z-logo.png'
+        body: payload.data?.body,
+        icon: payload.data?.icon || '/triple-z-logo.png',
+        badge: payload.data?.badge || '/triple-z-logo.png',
+        data: {
+            click_action: payload.data?.click_action || '/'
+        }
     };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    // Optionally close any existing notifications before showing the new one
+    self.registration.getNotifications().then((notifications) => {
+        notifications.forEach((notification) => notification.close());
+        self.registration.showNotification(notificationTitle, notificationOptions);
+    });
 
-    // Forward to main app for sound
+    // Forward the payload to the main app if needed (e.g., to play sound)
     const channel = new BroadcastChannel('notification_channel');
     channel.postMessage({ key: payload });
+});
+
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    const redirectUrl = event.notification.data?.click_action || '/';
+
+    event.waitUntil(
+        clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+            // If there's an existing window, navigate it
+            for (const client of clientList) {
+                if ('navigate' in client) {
+                    client.navigate(redirectUrl);
+                    return client.focus();
+                }
+            }
+
+        })
+    );
 });

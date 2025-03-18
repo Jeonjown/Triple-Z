@@ -1,17 +1,17 @@
-//adminPushNotificationService.ts
-
 import admin from "../utils/firebase";
 
-// Function to send a notification to the "admins" topic
-export async function sendNotificationToAdmins(notification: {
+// Function to send a notification to the "admins" topic using data-only payload
+export async function sendPushNotificationToAdmins(notification: {
   title: string;
   body: string;
 }): Promise<void> {
   const message = {
     topic: "admins",
-    notification: {
+    data: {
       title: notification.title,
       body: notification.body,
+      icon: "/triple-z-logo.png",
+      click_action: "/",
     },
   };
 

@@ -1,4 +1,5 @@
 // src/components/NotificationIcon.tsx
+import React, { useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,15 +11,14 @@ import {
 import { FaBell } from "react-icons/fa";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { useNavigate } from "react-router-dom";
-
 import {
   useNotificationReceiver,
   MyNotification,
 } from "@/features/Notifications/hooks/useNotificationReceiver";
-import { useNotifications } from "@/features/Notifications/hooks/useNotification";
 import { useMarkNotificationAsRead } from "@/features/Notifications/hooks/useMarkNotificationasRead";
+import { useNotifications } from "../hooks/useNotification";
 
-const NotificationIcon = () => {
+const NotificationIcon: React.FC = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -28,39 +28,41 @@ const NotificationIcon = () => {
     }
   };
 
-  // Fetch initial notifications for the user.
+  // Fetch initial notifications via REST (ensure this endpoint returns only unread notifications).
   const {
     data: initialNotifications,
     isPending,
     error,
   } = useNotifications(user?._id || "");
 
-  // Use the realtime hook to combine initial notifications with updates.
-  // Cast initialNotifications as MyNotification[] if necessary.
-  const { notifications, setNotifications } = useNotificationReceiver(
-    user?._id || "",
-    (initialNotifications as MyNotification[]) || [],
-  );
+  // Setup realtime notifications using the DB-saved notifications.
+  const { notifications, unreadCount, setNotifications } =
+    useNotificationReceiver(
+      user?._id || "",
+      (initialNotifications as MyNotification[]) || [],
+    );
 
-  // Filter the notifications to show only unread ones.
-  const unreadNotifications = notifications.filter((n) => !n.read);
-  const unreadCount = unreadNotifications.length;
+  useEffect(() => {
+    console.log("Current notifications state:", notifications);
+  }, [notifications]);
 
-  // Get the mutation hook for marking a notification as read.
   const { mutate: markAsRead, isPending: isPendingMarkAsRead } =
     useMarkNotificationAsRead();
 
-  // Handler for marking a notification as read.
+  // When marking a notification as read, update the DB and remove it from local state.
   const handleMarkAsRead = (notificationId: string) => {
     markAsRead(notificationId, {
       onSuccess: () => {
-        // Remove the notification from local state after it is marked as read.
+        console.log(`Notification ${notificationId} marked as read`);
         setNotifications((prev) =>
-          prev.filter((n) => n._id !== notificationId),
+          prev.filter((notification) => notification._id !== notificationId),
         );
       },
     });
   };
+
+  // Filter notifications to show only unread ones.
+  const unreadNotifications = notifications.filter((notif) => !notif.read);
 
   return (
     <div className="relative ml-auto gap-2 md:flex">
@@ -73,50 +75,41 @@ const NotificationIcon = () => {
             </span>
           )}
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="mr-2">
-          {[
-            <DropdownMenuLabel key="label" className="font-bold">
-              NOTIFICATIONS
-            </DropdownMenuLabel>,
-            <DropdownMenuSeparator key="separator" />,
-            isPending ? (
-              <DropdownMenuItem key="loading">
-                Loading notifications...
+        <DropdownMenuContent className="mr-2 px-5">
+          <DropdownMenuLabel className="font-bold">
+            NOTIFICATIONS
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {isPending ? (
+            <DropdownMenuItem>Loading notifications...</DropdownMenuItem>
+          ) : error ? (
+            <DropdownMenuItem>Error loading notifications</DropdownMenuItem>
+          ) : unreadNotifications.length > 0 ? (
+            unreadNotifications.map((notification: MyNotification) => (
+              <DropdownMenuItem
+                key={notification._id}
+                className="hover:cursor-pointer"
+                onClick={() => handleRedirect(notification.redirectUrl)}
+              >
+                <div>
+                  <strong>{notification.title}</strong>
+                  <p>{notification.description}</p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMarkAsRead(notification._id);
+                    }}
+                    disabled={isPendingMarkAsRead}
+                    className="mt-2 text-blue-500 hover:underline"
+                  >
+                    Mark as Read
+                  </button>
+                </div>
               </DropdownMenuItem>
-            ) : error ? (
-              <DropdownMenuItem key="error">
-                Error loading notifications
-              </DropdownMenuItem>
-            ) : unreadNotifications.length > 0 ? (
-              unreadNotifications.map((notification: MyNotification) => (
-                <DropdownMenuItem
-                  key={notification._id}
-                  className="hover:cursor-pointer"
-                  onClick={() => handleRedirect(notification.redirectUrl)}
-                >
-                  <div>
-                    <strong>{notification.title}</strong>
-                    <p>{notification.description}</p>
-                    <button
-                      onClick={(e) => {
-                        // Prevent the click event from bubbling up to the DropdownMenuItem
-                        e.stopPropagation();
-                        handleMarkAsRead(notification._id);
-                      }}
-                      disabled={isPendingMarkAsRead}
-                      className="mt-2 text-blue-500 hover:underline"
-                    >
-                      Mark as Read
-                    </button>
-                  </div>
-                </DropdownMenuItem>
-              ))
-            ) : (
-              <DropdownMenuItem key="none">
-                No notifications found
-              </DropdownMenuItem>
-            ),
-          ]}
+            ))
+          ) : (
+            <DropdownMenuItem>No unread notifications</DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

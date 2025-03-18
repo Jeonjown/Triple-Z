@@ -2,8 +2,7 @@ import React, { useState, ChangeEvent, KeyboardEvent, useEffect } from "react";
 import { MessageCircle } from "lucide-react";
 import { io } from "socket.io-client";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
-import { v4 as uuid } from "uuid"; // Import uuid for generating unique IDs
-// import { useSendNotificationToAdmin } from "@/features/Notifications/hooks/useSendNotificationToAdmins";
+import { v4 as uuid } from "uuid"; // For generating unique room IDs
 import { useMessagesForRoom } from "../hooks/useMessagesForRoom";
 
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
@@ -19,12 +18,11 @@ interface Message {
 const UserChat: React.FC = () => {
   const { user } = useAuthStore();
 
-  // Declare roomId state before using it in any hook.
+  // Initialize roomId: either based on user._id or generate one for unauthenticated users.
   const [roomId, setRoomId] = useState<string>(() => {
     if (user?._id) {
       return `room_${user._id}`;
     }
-    // For first-time or unauthenticated users, check localStorage for a stored room ID.
     let storedRoom = localStorage.getItem("chatRoomId");
     if (!storedRoom) {
       storedRoom = `room_${uuid()}`;
@@ -33,23 +31,21 @@ const UserChat: React.FC = () => {
     return storedRoom;
   });
 
-  // Use the hook to fetch chat history
+  // Hook to fetch chat history.
   const { data } = useMessagesForRoom(roomId);
 
-  // Local states for managing chat
+  // Local states for managing chat.
   const [open, setOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
-  // const { mutate } = useSendNotificationToAdmin();
 
-  // Update local messages state when chat history is loaded
   useEffect(() => {
     if (data && data.length > 0) {
       setMessages(data);
     }
   }, [data]);
 
-  // Update roomId when user logs in or their info changes.
+  // Update roomId when the user logs in or their info changes.
   useEffect(() => {
     if (user?._id) {
       const newRoom = `room_${user._id}`;
@@ -75,25 +71,34 @@ const UserChat: React.FC = () => {
     };
   }, [roomId]);
 
-  // Send a message using the appropriate room ID.
+  // Send a message and also notify admins if a non-admin sends a message.
   const sendMessage = (): void => {
     if (input.trim() === "") return;
+
     const newMessage: Message = {
       roomId,
       userId: user?._id || roomId,
       text: input,
       sender: user?.role === "admin" ? "admin" : "user",
     };
-    console.log(newMessage);
+
     setInput("");
     socket.emit("send-message", newMessage);
-    // mutate({
-    //   title: "New Message Received",
-    //   description: `User ${user?._id || roomId} sent: "${newMessage.text}"`,
-    // });
+
+    // If the sender is not an admin, emit an event to notify admins.
+    if (user?.role !== "admin") {
+      const notificationPayload = {
+        title: "New Message Received",
+        description: `Message: ${newMessage.text}`,
+        redirectUrl: "/admin-chat", // Customize as needed
+      };
+      socket.emit("send-admin-notification", notificationPayload);
+    }
   };
 
+  // Only non-admin users see this chat widget.
   if (user?.role === "admin") return null;
+
   return (
     <div className="fixed bottom-10 right-10 z-20">
       {open ? (
@@ -146,7 +151,7 @@ const UserChat: React.FC = () => {
           </div>
         </div>
       ) : (
-        // Chat icon button to open the chat widget
+        // Chat icon button to open the chat widget.
         <button
           onClick={() => setOpen(true)}
           className="rounded-full bg-primary p-3 text-white shadow-lg"

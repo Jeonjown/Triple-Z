@@ -31,7 +31,7 @@ export async function requestFCMToken(): Promise<string | null> {
       vapidKey: import.meta.env.VITE_VAPID_KEY,
     });
 
-    console.log("FCM Token:", token);
+    // console.log("FCM Token:", token);
     return token;
   } catch (error) {
     console.error("Error getting FCM token:", error);
@@ -41,15 +41,36 @@ export async function requestFCMToken(): Promise<string | null> {
 // Handle foreground messages
 onMessage(messaging, (payload) => {
   console.log("Foreground message:", payload);
+
+  let notificationTitle = "";
+  let notificationOptions = {};
+  let redirectUrl = "/";
+
   if (payload.notification) {
-    new Notification(payload.notification.title!, {
+    notificationTitle = payload.notification.title!;
+    notificationOptions = {
       body: payload.notification.body,
       icon: "/triple-z-logo.png",
       badge: "/triple-z-logo.png",
-    });
-
-    // Play notification sound
-    const audio = new Audio("/notification-sound.mp3");
-    audio.play().catch((error) => console.log("Audio play failed:", error));
+    };
+  } else if (payload.data) {
+    notificationTitle = payload.data.title;
+    notificationOptions = {
+      body: payload.data.body,
+      icon: payload.data.icon || "/triple-z-logo.png",
+      badge: payload.data.badge || "/triple-z-logo.png",
+    };
+    redirectUrl = payload.data.click_action || "/";
   }
+
+  // Create the notification and set an onclick to navigate in the same tab
+  const notification = new Notification(notificationTitle, notificationOptions);
+  notification.onclick = (event) => {
+    event.preventDefault();
+    window.location.href = redirectUrl; // Navigate the current tab
+  };
+
+  // Optionally, play a sound
+  const audio = new Audio("/notification-sound.mp3");
+  audio.play().catch((error) => console.log("Audio play failed:", error));
 });

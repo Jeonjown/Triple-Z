@@ -1,4 +1,4 @@
-// models/Notification.ts
+// models/notificationsModel.ts
 import mongoose, { Schema, Document } from "mongoose";
 import { notificationDB } from "../db";
 
@@ -9,6 +9,13 @@ export interface INotification extends Document {
   read: boolean;
   redirectUrl: string;
   createdAt: Date;
+}
+
+export interface INotificationInput {
+  title: string;
+  description: string;
+  userId: mongoose.Types.ObjectId;
+  redirectUrl: string;
 }
 
 const NotificationSchema: Schema = new Schema({
