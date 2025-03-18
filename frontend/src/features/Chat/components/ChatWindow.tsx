@@ -1,4 +1,4 @@
-// ChatWindow.tsx
+import { useSendPushNotificationToUser } from "@/features/Notifications/hooks/useSendPushNotificationToUser";
 import React, { ChangeEvent, KeyboardEvent } from "react";
 
 interface Message {
@@ -18,6 +18,8 @@ interface ChatWindowProps {
   onSendMessage: () => void;
   messagesLoading?: boolean;
   messagesError?: Error | null;
+  // Optional: the target user's FCM token to send the notification to.
+  pushToken?: string;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -27,10 +29,35 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   onSendMessage,
   messagesLoading,
   messagesError,
+  pushToken,
 }) => {
+  // Use the FCM push notification hook for sending a message to a user.
+  const { mutate: sendPushNotification, isPending } =
+    useSendPushNotificationToUser();
+
+  // This handler wraps the original onSendMessage.
+  const handleSendMessage = () => {
+    // Send the chat message.
+    onSendMessage();
+
+    // If a push token is provided, trigger the FCM push notification.
+    if (pushToken) {
+      const payload = {
+        token: pushToken,
+        title: "New Chat Message",
+        body: input, // You can customize the notification message here.
+        icon: "/triple-z-logo.png", // Optional: adjust as needed.
+        click_action: "/chat", // Optional: URL to navigate on click.
+      };
+
+      // Call the hook's mutate function to send the notification.
+      sendPushNotification(payload);
+    }
+  };
+
   return (
     <div className="flex h-[90vh] flex-col">
-      {/* Fixed Header: Display the username once */}
+      {/* Fixed Header: Display the username or a title */}
       <div className="bg-primary px-4 py-3 font-bold text-white">
         {messages[0]?.username || "Chat"}
       </div>
@@ -74,12 +101,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             onInputChange(e.target.value)
           }
           onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-            if (e.key === "Enter") onSendMessage();
+            if (e.key === "Enter") handleSendMessage();
           }}
           className="flex-1 rounded-md border p-2 focus:outline-none focus:ring-2 focus:ring-primary"
         />
         <button
-          onClick={onSendMessage}
+          onClick={handleSendMessage}
+          disabled={isPending} // Disable if the push notification request is pending
           className="ml-2 rounded-md bg-primary px-4 py-2 text-white transition hover:opacity-80"
         >
           Send

@@ -81,3 +81,24 @@ export const markNotificationAsRead = async (
     throw error;
   }
 };
+
+export const markAllNotificationsAsRead = async (
+  userId: string,
+): Promise<NotificationResponse> => {
+  try {
+    const response = await api.patch(
+      `/api/notifications/${userId}/mark-read-all`,
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw {
+        statusCode: error.response?.status || 500,
+        message:
+          error.response?.data?.message?.error ||
+          "An error occurred while marking all notifications as read",
+      };
+    }
+    throw { statusCode: 500, message: "An unexpected error occurred" };
+  }
+};

@@ -1,10 +1,12 @@
-import React, { useState, ChangeEvent, KeyboardEvent, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from "react";
 import { MessageCircle } from "lucide-react";
 import { io } from "socket.io-client";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
-import { v4 as uuid } from "uuid"; // For generating unique room IDs
+import { v4 as uuid } from "uuid";
 import { useMessagesForRoom } from "../hooks/useMessagesForRoom";
+import { useSendPushNotificationToAdmins } from "@/features/Notifications/hooks/useSendPushNotificationToAdmins";
 
+// Initialize socket connection
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
 
 interface Message {
@@ -18,7 +20,7 @@ interface Message {
 const UserChat: React.FC = () => {
   const { user } = useAuthStore();
 
-  // Initialize roomId: either based on user._id or generate one for unauthenticated users.
+  // Initialize roomId: use the user ID or generate one for guest users
   const [roomId, setRoomId] = useState<string>(() => {
     if (user?._id) {
       return `room_${user._id}`;
@@ -31,21 +33,24 @@ const UserChat: React.FC = () => {
     return storedRoom;
   });
 
-  // Hook to fetch chat history.
+  // Fetch chat history for the room (custom hook)
   const { data } = useMessagesForRoom(roomId);
-
-  // Local states for managing chat.
-  const [open, setOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
 
+  // Initialize the admin push notification hook
+  const { mutate: notifyAdmins, isPending: notifyAdminsPending } =
+    useSendPushNotificationToAdmins();
+
+  // Set messages when data changes
   useEffect(() => {
     if (data && data.length > 0) {
       setMessages(data);
     }
   }, [data]);
 
-  // Update roomId when the user logs in or their info changes.
+  // Update roomId when the user logs in or changes
   useEffect(() => {
     if (user?._id) {
       const newRoom = `room_${user._id}`;
@@ -55,9 +60,8 @@ const UserChat: React.FC = () => {
     }
   }, [user?._id, roomId]);
 
-  // Join the room and set up the message listener.
+  // Manage socket room joining and message reception
   useEffect(() => {
-    const previousRoomId = roomId;
     socket.emit("join-room", roomId);
 
     const messageHandler = (msg: Message) => {
@@ -67,11 +71,11 @@ const UserChat: React.FC = () => {
 
     return () => {
       socket.off("receive-message", messageHandler);
-      socket.emit("leave-room", previousRoomId);
+      socket.emit("leave-room", roomId);
     };
   }, [roomId]);
 
-  // Send a message and also notify admins if a non-admin sends a message.
+  // Send a message via socket and trigger admin notifications if needed
   const sendMessage = (): void => {
     if (input.trim() === "") return;
 
@@ -85,18 +89,17 @@ const UserChat: React.FC = () => {
     setInput("");
     socket.emit("send-message", newMessage);
 
-    // If the sender is not an admin, emit an event to notify admins.
+    // For non-admin users, notify admins via the FCM hook
     if (user?.role !== "admin") {
       const notificationPayload = {
         title: "New Message Received",
-        description: `Message: ${newMessage.text}`,
-        redirectUrl: "/admin-chat", // Customize as needed
+        body: `Message: ${newMessage.text}`,
       };
-      socket.emit("send-admin-notification", notificationPayload);
+      notifyAdmins(notificationPayload);
     }
   };
 
-  // Only non-admin users see this chat widget.
+  // Hide chat for admin users
   if (user?.role === "admin") return null;
 
   return (
@@ -115,14 +118,10 @@ const UserChat: React.FC = () => {
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`rounded p-2 ${
-                  msg.sender === "user"
-                    ? "self-end bg-primary text-white"
-                    : "self-start bg-gray-200 text-black"
-                }`}
+                className={`rounded p-2 ${msg.sender === "user" ? "self-end bg-primary text-white" : "self-start bg-gray-200 text-black"}`}
               >
                 <p className="text-sm font-bold">
-                  {msg.sender === "user" ? "You" : "Triple-Z"}
+                  {msg.sender === "user" ? "You" : "Admin"}
                 </p>
                 <p>{msg.text}</p>
               </div>
@@ -144,6 +143,7 @@ const UserChat: React.FC = () => {
             />
             <button
               onClick={sendMessage}
+              disabled={notifyAdminsPending} // disable while notification is pending
               className="ml-2 rounded bg-primary px-3 py-2 text-white"
             >
               Send

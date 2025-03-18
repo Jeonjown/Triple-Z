@@ -8,7 +8,6 @@ import {
 
 /**
  * Custom hook to send a notification to all users.
- * Payload now includes userId.
  */
 export const useSendNotificationToAll = () => {
   const queryClient = useQueryClient();
