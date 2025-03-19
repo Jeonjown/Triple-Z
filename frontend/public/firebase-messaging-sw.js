@@ -24,7 +24,8 @@ messaging.onBackgroundMessage((payload) => {
         badge: payload.data?.badge || '/triple-z-logo.png',
         data: {
             click_action: payload.data?.click_action || '/'
-        }
+        },
+        vibrate: [200, 100, 200]
     };
 
     // Optionally close any existing notifications before showing the new one
