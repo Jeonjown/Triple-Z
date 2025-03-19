@@ -16,7 +16,7 @@ export interface AdminPushNotificationPayload {
 
 // Payload for sending a push notification to a user
 export interface UserPushNotificationPayload {
-  token: string;
+  userId: string;
   title: string;
   body: string;
   icon?: string;

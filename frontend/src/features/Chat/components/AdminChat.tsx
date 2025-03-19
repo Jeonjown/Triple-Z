@@ -228,6 +228,7 @@ const AdminChat: React.FC = () => {
             onInputChange={setInput}
             onSendMessage={sendAdminMessage}
             messagesLoading={messagesLoading}
+            pushToken={selectedUserId}
           />
         )}
       </div>

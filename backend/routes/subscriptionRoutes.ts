@@ -1,14 +1,13 @@
-// src/routes/subscriptionRoutes.ts
+// routes/subscriptionRoutes.ts
 import { Router } from "express";
 import {
-  subscribeToAdminsTopic,
-  unsubscribeFromAdminsTopic,
+  registerFcmToken,
+  removeFcmToken,
 } from "../controllers/subscriptionController";
 
 const router = Router();
 
-// Only admin users can access this endpoint
-router.post("/subscribe-admin", subscribeToAdminsTopic);
-router.post("/unsubscribe-admin", unsubscribeFromAdminsTopic);
+router.post("/register", registerFcmToken);
+router.post("/remove", removeFcmToken);
 
 export default router;

@@ -43,11 +43,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     // If a push token is provided, trigger the FCM push notification.
     if (pushToken) {
       const payload = {
-        token: pushToken,
+        userId: pushToken,
         title: "New Chat Message",
         body: input, // You can customize the notification message here.
         icon: "/triple-z-logo.png", // Optional: adjust as needed.
-        click_action: "/chat", // Optional: URL to navigate on click.
+        click_action: "/", // Optional: URL to navigate on click.
       };
 
       // Call the hook's mutate function to send the notification.

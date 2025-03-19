@@ -1,23 +1,49 @@
 // src/controllers/notificationController.ts
 import { Request, Response, NextFunction } from "express";
 import { createError } from "../utils/createError";
-import { sendPushNotification } from "../services/pushNotificationService";
+
 import { sendPushNotificationToAdmins } from "../services/adminPushNotificationService";
+import Subscription from "../models/subscriptionModel";
+import { sendMulticastPushNotification } from "../services/pushNotificationService";
+
+interface PushNotificationRequestBody {
+  userId: string;
+  title: string;
+  body: string;
+  icon?: string;
+  click_action?: string;
+}
 
 export async function sendPushNotificationToUser(
-  req: Request,
+  req: Request<{}, {}, PushNotificationRequestBody>,
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const { token, title, body, icon, click_action } = req.body;
+  const { userId, title, body, icon, click_action } = req.body;
 
   // Validate required fields
-  if (!token || !title || !body) {
-    return next(createError("Token, title, and body are required", 400));
+  if (!userId || !title || !body) {
+    return next(createError("userId, title, and body are required", 400));
   }
 
   try {
-    await sendPushNotification({ token, title, body, icon, click_action });
+    // Find the subscription document for the given userId
+    const subscription = await Subscription.findOne({ userId });
+    if (!subscription || subscription.tokens.length === 0) {
+      return next(createError("No tokens found for this user", 404));
+    }
+
+    // Extract token strings from the tokens array
+    const tokens = subscription.tokens.map((tokenObj) => tokenObj.token);
+
+    // Send notification using multicast
+    await sendMulticastPushNotification({
+      tokens,
+      title,
+      body,
+      icon,
+      click_action,
+    });
     res.json({ message: "Notification sent successfully" });
   } catch (error: unknown) {
     console.error("Error in controller:", error);
