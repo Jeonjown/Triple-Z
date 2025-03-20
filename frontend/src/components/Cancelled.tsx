@@ -1,6 +1,7 @@
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import useGetReservations from "@/features/Events/hooks/useGetEventReservations";
-import { format } from "date-fns";
+import useGetGroupReservations from "@/features/Events/hooks/useGetGroupReservations";
+import { format, compareDesc } from "date-fns";
 import { Copy } from "lucide-react";
 import {
   Tooltip,
@@ -8,7 +9,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-
 import {
   Table,
   TableBody,
@@ -17,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import {
   Dialog,
   DialogContent,
@@ -27,7 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-// Define interfaces for explicit types
+// Define interfaces.
 interface User {
   _id: string;
   username: string;
@@ -42,7 +41,7 @@ interface CartItem {
   image: string;
 }
 
-interface Reservation {
+export interface Reservation {
   _id: string;
   userId: User;
   fullName: string;
@@ -64,64 +63,122 @@ interface Reservation {
   __v: number;
 }
 
-interface ReservationData {
+interface EventReservationData {
   reservations: Reservation[];
 }
 
+// Raw group reservation interface.
+interface GroupReservationRaw {
+  _id: string;
+  userId: User;
+  fullName: string;
+  contactNumber: string;
+  partySize: number;
+  date: string;
+  startTime: string;
+  endTime: string;
+  cart: CartItem[];
+  eventStatus: string;
+  paymentStatus: string;
+  subtotal: number;
+  totalPayment: number;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+// Map group reservations into the unified Reservation format.
+const mapGroupToReservation = (group: GroupReservationRaw): Reservation => ({
+  ...group,
+  eventType: "Group Reservation", // Mark as Group Reservation.
+  specialRequest: "",
+  eventFee: 0,
+});
+
 const Cancelled = () => {
-  const { data } = useGetReservations() as { data?: ReservationData };
+  // Get event reservations.
+  const { data } = useGetReservations() as { data?: EventReservationData };
+  // Get group reservations.
+  const { data: groupData } = useGetGroupReservations();
   const { user } = useAuthStore();
 
-  // Filter reservations for the current user with cancelled status only
-  const cancelledReservations: Reservation[] =
+  // Filter cancelled event reservations for the current user.
+  const eventCancelled: Reservation[] =
     data?.reservations.filter(
       (reservation: Reservation) =>
         reservation.userId._id === user?._id &&
         reservation.eventStatus === "Cancelled",
     ) || [];
 
+  // Map, then filter cancelled group reservations.
+  const groupCancelled: Reservation[] = groupData
+    ? groupData
+        .map((group: GroupReservationRaw) => mapGroupToReservation(group))
+        .filter(
+          (reservation) =>
+            reservation.userId._id === user?._id &&
+            reservation.eventStatus === "Cancelled",
+        )
+    : [];
+
+  // Merge and sort descending (most recent first).
+  const mergedReservations = [...eventCancelled, ...groupCancelled].sort(
+    (a, b) => compareDesc(new Date(a.date), new Date(b.date)),
+  );
+
   return (
     <div className="overflow-x-auto p-5">
       <h3 className="mb-4 text-xl font-semibold">Cancelled Reservations</h3>
-      <table className="min-w-full border-collapse">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border-y px-4 py-2">Date &amp; Time</th>
-            <th className="border-y px-4 py-2">Event</th>
-            <th className="border-y px-4 py-2">Party Size</th>
-            <th className="border-y px-4 py-2">Special Request</th>
-            <th className="border-y px-4 py-2">Status</th>
-            <th className="border-y px-4 py-2">Payment</th>
-            <th className="border-y px-4 py-2">ID</th>
-            <th className="border-y px-4 py-2">Cart Details</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cancelledReservations.length > 0 ? (
-            cancelledReservations.map((reservation: Reservation) => (
-              <tr key={reservation._id} className="hover:bg-gray-50">
-                <td className="border-y px-4 py-2">
-                  {format(new Date(reservation.date), "MMMM dd, yyyy")}
+      <Table className="min-w-full">
+        <TableHeader>
+          <TableRow className="border-b border-gray-300 bg-gray-100">
+            <TableHead className="px-4 py-2">Date & Time</TableHead>
+            <TableHead className="px-4 py-2">Event</TableHead>
+            <TableHead className="px-4 py-2">Party Size</TableHead>
+            <TableHead className="px-4 py-2">Special Request</TableHead>
+            <TableHead className="px-4 py-2">Status</TableHead>
+            <TableHead className="px-4 py-2">Payment</TableHead>
+            <TableHead className="px-4 py-2">ID</TableHead>
+            <TableHead className="px-4 py-2">Cart Details</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {mergedReservations.length > 0 ? (
+            mergedReservations.map((reservation: Reservation) => (
+              <TableRow
+                key={reservation._id}
+                className="border-b border-gray-300 hover:bg-gray-50"
+              >
+                <TableCell className="px-4 py-2">
+                  <span className="font-bold">
+                    {format(new Date(reservation.date), "MMMM dd, yyyy")}
+                  </span>
                   <br />
-                  {reservation.startTime} - {reservation.endTime}
-                </td>
-                <td className="border-y px-4 py-2">{reservation.eventType}</td>
-                <td className="border-y px-4 py-2">
+                  <span>
+                    {reservation.startTime} - {reservation.endTime}
+                  </span>
+                </TableCell>
+                <TableCell className="px-4 py-2">
+                  <span className="text-xs font-bold">
+                    {reservation.eventType}
+                  </span>
+                </TableCell>
+                <TableCell className="px-4 py-2">
                   {reservation.partySize} pax
-                </td>
-                <td className="border-y px-4 py-2">
-                  {reservation.specialRequest}
-                </td>
-                <td className="border-y px-4 py-2">
+                </TableCell>
+                <TableCell className="px-4 py-2">
+                  {reservation.specialRequest || "N/A"}
+                </TableCell>
+                <TableCell className="px-4 py-2">
                   {reservation.eventStatus}
-                </td>
-                <td className="border-y px-4 py-2">
+                </TableCell>
+                <TableCell className="px-4 py-2">
                   <div>
                     <span className="block">{reservation.paymentStatus}</span>
                     <span className="block">₱{reservation.totalPayment}</span>
                   </div>
-                </td>
-                <td className="border-y px-4 py-2">
+                </TableCell>
+                <TableCell className="px-4 py-2">
                   <div className="flex items-center space-x-2">
                     <span className="text-xs font-medium text-primary">
                       {reservation._id}
@@ -144,8 +201,8 @@ const Cancelled = () => {
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                </td>
-                <td className="border-y px-4 py-2">
+                </TableCell>
+                <TableCell className="px-4 py-2">
                   <Dialog>
                     <DialogTrigger asChild>
                       <button className="text-blue-600 hover:underline">
@@ -159,40 +216,41 @@ const Cancelled = () => {
                           Order details for this reservation.
                         </DialogDescription>
                       </DialogHeader>
-                      <Table>
+                      <Table className="min-w-full">
                         <TableHeader>
-                          <TableRow>
-                            <TableHead className="w-20 border-y px-4 py-2">
+                          <TableRow className="border-b border-gray-300">
+                            <TableHead className="w-20 px-4 py-2">
                               Image
                             </TableHead>
-                            <TableHead className="border-y px-4 py-2">
-                              Item
-                            </TableHead>
-                            <TableHead className="border-y px-4 py-2">
+                            <TableHead className="px-4 py-2">Item</TableHead>
+                            <TableHead className="px-4 py-2">
                               Quantity
                             </TableHead>
-                            <TableHead className="border-y px-4 py-2 text-right">
+                            <TableHead className="px-4 py-2 text-right">
                               Price
                             </TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {reservation.cart.map((item: CartItem) => (
-                            <TableRow key={item._id}>
-                              <TableCell className="border-y px-4 py-2">
+                            <TableRow
+                              key={item._id}
+                              className="border-b border-gray-300"
+                            >
+                              <TableCell className="px-4 py-2">
                                 <img
                                   src={item.image}
                                   alt={item.title}
                                   className="h-10 w-10 rounded object-cover"
                                 />
                               </TableCell>
-                              <TableCell className="border-y px-4 py-2">
+                              <TableCell className="px-4 py-2">
                                 {item.title}
                               </TableCell>
-                              <TableCell className="border-y px-4 py-2">
+                              <TableCell className="px-4 py-2">
                                 {item.quantity}
                               </TableCell>
-                              <TableCell className="border-y px-4 py-2 text-right">
+                              <TableCell className="px-4 py-2 text-right">
                                 ₱{item.totalPrice}
                               </TableCell>
                             </TableRow>
@@ -215,18 +273,18 @@ const Cancelled = () => {
                       </div>
                     </DialogContent>
                   </Dialog>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))
           ) : (
-            <tr>
-              <td className="px-4 py-2 text-center" colSpan={8}>
+            <TableRow>
+              <TableCell className="px-4 py-2 text-center" colSpan={8}>
                 No cancelled reservations history.
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };
