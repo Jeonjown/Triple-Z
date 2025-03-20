@@ -109,6 +109,15 @@ const BlogCarousel: React.FC = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
+
+        <div className="mt-5 text-center">
+          <h2 className="text-base font-semibold text-primary md:text-lg">
+            WE CREATE
+          </h2>
+          <p className="font-heading text-3xl md:text-4xl">
+            Unforgettable Events
+          </p>
+        </div>
       </Carousel>
     </section>
   );
