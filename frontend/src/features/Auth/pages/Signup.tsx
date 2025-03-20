@@ -65,7 +65,7 @@ const Signup = () => {
       >
         {({ touched, errors }) => (
           <div className="mt-40 flex h-[40vh] w-full items-center justify-center md:h-[60vh]">
-            <Form className="flex w-full max-w-screen-sm flex-col px-12 py-8 md:mx-10 md:py-14 md:shadow-aesthetic">
+            <Form className="md:shadow-aesthetic flex w-full max-w-screen-sm flex-col px-12 py-8 md:mx-10 md:py-14">
               <h2 className="text-center text-2xl">Create an Account</h2>
               <p className="mb-10 text-center">Please enter your details</p>
 
@@ -128,7 +128,7 @@ const Signup = () => {
 
               <button
                 type="submit"
-                className="mt-10 rounded bg-accent py-2 text-white hover:scale-105 hover:opacity-90 active:scale-110 active:opacity-95 md:text-base"
+                className="mt-10 rounded bg-primary py-2 text-white hover:scale-105 hover:opacity-90 active:scale-110 active:opacity-95 md:text-base"
               >
                 Sign up
               </button>
