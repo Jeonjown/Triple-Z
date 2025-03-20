@@ -21,6 +21,37 @@ interface GroupsCartProps {
   tooltipTrigger: number;
 }
 
+const QuantityInput: React.FC<{
+  value: number;
+  onChange: (newVal: number) => void;
+}> = ({ value, onChange }) => {
+  const [inputValue, setInputValue] = useState<string>(value.toString());
+
+  useEffect(() => {
+    setInputValue(value.toString());
+  }, [value]);
+
+  return (
+    <input
+      type="number"
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+      onBlur={() => {
+        const parsed = parseInt(inputValue, 10);
+        if (!isNaN(parsed) && parsed >= 1 && parsed <= 999) {
+          onChange(parsed);
+        } else {
+          // Reset to the last valid number if the value is invalid or empty
+          setInputValue(value.toString());
+        }
+      }}
+      min="1"
+      max="99"
+      className="w-16 rounded border text-center"
+    />
+  );
+};
+
 const EventsCart: React.FC<GroupsCartProps> = ({
   cart,
   updateQuantity,
@@ -38,16 +69,11 @@ const EventsCart: React.FC<GroupsCartProps> = ({
   const didMount = useRef(false);
 
   useEffect(() => {
-    // If tooltipTrigger is 0, do nothing
     if (tooltipTrigger === 0) return;
-
-    // Skip initial mount
     if (!didMount.current) {
       didMount.current = true;
       return;
     }
-
-    // Show tooltip then hide after 300ms
     setShowTooltip(true);
     const timer = setTimeout(() => setShowTooltip(false), 300);
     return () => clearTimeout(timer);
@@ -105,18 +131,9 @@ const EventsCart: React.FC<GroupsCartProps> = ({
                   >
                     -
                   </button>
-                  <input
-                    type="number"
+                  <QuantityInput
                     value={item.quantity}
-                    onChange={(e) => {
-                      const newVal = parseInt(e.target.value, 10);
-                      if (!isNaN(newVal) && newVal >= 1 && newVal <= 99) {
-                        updateQuantity(item._id, newVal);
-                      }
-                    }}
-                    min="1"
-                    max="99"
-                    className="w-16 rounded border text-center"
+                    onChange={(newVal) => updateQuantity(item._id, newVal)}
                   />
                   <button
                     className="rounded-lg border px-2 py-1 text-sm hover:bg-gray-200"

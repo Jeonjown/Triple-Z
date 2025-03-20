@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useFetchMenu } from "@/features/Menu/hooks/useFetchMenu";
-import { useFetchItemsByCategories } from "@/features/Menu/hooks/useFetchItemsByCategories";
-import LoadingPage from "@/pages/LoadingPage";
 import { Search, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useFormContext } from "react-hook-form";
+import LoadingPage from "@/pages/LoadingPage";
+import { useFetchItemsByCategories } from "@/features/Menu/hooks/useFetchItemsByCategories";
+import { useFetchMenu } from "@/features/Menu/hooks/useFetchMenu";
 
 // Interfaces for menu structure
 interface Subcategory {
@@ -37,6 +37,7 @@ export interface MenuItem {
   sizes: SizeOption[];
   requiresSizeSelection: boolean;
   description?: string;
+  availability?: boolean; // add availability property if not already defined
 }
 
 export interface SelectedItem {
@@ -113,6 +114,14 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
 
   // Handle Add to Cart click
   const handleAddClick = (item: MenuItem) => {
+    if (item.availability === false) {
+      toast({
+        title: "Item Unavailable",
+        description: `${item.title} is not available.`,
+        variant: "destructive",
+      });
+      return;
+    }
     let sizeId: string | undefined = undefined;
     let price: number | null = item.basePrice; // Default to basePrice
 
@@ -225,44 +234,57 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
           className="grid grid-cols-1 gap-4 overflow-y-auto sm:grid-cols-2 md:grid-cols-3"
           style={{ maxHeight: "calc(100vh - 200px)" }}
         >
-          {filteredItems.map((item: MenuItem) => (
-            <div
-              key={item._id}
-              className="flex min-h-[320px] flex-col gap-2 rounded-lg border bg-white p-4 transition duration-150 hover:shadow-lg"
-            >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="h-30 w-full rounded object-cover"
-              />
-              <div className="flex flex-1 flex-col">
-                <div className="text-lg font-semibold text-gray-800">
-                  {item.title}
-                </div>
-                {item.requiresSizeSelection && item.sizes.length > 0 && (
-                  <select
-                    value={selectedSizes[item._id] || item.sizes[0]._id}
-                    onChange={(e) => handleSizeChange(item._id, e.target.value)}
-                    className="mt-1 w-full rounded border p-1 text-sm"
-                  >
-                    {item.sizes.map((size) => (
-                      <option key={size._id} value={size._id}>
-                        {size.size} (₱{size.sizePrice})
-                      </option>
-                    ))}
-                  </select>
-                )}
-                <p className="mb-4 mt-1 whitespace-normal text-sm text-gray-600">
-                  {item.description}
-                </p>
-                <div className="mx-auto mt-auto">
-                  <Button type="button" onClick={() => handleAddClick(item)}>
-                    Add to Cart
-                  </Button>
+          {filteredItems.map((item: MenuItem) => {
+            const cardContent = (
+              <div
+                className={`flex min-h-[320px] flex-col gap-2 rounded-lg border bg-white p-4 transition duration-150 hover:shadow-lg ${
+                  item.availability === false
+                    ? "pointer-events-none cursor-not-allowed opacity-50 grayscale filter"
+                    : ""
+                }`}
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="h-30 w-full rounded object-cover"
+                />
+                <div className="flex flex-1 flex-col">
+                  <div className="text-lg font-semibold text-gray-800">
+                    {item.title}
+                  </div>
+                  {item.requiresSizeSelection && item.sizes.length > 0 && (
+                    <select
+                      value={selectedSizes[item._id] || item.sizes[0]._id}
+                      onChange={(e) =>
+                        handleSizeChange(item._id, e.target.value)
+                      }
+                      className="mt-1 w-full rounded border p-1 text-sm"
+                    >
+                      {item.sizes.map((size) => (
+                        <option key={size._id} value={size._id}>
+                          {size.size} (₱{size.sizePrice})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <p className="mb-4 mt-1 whitespace-normal text-sm text-gray-600">
+                    {item.description}
+                  </p>
+                  <div className="mx-auto mt-auto">
+                    <Button
+                      type="button"
+                      onClick={() => handleAddClick(item)}
+                      disabled={item.availability === false}
+                    >
+                      Add to Cart
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+
+            return <div key={item._id}>{cardContent}</div>;
+          })}
         </div>
         {/* Special Request Text Area */}
         <div className="mt-6">

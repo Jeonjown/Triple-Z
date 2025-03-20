@@ -29,8 +29,6 @@ export const initSocket = (httpServer: any) => {
       if (callback) callback({ status: "joined" });
     });
 
-    // Other listeners (get-notifications, leave-room, etc.) remain unchanged
-
     // --- Updated "send-message" event for user messages ---
     socket.on("send-message", async (messageData: SocketMessage) => {
       try {
@@ -39,17 +37,14 @@ export const initSocket = (httpServer: any) => {
         io.to(messageData.roomId).emit("receive-message", savedMessage);
 
         // Create notifications for admin users (the receiver)
-        // Build the payload without a userId since we create one for each admin.
         const notificationPayload = {
           title: "New Message Received",
           description: `Message from user: ${savedMessage.text}`,
           redirectUrl: "/admin-chat",
         };
-        // Create a notification for each admin
         const adminNotifications = await createAdminNotifications(
           notificationPayload
         );
-        // Emit the notification only to admin clients (targeted by their userId)
         adminNotifications.forEach((notif) => {
           io.to(notif.userId.toString()).emit("notification", notif);
         });
@@ -62,11 +57,9 @@ export const initSocket = (httpServer: any) => {
     socket.on("admin-message", async (messageData: SocketMessage) => {
       try {
         const savedMessage = await saveAdminMessage(messageData);
-        // Update chat window for all participants in the room
         io.to(messageData.roomId).emit("receive-message", savedMessage);
 
         // Notify only the user (receiver)
-        // Here, savedMessage.userId should refer to the user who originally started the chat.
         if (savedMessage.userId) {
           const notificationPayload = {
             title: "New Message Received",
@@ -87,8 +80,25 @@ export const initSocket = (httpServer: any) => {
       }
     });
 
-    // The rest of your socket listeners (send-notification, send-admin-notification, etc.)
-    // You can remove or adjust any events (such as "send-admin-notification") that are now redundant.
+    // --- New "new-reservation-notification" event ---
+    socket.on("send-admins-notification", async (payload) => {
+      try {
+        // Use the payload received from the client.
+        const notificationPayload = {
+          title: payload.title || "New Reservation Received",
+          description: payload.body, // Use 'body' property from client payload
+          redirectUrl: payload.redirectUrl || "/admin-reservations",
+        };
+        const adminNotifications = await createAdminNotifications(
+          notificationPayload
+        );
+        adminNotifications.forEach((notif) => {
+          io.to(notif.userId.toString()).emit("notification", notif);
+        });
+      } catch (error) {
+        console.error("Error sending admin notification:", error);
+      }
+    });
 
     socket.on("leave-room", (roomId: string) => {
       socket.leave(roomId);

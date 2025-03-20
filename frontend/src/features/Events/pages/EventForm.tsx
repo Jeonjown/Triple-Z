@@ -11,8 +11,6 @@ import { ProgressBar } from "@/components/ProgressBar";
 // Import the SelectedItem type from EmbeddedMenu
 import { SelectedItem } from "../components/events-form/EmbeddedMenu";
 
-// ─── Unified CartItem type (single source of truth) ────────────────────────────
-// Now includes 'price' and optional 'size'
 export type CartItem = {
   _id: string;
   title: string;
@@ -26,8 +24,6 @@ export type CartItem = {
 const defaultMinGuests = 24;
 const defaultMinDaysPrior = 14;
 
-// ─── Updated Zod Schema ─────────────────────────────────────────────────────────
-// Added 'price' and optional 'size' to the cart schema.
 const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
   z.object({
     fullName: z.string().nonempty("Full Name is required."),
@@ -111,6 +107,27 @@ const EventForm = () => {
     { step: 4, label: "Thank You" },
   ];
 
+  // Define text mapping for each step
+  const stepTexts = [
+    {
+      header: "Make a Reservation",
+      description:
+        "Select your details and we'll try to get the best seats for you.",
+    },
+    {
+      header: "Choose Your Packages",
+      description: "Select the packages you want to add to your reservation.",
+    },
+    {
+      header: "Confirm Your Reservation",
+      description: "Review your details and packages before confirming.",
+    },
+    {
+      header: "Thank you for your reservation!",
+      description: "",
+    },
+  ];
+
   // Initialize the form with default values. Note the empty cart array.
   const methods = useForm<EventFormValues>({
     resolver: zodResolver(reservationSchema),
@@ -151,7 +168,7 @@ const EventForm = () => {
 
   return (
     <FormProvider {...methods}>
-      <div className="mx-auto mt-10 flex flex-col items-center justify-center space-y-8 p-5">
+      <div className="mx-auto mt-20 flex flex-col items-center justify-center space-y-8 p-5 md:mt-10">
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
           className="w-full max-w-4xl"
@@ -159,17 +176,16 @@ const EventForm = () => {
           <div className="md:shadow-aesthetic flex w-full flex-col">
             {currentStep !== 4 ? (
               <>
-                <h2 className="mb-4 text-center font-heading text-2xl">
-                  Make a Reservation
+                <h2 className="mb-4 text-center font-heading text-3xl">
+                  {stepTexts[currentStep - 1].header}
                 </h2>
                 <p className="text-center">
-                  Select your details and we'll try to get the best seats for
-                  you.
+                  {stepTexts[currentStep - 1].description}
                 </p>
               </>
             ) : (
               <h2 className="mb-4 text-center text-4xl">
-                Thank you for your reservation!
+                {stepTexts[3].header}
               </h2>
             )}
             <ProgressBar currentStep={currentStep} steps={steps} />

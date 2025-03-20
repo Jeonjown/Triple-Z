@@ -1,13 +1,11 @@
 import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from "react";
 import { MessageCircle } from "lucide-react";
-import { io } from "socket.io-client";
+
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { v4 as uuid } from "uuid";
 import { useMessagesForRoom } from "../hooks/useMessagesForRoom";
 import { useSendPushNotificationToAdmins } from "@/features/Notifications/hooks/useSendPushNotificationToAdmins";
-
-// Initialize socket connection
-const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
+import { socket } from "@/socket";
 
 interface Message {
   roomId: string;

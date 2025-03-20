@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { io } from "socket.io-client";
+
 import RoomList, { Room } from "./RoomList";
 import ChatWindow from "./ChatWindow";
 import UserDetails from "./UserDetails";
@@ -17,8 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
-const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
+import { socket } from "@/socket";
 
 export interface Message {
   userId: string;

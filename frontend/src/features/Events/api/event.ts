@@ -48,24 +48,32 @@ interface ReservationError {
 }
 
 export interface Reservation {
-  _id: string;
-  user: UserReservation;
-  fullName: string;
-  contactNumber: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  eventType: string;
-  partySize: number;
-  specialRequest?: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
+  message: string;
+  reservation: {
+    _id: string;
+    user: UserReservation;
+    fullName: string;
+    contactNumber: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    eventType: string;
+    partySize: number;
+    specialRequest?: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
 }
 
 interface ReservationError {
   error: string;
+}
+
+interface ErrorResponse {
+  message?: string;
+  error?: string;
 }
 
 export const createEventReservation = async (
@@ -81,7 +89,7 @@ export const createEventReservation = async (
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError;
+      const axiosError = error as AxiosError<ErrorResponse>;
       throw new Error(
         axiosError.response?.data?.message ||
           axiosError.response?.data?.error ||
