@@ -37,7 +37,7 @@ export interface MenuItem {
   sizes: SizeOption[];
   requiresSizeSelection: boolean;
   description?: string;
-  availability?: boolean; // add availability property if not already defined
+  availability?: boolean; // Optional availability flag
 }
 
 export interface SelectedItem {
@@ -51,19 +51,17 @@ interface EmbeddedMenuProps {
 }
 
 const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
-  // Fetch menu data and pending state
+  // Fetch the menu data
   const { data: menuData, isPending: menuPending } = useFetchMenu() as {
     data?: MenuData;
     isPending: boolean;
   };
 
-  // Initialize toast
+  // Toast and form context
   const { toast } = useToast();
-
-  // Get register method from react-hook-form for specialRequest field
   const { register } = useFormContext();
 
-  // State for selected category/subcategory and UI controls
+  // UI state for selected category/subcategory and search query
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null,
   );
@@ -81,7 +79,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     (cat) => cat.category.toLowerCase() === "packages",
   );
 
-  // Set default category/subcategory using the Packages category
+  // Set default category and subcategory from Packages
   useEffect(() => {
     if (packagesCategory) {
       setSelectedCategoryId(packagesCategory._id);
@@ -96,13 +94,13 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     }
   }, [packagesCategory]);
 
-  // Fetch items based on selected category/subcategory
+  // Fetch items based on the selected category/subcategory
   const { data: items, isPending: itemsPending } = useFetchItemsByCategories(
     selectedCategoryId ?? "",
     selectedSubcategoryId ?? "",
   ) as { data?: MenuItem[]; isPending: boolean };
 
-  // Filter items by search query
+  // Filter the items based on the search query
   const filteredItems = (items || []).filter((item) =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
@@ -112,7 +110,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     setSelectedSizes((prev) => ({ ...prev, [itemId]: newSizeId }));
   };
 
-  // Handle Add to Cart click
+  // Handle adding an item to the cart
   const handleAddClick = (item: MenuItem) => {
     if (item.availability === false) {
       toast({
@@ -123,8 +121,9 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
       return;
     }
     let sizeId: string | undefined = undefined;
-    let price: number | null = item.basePrice; // Default to basePrice
+    let price: number | null = item.basePrice;
 
+    // Check for required size selection
     if (item.requiresSizeSelection && item.sizes.length > 0) {
       sizeId = selectedSizes[item._id] || item.sizes[0]._id;
       if (!selectedSizes[item._id]) {
@@ -147,13 +146,14 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     });
   };
 
-  // Loading state
+  // Display a loading state if data is still fetching
   if (menuPending || itemsPending) return <LoadingPage />;
   if (!packagesCategory) return <></>;
 
   return (
-    <div className="mt-5 flex w-full flex-col rounded-md md:flex-row md:border md:p-5">
-      {/* Mobile Sidebar: Render only Packages subcategories */}
+    // Parent container is set to full viewport height for proper flex behavior.
+    <div className="mt-5 flex h-screen w-full flex-col rounded-md md:flex-row md:border md:p-5">
+      {/* Mobile Sidebar: Only visible on smaller screens */}
       <div className="block md:hidden">
         <div className="fixed left-0 top-24 z-10 w-full bg-white p-3 shadow-md">
           <button
@@ -181,7 +181,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
           )}
         </div>
       </div>
-      {/* Desktop Sidebar: Render only Packages subcategories */}
+      {/* Desktop Sidebar: Only visible on medium and larger screens */}
       <div className="hidden w-full md:block md:w-1/4 md:border-r">
         <h3 className="mb-2 text-xl font-bold">Packages</h3>
         {packagesCategory.subcategories && (
@@ -203,8 +203,8 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
           </div>
         )}
       </div>
-      {/* Menu Items */}
-      <div className="w-full p-4 md:w-3/4">
+      {/* Main content area for Menu Items */}
+      <div className="flex w-full flex-col p-4 md:w-3/4">
         <h3 className="mb-2 text-xl font-bold">Menu Items</h3>
         {/* Search Bar */}
         <div className="relative mb-4">
@@ -230,13 +230,15 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
         {filteredItems.length === 0 && (
           <p className="text-gray-500">No items available.</p>
         )}
-        <div
-          className="grid grid-cols-1 gap-4 overflow-y-auto sm:grid-cols-2 md:grid-cols-3"
-          style={{ maxHeight: "calc(100vh - 200px)" }}
-        >
-          {filteredItems.map((item: MenuItem) => {
-            const cardContent = (
+        {/* Flex container to allow the grid to take remaining height */}
+        <div className="flex-1 overflow-hidden">
+          <div
+            className="grid grid-cols-1 gap-4 overflow-y-auto sm:grid-cols-2 md:grid-cols-3"
+            style={{ maxHeight: "calc(100vh - 200px)" }} // Adjust the calculation as needed
+          >
+            {filteredItems.map((item: MenuItem) => (
               <div
+                key={item._id}
                 className={`flex min-h-[320px] flex-col gap-2 rounded-lg border bg-white p-4 transition duration-150 hover:shadow-lg ${
                   item.availability === false
                     ? "pointer-events-none cursor-not-allowed opacity-50 grayscale filter"
@@ -281,10 +283,8 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
                   </div>
                 </div>
               </div>
-            );
-
-            return <div key={item._id}>{cardContent}</div>;
-          })}
+            ))}
+          </div>
         </div>
         {/* Special Request Text Area */}
         <div className="mt-6">
