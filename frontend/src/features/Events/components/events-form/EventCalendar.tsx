@@ -95,11 +95,14 @@ const EventCalendar = () => {
           </div>
 
           <div className="flex flex-col items-center">
-            <p className="text-xs font-semibold">Earliest Booking Date</p>
-            <p className="text-xs">prior the event</p>
+            <p className="text-xs font-semibold">Booking Period Begins:</p>
             <p className="font-semibold text-primary">
               {earliestAvailableDate
-                ? earliestAvailableDate.toLocaleDateString()
+                ? earliestAvailableDate.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
                 : "Loading..."}
             </p>
           </div>
