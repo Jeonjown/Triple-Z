@@ -1,4 +1,5 @@
 // src/components/EventStatusCell.tsx
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,9 +8,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { GroupReservation } from "./columns";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
-import { useNotificationSender } from "@/features/Notifications/hooks/useSendNotificationSender";
+import { GroupReservation } from "./columns";
 import { useUpdateGroupReservationStatus } from "@/features/Events/hooks/useUpdateGroupReservationStatus ";
 
 interface EventStatusCellProps {
@@ -21,57 +29,73 @@ const EventStatusCell = ({
 }: EventStatusCellProps): JSX.Element => {
   const { mutate } = useUpdateGroupReservationStatus();
 
-  // Initialize notification sender for the user associated with the reservation.
-  console.log(reservation.userId._id);
-  const { sendNotification } = useNotificationSender(reservation.userId._id);
+  // State to store the selected status and control the dialog.
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  const updateStatus = (newStatus: string) => {
-    mutate(
-      {
-        reservationId: reservation._id,
-        eventStatus: newStatus,
-      },
-      {
-        onSuccess: () => {
-          // After updating the status, send a notification to the user.
-          sendNotification({
-            userId: reservation.userId._id,
-            title: "Reservation Status Updated",
-            description: `Your reservation status has been updated to ${newStatus}.`,
-            // Update the redirect URL as needed.
-            redirectUrl: "/profile",
-          });
-        },
-        onError: (error) => {
-          console.error("Error updating reservation status", error);
-        },
-      },
-    );
+  // Handle dropdown item click: store the status and open the confirmation dialog.
+  const handleStatusSelection = (status: string) => {
+    setSelectedStatus(status);
+    // Optionally, add a delay if the dropdown needs to close first.
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 100);
+  };
+
+  // Confirm the change and trigger the mutation.
+  const confirmStatusChange = () => {
+    mutate({
+      reservationId: reservation._id,
+      eventStatus: selectedStatus,
+      userId: reservation.userId._id,
+    });
+    setIsDialogOpen(false);
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="h-8 w-20 px-12">
-          {reservation.eventStatus}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        <DropdownMenuLabel>Status</DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => updateStatus("Pending")}>
-          Pending
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateStatus("Confirmed")}>
-          Confirmed
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateStatus("Cancelled")}>
-          Cancelled
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateStatus("Completed")}>
-          Completed
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="h-8 w-20 px-12">
+            {reservation.eventStatus}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuLabel>Status</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => handleStatusSelection("Pending")}>
+            Pending
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleStatusSelection("Confirmed")}>
+            Confirmed
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleStatusSelection("Cancelled")}>
+            Cancelled
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleStatusSelection("Completed")}>
+            Completed
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Status Change</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to change the event status to "
+              {selectedStatus}"?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmStatusChange}>Confirm</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

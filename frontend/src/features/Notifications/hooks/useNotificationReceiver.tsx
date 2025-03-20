@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSocket } from "@/hooks/useSocket";
-import { playPingSound } from "@/utils/playPingSound";
+// import { playPingSound } from "@/utils/playPingSound";
 
 export interface MyNotification {
   _id: string;
@@ -24,7 +24,6 @@ export const useNotificationReceiver = (
 
   // Update notifications state when the initial notifications prop changes.
   useEffect(() => {
-    console.log("Setting initial notifications:", initialNotifications);
     setNotifications(initialNotifications);
   }, [initialNotifications]);
 
@@ -53,7 +52,7 @@ export const useNotificationReceiver = (
     // Listener for receiving a new realtime notification.
     const handleRealtimeNotification = (notification: MyNotification) => {
       console.log("Received realtime notification from server:", notification);
-      playPingSound();
+      // playPingSound();
       setNotifications((prev) => [notification, ...prev]);
     };
 

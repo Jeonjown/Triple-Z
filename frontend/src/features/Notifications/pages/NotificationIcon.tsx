@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,10 +43,6 @@ const NotificationIcon: React.FC = () => {
       user?._id || "",
       (initialNotifications as MyNotification[]) || [],
     );
-
-  useEffect(() => {
-    console.log("Current notifications state:", notifications);
-  }, [notifications]);
 
   // Single notification mutation hook.
   const { mutate: markAsRead, isPending: isPendingMarkAsRead } =

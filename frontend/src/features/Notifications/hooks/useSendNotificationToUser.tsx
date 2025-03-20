@@ -5,7 +5,6 @@ import {
   createNotification,
   NotificationData,
   NotificationResponse,
-  sendNotificationToUser,
 } from "../api/notification";
 
 export type NotificationPayload = NotificationData;
@@ -22,11 +21,8 @@ export const useSendNotificationToUser = () => {
       if (!payload.userId) {
         throw new Error("userId is required for user-specific notifications.");
       }
-      return await sendNotificationToUser(
-        payload.title,
-        payload.description,
-        payload.userId,
-      );
+      // Directly call the API helper to create the notification.
+      return await createNotification(payload);
     },
     onError: (err: Error) => {
       console.error("Error sending notification:", err);
@@ -37,20 +33,14 @@ export const useSendNotificationToUser = () => {
         variant: "destructive",
       });
     },
-    onSuccess: async (data, variables) => {
-      try {
-        // Use the original payload (variables) to save the notification
-        await createNotification(variables);
-        console.log("Notification sent and saved successfully:", data);
-        queryClient.invalidateQueries({ queryKey: ["notifications"] });
-        toast({
-          title: "Notification sent",
-          description: "The notification was sent successfully.",
-          variant: "default",
-        });
-      } catch (error) {
-        console.error("Error saving notification:", error);
-      }
+    onSuccess: (data) => {
+      console.log("Notification sent and saved successfully:", data);
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      toast({
+        title: "Notification sent",
+        description: "The notification was sent successfully.",
+        variant: "default",
+      });
     },
   });
 

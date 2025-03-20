@@ -1,6 +1,6 @@
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import useGetReservations from "@/features/Events/hooks/useGetEventReservations";
-import { format } from "date-fns";
+import { format, isBefore, startOfDay } from "date-fns";
 import { CalendarDays, Copy } from "lucide-react";
 import {
   Tooltip,
@@ -56,24 +56,30 @@ const MySchedule = () => {
   console.log(data);
   const { user } = useAuthStore();
 
-  // Filter reservations for the current user with only pending and confirmed statuses
+  // Get today's date without time for accurate comparison
+  const today = startOfDay(new Date());
+
+  // Filter reservations for the current user with only pending and confirmed statuses and future dates
   const userReservations: Reservation[] =
-    data?.reservations.filter(
-      (reservation: Reservation) =>
+    data?.reservations.filter((reservation: Reservation) => {
+      const reservationDate = startOfDay(new Date(reservation.date));
+      return (
         reservation.userId._id === user?._id &&
         (reservation.eventStatus === "Pending" ||
-          reservation.eventStatus === "confirmed"),
-    ) || [];
+          reservation.eventStatus === "confirmed") &&
+        !isBefore(reservationDate, today) // Only show upcoming or today's reservations
+      );
+    }) || [];
 
   return (
     <div className="p-5">
-      <h3 className="text-xl font-semibold">Schedule Details</h3>
+      <h3 className="text-xl font-semibold">Upcoming Reservations</h3>
       {userReservations.length > 0 ? (
         userReservations.map((reservation: Reservation) => (
           // Reservation Card with enhanced styling
           <div key={reservation._id} className="my-4 border-b p-4">
             {/* Reservation Details Grid */}
-            <div className="relative grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               {/* Left Column: Reservation Details */}
               <div className="space-y-2">
                 <div>
@@ -102,32 +108,34 @@ const MySchedule = () => {
                   <p className="text-primary">Event Status:</p>
                   <p className="font-medium">{reservation.eventStatus}</p>
                 </div>
-                <div>
-                  <p className="text-primary">Payment Status:</p>
-                  <p className="font-medium">{reservation.paymentStatus}</p>
-                </div>
-                {/* ID row placed at the bottom */}
-                <div className="absolute bottom-0 flex items-center space-x-2">
-                  <p className="text-xs font-medium text-primary">
-                    ID: {reservation._id}
-                  </p>
-                  <TooltipProvider>
-                    <Tooltip delayDuration={100}>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={() =>
-                            navigator.clipboard.writeText(reservation._id)
-                          }
-                          className="cursor-pointer text-gray-500 hover:text-gray-700"
-                        >
-                          <Copy size={16} />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Copy Reservation ID</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                {/* Payment Status and Reservation ID section */}
+                <div className="mt-4 space-y-2">
+                  <div>
+                    <p className="text-primary">Payment Status:</p>
+                    <p className="font-medium">{reservation.paymentStatus}</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-xs font-medium text-primary">
+                      ID: {reservation._id}
+                    </p>
+                    <TooltipProvider>
+                      <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() =>
+                              navigator.clipboard.writeText(reservation._id)
+                            }
+                            className="cursor-pointer text-gray-500 hover:text-gray-700"
+                          >
+                            <Copy size={16} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Copy Reservation ID</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </div>
               </div>
 
@@ -177,7 +185,7 @@ const MySchedule = () => {
           </div>
         ))
       ) : (
-        <p>No reservations found.</p>
+        <p>No upcoming reservations found.</p>
       )}
     </div>
   );

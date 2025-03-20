@@ -18,8 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-import { playPingSound } from "@/utils/playPingSound";
-
 const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
 
 export interface Message {
@@ -159,7 +157,6 @@ const AdminChat: React.FC = () => {
 
       if (data.roomId === roomId) {
         setMessages((prev) => [...prev, data]);
-        if (soundEnabled) playPingSound();
       }
     };
 

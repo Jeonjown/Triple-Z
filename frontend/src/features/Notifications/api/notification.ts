@@ -26,6 +26,7 @@ export interface NotificationData {
   userId: string;
   read?: boolean;
   createdAt?: Date;
+  redirectUrl: string;
 }
 
 export const createNotification = async (
@@ -33,7 +34,11 @@ export const createNotification = async (
 ) => {
   try {
     // Await the promise to resolve and get the response
-    const response = await api.post("/api/notifications/", notificationData);
+    const response = await api.post(
+      "/api/notifications/create",
+      notificationData,
+    );
+    console.log(notificationData);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

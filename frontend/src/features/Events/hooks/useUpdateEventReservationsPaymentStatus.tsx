@@ -1,48 +1,69 @@
+// hooks/useUpdateEventReservationPaymentStatusWithNotification.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/hooks/use-toast";
 import { updateEventReservationPaymentStatus } from "../api/event";
+import { toast } from "@/hooks/use-toast";
+import { useSendNotificationToUser } from "@/features/Notifications/hooks/useSendNotificationToUser";
+import { useSendPushNotificationToUser } from "@/features/Notifications/hooks/useSendPushNotificationToUser";
 
-// Define an interface for the update payment status input
+// Extend the input type to include userId.
 interface UpdateReservationStatusArgs {
   reservationId: string;
   paymentStatus: string;
+  userId: string;
 }
 
-export const useUpdateEventReservationPaymentStatus = () => {
+export const useUpdateEventReservationPaymentStatusWithNotification = () => {
   const queryClient = useQueryClient();
+  // Get the realtime notification mutation.
+  const { mutate: sendRealtimeNotification } = useSendNotificationToUser();
+  // Get the push notification mutation.
+  const { mutate: sendPushNotification } = useSendPushNotificationToUser();
 
-  // Define the mutation with correct generics: <TData, TError, TVariables>
   const { mutate, isPending, isError, error } = useMutation<
-    string, // TData: the API returns a string message
-    Error, // TError: error object type
-    UpdateReservationStatusArgs // TVariables: input variables type
+    string, // success type from updateEventReservationPaymentStatus
+    Error, // error type
+    UpdateReservationStatusArgs // input type for mutation function
   >({
     mutationFn: ({
       reservationId,
       paymentStatus,
     }: UpdateReservationStatusArgs) => {
-      // Call the API function with paymentStatus first, then reservationId
+      // Update the payment status.
       return updateEventReservationPaymentStatus(paymentStatus, reservationId);
     },
-    onError: (err: Error) => {
+    onError: (err) => {
       console.error("Error updating payment status:", err);
-      // Display error toast with a descriptive message
       toast({
         title: "Error updating payment status",
         description: err.message,
         variant: "destructive",
       });
     },
-    onSuccess: (data: string) => {
+    onSuccess: (data, variables) => {
       console.log("Payment status updated successfully:", data);
-      // Invalidate the query to refresh reservations data
       queryClient.invalidateQueries({ queryKey: ["eventReservations"] });
-      // Display success toast with a confirmation message
       toast({
         title: "Payment status updated",
         description: "The payment status was updated successfully.",
         variant: "default",
       });
+
+      // If a valid userId exists, send notifications.
+      if (variables.userId) {
+        // Build and send realtime notification.
+        sendRealtimeNotification({
+          title: "Reservation Status Updated",
+          description: `Your reservation payment status has been updated to ${variables.paymentStatus}.`,
+          redirectUrl: "/profile", // Adjust as needed.
+          userId: variables.userId,
+        });
+        // Build and send push notification.
+        sendPushNotification({
+          userId: variables.userId,
+          title: "Reservation Status Updated",
+          body: `Your reservation payment status has been updated to ${variables.paymentStatus}.`,
+        });
+      }
     },
   });
 

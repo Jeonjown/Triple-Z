@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { Notification } from "../models/notificationsModel";
 import User from "../models/userModel";
 import { createError } from "../utils/createError";
+import { io } from "../socket/socket";
 
 // Create a new notification
 export const createNotification = async (
@@ -15,19 +16,28 @@ export const createNotification = async (
     return next(createError("Missing required fields", 400));
   }
   try {
+    // Save the notification to the database.
     const notification = await Notification.create({
       title,
       description,
       userId,
       redirectUrl,
     });
+
+    // Emit the realtime notification to the specific user room.
+    if (io) {
+      io.to(userId).emit("notification", notification);
+    } else {
+      console.error("Socket.io server not initialized");
+    }
+
+    // Return the notification in the response.
     res.status(201).json({ notification });
   } catch (error) {
     console.error("Error saving notification:", error);
     return next(createError("Error saving notification", 500));
   }
 };
-
 // Get notifications for a user
 export const getNotifications = async (
   req: Request,
