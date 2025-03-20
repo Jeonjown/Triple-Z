@@ -25,7 +25,7 @@ const Banner = () => {
 
           {/* Content */}
           <div className="relative z-10 px-5 py-10 sm:p-8 lg:max-w-prose xl:ml-20 xl:mr-auto xl:-translate-y-10">
-            <h1 className="font-heading text-5xl font-light sm:text-6xl lg:text-7xl xl:mt-0">
+            <h1 className="font-heading text-5xl font-light sm:text-6xl lg:text-7xl xl:mt-0 xl:text-8xl">
               Welcome to Triple Z
             </h1>
 
@@ -54,7 +54,7 @@ const Banner = () => {
             <img
               src="Triple-z-image.webp"
               alt="event background mobile"
-              className="hidden w-full max-w-3xl lg:flex"
+              className="hidden w-full max-w-4xl lg:flex"
             />
           </div>
         </div>
