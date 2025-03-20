@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useFetchMenu } from "@/features/Menu/hooks/useFetchMenu";
 import { useFetchItemsByCategories } from "@/features/Menu/hooks/useFetchItemsByCategories";
 import LoadingPage from "@/pages/LoadingPage";
@@ -36,6 +36,7 @@ export interface MenuItem {
   sizes: SizeOption[];
   requiresSizeSelection: boolean;
   description?: string;
+  availability?: boolean; // Optional availability flag
 }
 
 export interface SelectedItem {
@@ -71,18 +72,30 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+  // Memoize filtered categories to avoid recalculation on every render.
+  const filteredCategories = useMemo(() => {
+    return (
+      menuData?.categories.filter(
+        (category) => category.category.toLowerCase() !== "packages",
+      ) || []
+    );
+  }, [menuData]);
+
   // Set default category and subcategory when menu loads
   useEffect(() => {
-    if (menuData?.categories?.length) {
-      const defaultCategory = menuData.categories[0];
+    if (filteredCategories.length) {
+      const defaultCategory = filteredCategories[0];
       setSelectedCategoryId(defaultCategory._id);
-      if (defaultCategory.subcategories?.length) {
+      if (
+        defaultCategory.subcategories &&
+        defaultCategory.subcategories.length
+      ) {
         setSelectedSubcategoryId(defaultCategory.subcategories[0]._id);
       } else {
         setSelectedSubcategoryId(null);
       }
     }
-  }, [menuData]);
+  }, [filteredCategories]);
 
   // Fetch items based on selected category/subcategory
   const { data: items, isPending: itemsPending } = useFetchItemsByCategories(
@@ -102,6 +115,15 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
 
   // Handle Add to Cart click
   const handleAddClick = (item: MenuItem) => {
+    // If the item is unavailable, show a toast and do nothing
+    if (item.availability === false) {
+      toast({
+        title: "Item Unavailable",
+        description: `${item.title} is not available.`,
+        variant: "destructive",
+      });
+      return;
+    }
     let sizeId: string | undefined = undefined;
     let price: number | null = item.basePrice; // Default to basePrice
 
@@ -132,7 +154,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
 
   // Render a loading state if data is still fetching
   if (menuPending || itemsPending) return <LoadingPage />;
-  if (!menuData?.categories) return <></>;
+  if (!filteredCategories.length) return <></>;
 
   return (
     <div className="mt-5 flex w-full flex-col rounded-md md:flex-row md:border md:p-5">
@@ -147,7 +169,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
           </button>
           {isMobileSidebarOpen && (
             <div className="mt-2 animate-fadeIn rounded-md border bg-white p-3 shadow-lg transition-opacity duration-300 ease-in-out">
-              {menuData.categories.map((category) => (
+              {filteredCategories.map((category) => (
                 <div key={category._id} className="mb-3">
                   <h2 className="font-bold text-primary">
                     {category.category}
@@ -174,7 +196,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
       {/* Desktop Sidebar */}
       <div className="hidden w-full md:block md:w-1/4 md:border-r">
         <h3 className="mb-2 text-xl font-bold">Categories</h3>
-        {menuData.categories.map((category) => (
+        {filteredCategories.map((category) => (
           <div key={category._id} className="mb-2">
             <button
               type="button"
@@ -252,7 +274,11 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
           {filteredItems.map((item: MenuItem) => (
             <div
               key={item._id}
-              className="flex min-h-[320px] flex-col gap-2 rounded-lg border bg-white p-4 transition duration-150 hover:shadow-lg"
+              className={`flex min-h-[320px] flex-col gap-2 rounded-lg border bg-white p-4 transition duration-150 hover:shadow-lg ${
+                item.availability === false
+                  ? "pointer-events-none cursor-not-allowed opacity-50 grayscale filter"
+                  : ""
+              }`}
             >
               <img
                 src={item.image}
@@ -280,7 +306,11 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
                   {item.description}
                 </p>
                 <div className="mx-auto mt-auto">
-                  <Button type="button" onClick={() => handleAddClick(item)}>
+                  <Button
+                    type="button"
+                    onClick={() => handleAddClick(item)}
+                    disabled={item.availability === false}
+                  >
                     Add to Cart
                   </Button>
                 </div>

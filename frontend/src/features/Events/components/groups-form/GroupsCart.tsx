@@ -11,7 +11,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { RiShoppingBag3Fill } from "react-icons/ri";
-// Import the unified CartItem type from GroupForm.tsx
+// Import the unified CartItem type from your GroupForm page
 import { CartItem } from "../../pages/GroupForm";
 
 interface GroupsCartProps {
@@ -21,27 +21,69 @@ interface GroupsCartProps {
   tooltipTrigger: number;
 }
 
+const QuantityInput: React.FC<{
+  value: number;
+  onChange: (newVal: number) => void;
+}> = ({ value, onChange }) => {
+  const [inputValue, setInputValue] = useState<string>(value.toString());
+
+  useEffect(() => {
+    setInputValue(value.toString());
+  }, [value]);
+
+  return (
+    <input
+      type="number"
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+      onBlur={() => {
+        const parsed = parseInt(inputValue, 10);
+        if (!isNaN(parsed) && parsed >= 1 && parsed <= 999) {
+          onChange(parsed);
+        } else {
+          // Reset to the last valid value if input is invalid
+          setInputValue(value.toString());
+        }
+      }}
+      min="1"
+      max="999"
+      className="w-16 rounded border text-center"
+    />
+  );
+};
+
 const GroupsCart: React.FC<GroupsCartProps> = ({
   cart,
   updateQuantity,
   removeFromCart,
   tooltipTrigger,
 }) => {
+  // Calculate overall cart total
   const totalCartPrice = cart.reduce(
     (total, item) => total + item.totalPrice,
     0,
   );
+
+  // Manage tooltip state for "Item added!" notification
   const [showTooltip, setShowTooltip] = useState(false);
   const didMount = useRef(false);
+  const lastTooltipTrigger = useRef(tooltipTrigger);
 
   useEffect(() => {
+    // Only trigger tooltip if the new tooltipTrigger is greater than the last value
     if (!didMount.current) {
       didMount.current = true;
+      lastTooltipTrigger.current = tooltipTrigger;
       return;
     }
-    setShowTooltip(true);
-    const timer = setTimeout(() => setShowTooltip(false), 300);
-    return () => clearTimeout(timer);
+    if (tooltipTrigger > lastTooltipTrigger.current) {
+      setShowTooltip(true);
+      const timer = setTimeout(() => setShowTooltip(false), 300);
+      lastTooltipTrigger.current = tooltipTrigger;
+      return () => clearTimeout(timer);
+    } else {
+      lastTooltipTrigger.current = tooltipTrigger;
+    }
   }, [tooltipTrigger]);
 
   return (
@@ -53,7 +95,7 @@ const GroupsCart: React.FC<GroupsCartProps> = ({
               Item added!
             </div>
           )}
-          <RiShoppingBag3Fill className="size-12 rounded-full bg-secondary p-2 text-primary hover:scale-105 hover:cursor-pointer" />
+          <RiShoppingBag3Fill className="size-16 rounded-full bg-secondary p-2 text-primary hover:scale-105 hover:cursor-pointer" />
           {cart.length > 0 && (
             <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
               {cart.length}
@@ -84,7 +126,6 @@ const GroupsCart: React.FC<GroupsCartProps> = ({
                   <p className="text-xs">
                     Unit Price: ₱{item.price.toFixed(2)}
                   </p>
-                  {item.size && <p className="text-xs">Size: {item.size}</p>}
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -96,7 +137,10 @@ const GroupsCart: React.FC<GroupsCartProps> = ({
                   >
                     -
                   </button>
-                  <span className="text-sm">{item.quantity}</span>
+                  <QuantityInput
+                    value={item.quantity}
+                    onChange={(newVal) => updateQuantity(item._id, newVal)}
+                  />
                   <button
                     className="rounded-lg border px-2 py-1 text-sm hover:bg-gray-200"
                     onClick={() => updateQuantity(item._id, item.quantity + 1)}

@@ -1,6 +1,4 @@
-// useCreateGroupReservation.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
 import { toast } from "@/hooks/use-toast";
 import { useParams } from "react-router-dom";
 import {
@@ -8,11 +6,13 @@ import {
   GroupReservationFormValues,
   createGroupReservation,
 } from "../api/group";
+import { useSendPushNotificationToAdmins } from "@/features/Notifications/hooks/useSendPushNotificationToAdmins";
+import { socket } from "@/socket";
 
 export const useCreateGroupReservation = () => {
   const queryClient = useQueryClient();
   const { userId } = useParams<{ userId: string }>();
-  console.log("user id from use hook:", userId);
+  const { mutate: sendPushNotification } = useSendPushNotificationToAdmins();
 
   const { mutate, isPending, isError, error } = useMutation<
     GroupReservation,
@@ -20,7 +20,6 @@ export const useCreateGroupReservation = () => {
     GroupReservationFormValues
   >({
     mutationFn: (values: GroupReservationFormValues) => {
-      console.log(values);
       if (!userId) {
         throw new Error("User ID is required");
       }
@@ -35,12 +34,41 @@ export const useCreateGroupReservation = () => {
       });
     },
     onSuccess: (data: GroupReservation) => {
-      console.log("Group reservation created successfully:", data);
       queryClient.invalidateQueries({ queryKey: ["groupReservations"] });
       toast({
         title: "Reservation created",
         description: "The group reservation was created successfully.",
         variant: "default",
+      });
+
+      // Send push notification to admins.
+      sendPushNotification(
+        {
+          title: "New Group Reservation Received",
+          body: `Reservation for ${data.reservation.fullName} on ${new Date(
+            data.reservation.date,
+          ).toLocaleDateString()} has been received.`,
+        },
+        {
+          onSuccess: () => {
+            console.log("Admin notification sent successfully.");
+          },
+          onError: (notificationError: Error) => {
+            console.error(
+              "Error sending admin notification:",
+              notificationError,
+            );
+          },
+        },
+      );
+
+      // Emit a realtime notification via the socket instance.
+      socket.emit("send-admins-notification", {
+        title: "New Group Reservation Received",
+        body: `Reservation for ${data.fullName} on ${new Date(
+          data.date,
+        ).toLocaleDateString()} has been received.`,
+        redirectUrl: "/manage-group-reservations",
       });
     },
   });

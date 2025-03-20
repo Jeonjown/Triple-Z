@@ -9,6 +9,7 @@ import {
 } from "../controllers/groupReservationController";
 import { verifyAdminToken } from "../middleware/verifyAdminToken";
 import { verifyToken } from "../middleware/verifyToken";
+import { validateGroupReservation } from "../middleware/validateGroupReservation";
 
 const router = Router();
 
@@ -16,7 +17,12 @@ const router = Router();
 router.get("/", getGroupReservations);
 
 // Create a new group reservation (userId in URL)
-router.post("/:userId", verifyToken, createGroupReservation);
+router.post(
+  "/:userId",
+  verifyToken,
+  validateGroupReservation,
+  createGroupReservation
+);
 
 // Delete a group reservation (admin only)
 router.delete("/", verifyAdminToken, deleteGroupReservation);

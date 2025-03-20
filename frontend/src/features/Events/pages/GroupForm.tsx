@@ -8,6 +8,7 @@ import GroupStep3 from "../components/groups-form/GroupStep3";
 import GroupStep4 from "../components/groups-form/GroupStep4";
 import { SelectedItem } from "../components/groups-form/EmbeddedMenu";
 import { useGetEventReservationSettings } from "../hooks/useGetEventReservationSettings";
+import { ProgressBar } from "@/components/ProgressBar";
 
 // Unified CartItem type
 export type CartItem = {
@@ -20,8 +21,7 @@ export type CartItem = {
   size?: string;
 };
 
-// Updated Zod schema generator using new settings
-
+// Updated Zod schema using normalized date validation
 const getReservationSchema = (
   minReservation: number,
   maxReservation: number,
@@ -43,11 +43,23 @@ const getReservationSchema = (
       .refine(
         (val) => {
           const selectedDate = new Date(val);
-          const minDate = new Date();
-          minDate.setDate(minDate.getDate() + minDaysPrior);
-          return selectedDate >= minDate;
+          // Normalize selected date (ignore hours/minutes)
+          const normSelected = new Date(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth(),
+            selectedDate.getDate(),
+          );
+          const now = new Date();
+          // Create a normalized minimum date: today + minDaysPrior (date-only)
+          const normMin = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+          );
+          normMin.setDate(normMin.getDate() + minDaysPrior);
+          return normSelected >= normMin;
         },
-        { message: `Date must be at least ${minDaysPrior} day in advance` },
+        { message: `Date must be at least ${minDaysPrior} day(s) in advance` },
       ),
     startTime: z.string().nonempty("Start Time is required"),
     endTime: z.string().nonempty("End Time is required"),
@@ -85,6 +97,14 @@ const GroupForm = () => {
   const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Define the steps array for the progress bar.
+  const steps = [
+    { step: 1, label: "Details" },
+    { step: 2, label: "Packages" },
+    { step: 3, label: "Confirm" },
+    { step: 4, label: "Thank You" },
+  ];
 
   const nextStep = () => setCurrentStep((prev) => prev + 1);
   const prevStep = () => setCurrentStep((prev) => prev - 1);
@@ -145,6 +165,9 @@ const GroupForm = () => {
                 Thank you for your reservation!
               </h2>
             )}
+            {/* Progress Bar Integration */}
+            <ProgressBar currentStep={currentStep} steps={steps} />
+
             {currentStep === 1 && (
               <GroupStep1
                 nextStep={nextStep}

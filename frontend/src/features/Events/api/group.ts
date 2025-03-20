@@ -16,6 +16,7 @@ interface ReservationError {
 }
 
 export interface GroupReservation {
+  message: string;
   _id: string;
   userId: {
     _id: string;
@@ -75,9 +76,7 @@ export const createGroupReservation = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<ReservationError>;
-      throw new Error(
-        axiosError.response?.data?.message || "An error occurred",
-      );
+      throw new Error(axiosError.response?.data?.error || "An error occurred");
     }
     throw new Error("An unexpected error occurred");
   }

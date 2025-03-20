@@ -1,11 +1,16 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useFormContext } from "react-hook-form";
 import ScrollToTop from "@/components/ScrollToTop";
 import HourlyTimePicker from "./HourlyTimePicker";
 import GroupCalendar from "./GroupCalendar";
+import { useGetEventReservationSettings } from "../../hooks/useGetEventReservationSettings";
 import { GroupFormValues } from "../../pages/GroupForm";
+import TableOccupancyProgress from "../TableOccupancyProgress";
+import useGetGroupReservations from "../../hooks/useGetGroupReservations";
 
-// Updated type for settings to reflect the new reservation fields.
 export type EventReservationSettings = {
   eventReservationLimit: number;
   eventMinDaysPrior: number;
@@ -34,7 +39,6 @@ const GroupStep1 = ({
   maxReservation,
   settings,
 }: Step1Props) => {
-  // Use the typed form context instead of "any"
   const {
     setValue,
     register,
@@ -46,15 +50,64 @@ const GroupStep1 = ({
   const startTime = watch("startTime");
   const endTime = watch("endTime");
   const partySize = watch("partySize");
+  const dateInput = watch("date"); // Date entered by the user
 
-  // Extract table capacity and available tables from settings; provide fallbacks.
   const maxGuestsPerTable = settings?.groupMaxGuestsPerTable || 6;
-  const availableTables = settings?.groupMaxTablesPerDay ?? 0;
-
-  // Calculate the number of tables required based on partySize and table capacity.
+  const totalTables = settings?.groupMaxTablesPerDay ?? 0;
   const tablesOccupied = partySize
     ? Math.ceil(partySize / maxGuestsPerTable)
     : 0;
+
+  // State to store available tables computed solely from the date input.
+  const [inputAvailableTables, setInputAvailableTables] = useState<
+    number | null
+  >(null);
+  // Error message if the input date is fully booked.
+  const [fullyBookedError, setFullyBookedError] = useState<string | null>(null);
+
+  const { data: reservations } = useGetGroupReservations();
+  const { data: settingsData } = useGetEventReservationSettings();
+
+  useEffect(() => {
+    if (dateInput && reservations && settingsData) {
+      const d = new Date(dateInput);
+      if (!isNaN(d.getTime())) {
+        // Define start and end of the selected day.
+        const startOfDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const endOfDay = new Date(
+          d.getFullYear(),
+          d.getMonth(),
+          d.getDate() + 1,
+        );
+        // Filter reservations for that day.
+        const reservationsForDay = reservations.filter(
+          (r: { date: string; partySize: number }) => {
+            const resDate = new Date(r.date);
+            return resDate >= startOfDay && resDate < endOfDay;
+          },
+        );
+        // Sum tables required by all reservations (using same logic as in the calendar).
+        const totalBookedTables = reservationsForDay.reduce((sum, r) => {
+          return (
+            sum + Math.ceil(r.partySize / settingsData.groupMaxGuestsPerTable)
+          );
+        }, 0);
+        // Compute available tables.
+        const available = settingsData.groupMaxTablesPerDay - totalBookedTables;
+        setInputAvailableTables(available);
+        if (available === 0) {
+          setFullyBookedError(
+            "The date you picked is fully booked. Please choose another date.",
+          );
+        } else {
+          setFullyBookedError(null);
+        }
+      } else {
+        setInputAvailableTables(null);
+        setFullyBookedError(null);
+      }
+    }
+  }, [dateInput, reservations, settingsData]);
 
   const handleNextStep = async () => {
     const valid = await trigger([
@@ -65,6 +118,13 @@ const GroupStep1 = ({
       "startTime",
       "endTime",
     ]);
+    // Prevent moving to the next step if available tables are 0.
+    if (inputAvailableTables === 0) {
+      setFullyBookedError(
+        "The date you picked is fully booked. Please choose another date.",
+      );
+      return;
+    }
     if (valid) {
       nextStep();
     }
@@ -73,20 +133,18 @@ const GroupStep1 = ({
   return (
     <>
       <ScrollToTop />
-      <GroupCalendar />
-      <h3 className="font-semibold text-primary">
-        Available Tables For Today: {availableTables}
-      </h3>
       <div className="mt-10 lg:flex lg:space-x-2">
         <div className="flex-1">
-          <label htmlFor="fullName">Full Name</label>
-          <input
-            type="text"
+          <Label
+            htmlFor="fullName"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Full Name
+          </Label>
+          <Input
             id="fullName"
             {...register("fullName")}
-            className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
-              errors.fullName ? "border-red-500" : ""
-            }`}
+            className={`mb-4 mt-1 w-full ${errors.fullName ? "border-red-500" : ""}`}
           />
           {errors.fullName && (
             <div className="text-xs text-red-700">
@@ -97,14 +155,16 @@ const GroupStep1 = ({
           )}
         </div>
         <div className="flex-1">
-          <label htmlFor="contactNumber">Contact Number</label>
-          <input
-            type="text"
+          <Label
+            htmlFor="contactNumber"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Contact Number
+          </Label>
+          <Input
             id="contactNumber"
             {...register("contactNumber")}
-            className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
-              errors.contactNumber ? "border-red-500" : ""
-            }`}
+            className={`mb-4 mt-1 w-full ${errors.contactNumber ? "border-red-500" : ""}`}
           />
           {errors.contactNumber && (
             <div className="text-xs text-red-700">
@@ -117,45 +177,62 @@ const GroupStep1 = ({
       </div>
       <div className="lg:flex lg:space-x-2">
         <div className="flex-1">
-          <label htmlFor="partySize">Party Size</label>
-          <input
+          <Label
+            htmlFor="partySize"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Party Size
+          </Label>
+          <Input
             type="number"
+            id="partySize"
             min={minReservation}
             max={maxReservation}
             placeholder={`Allowed: ${minReservation} to ${maxReservation}`}
             {...register("partySize")}
-            className={`w-full rounded border p-3 focus:outline-secondary ${
-              errors.partySize ? "border-red-500" : ""
-            }`}
+            className={`mt-1 w-full ${errors.partySize ? "border-red-500" : ""}`}
           />
-          {/* Display allowed range and table capacity information */}
-          <p className="text-sm text-primary">
-            Allowed guests per reservation: {minReservation} to {maxReservation}
-            .
-          </p>
-          <p className="text-sm text-primary">
-            Each table can accommodate: {maxGuestsPerTable} guests.
-          </p>
-          <p className="text-sm text-primary">
-            Tables you will occupy: {tablesOccupied}
-          </p>
           {errors.partySize && (
-            <div className="text-xs text-red-700">
+            <div className="mt-2 text-xs text-red-700">
               {typeof errors.partySize.message === "string"
                 ? errors.partySize.message
                 : ""}
             </div>
           )}
+          <div className="mt-4 rounded-md bg-gray-50 p-4 shadow">
+            <ul className="list-disc space-y-1 pl-5 text-sm text-primary">
+              <TableOccupancyProgress
+                tablesOccupied={tablesOccupied}
+                totalTables={totalTables}
+              />
+              <li>
+                <span className="font-medium">Each table can accommodate:</span>{" "}
+                {maxGuestsPerTable} guests.
+              </li>
+              <li>
+                <span className="font-medium">
+                  Allowed guests per reservation:
+                </span>{" "}
+                {minReservation} to {maxReservation}.
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
-      <div>
-        <label htmlFor="date">Date</label>
-        <input
+      {/* Calendar for visual feedback only */}
+      <GroupCalendar />
+      <div className="mt-6">
+        <Label
+          htmlFor="date"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Date
+        </Label>
+        <Input
           type="date"
+          id="date"
           {...register("date")}
-          className={`mb-4 w-full rounded border p-3 focus:outline-secondary ${
-            errors.date ? "border-red-500" : ""
-          }`}
+          className={`mb-4 mt-1 w-full ${errors.date ? "border-red-500" : ""}`}
         />
         {errors.date && (
           <div className="text-xs text-red-700">
@@ -165,7 +242,12 @@ const GroupStep1 = ({
       </div>
       <div className="flex gap-4">
         <div className="flex-1">
-          <label htmlFor="startTime">Start Time</label>
+          <Label
+            htmlFor="startTime"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Start Time
+          </Label>
           <HourlyTimePicker
             value={startTime}
             onChange={(time) => setValue("startTime", time)}
@@ -179,7 +261,12 @@ const GroupStep1 = ({
           )}
         </div>
         <div className="flex-1">
-          <label htmlFor="endTime">End Time</label>
+          <Label
+            htmlFor="endTime"
+            className="block text-sm font-medium text-gray-700"
+          >
+            End Time
+          </Label>
           <HourlyTimePicker
             value={endTime}
             onChange={(time) => setValue("endTime", time)}
@@ -193,9 +280,19 @@ const GroupStep1 = ({
           )}
         </div>
       </div>
-      <Button type="button" onClick={handleNextStep} className="mt-10">
+      <Button
+        type="button"
+        onClick={handleNextStep}
+        className={`mt-10 ${inputAvailableTables === 0 ? "cursor-not-allowed bg-gray-300" : ""}`}
+        disabled={inputAvailableTables === 0}
+      >
         Next
       </Button>
+      {fullyBookedError && (
+        <p className="mt-2 text-center text-xs text-red-500">
+          {fullyBookedError}
+        </p>
+      )}
     </>
   );
 };

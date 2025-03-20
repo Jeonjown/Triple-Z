@@ -42,7 +42,7 @@ export const useCreateEventReservations = () => {
       // Send push notification to admins.
       sendPushNotification(
         {
-          title: "New Reservation Received",
+          title: "New Event Reservation Received",
           body: `Reservation for ${data.reservation.fullName} on ${new Date(
             data.reservation.date,
           ).toLocaleDateString()} has been received.`,
@@ -61,7 +61,7 @@ export const useCreateEventReservations = () => {
       );
       // Emit a realtime notification to admins via the socket instance.
       socket.emit("send-admins-notification", {
-        title: "New Reservation Received",
+        title: "New Event Reservation Received",
         body: `Reservation for ${data.reservation.fullName} on ${new Date(
           data.reservation.date,
         ).toLocaleDateString()} has been received.`,

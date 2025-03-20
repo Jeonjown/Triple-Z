@@ -1,4 +1,3 @@
-// components/groups-form/GroupStep2.tsx
 import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
@@ -67,7 +66,7 @@ const GroupStep2 = ({
             _id: selected.key, // Use the unique composite key for the cart item.
             title: menuItem.title,
             quantity,
-            price, // **Include the unit price here**
+            price, // Include the unit price here.
             image: menuItem.image,
             size: sizeText,
             totalPrice: quantity * price,
@@ -135,10 +134,20 @@ const GroupStep2 = ({
         <Button type="button" onClick={prevStep} className="w-full">
           Previous
         </Button>
-        <Button type="button" onClick={nextStep} className="w-full">
+        <Button
+          type="button"
+          onClick={nextStep}
+          className="w-full"
+          disabled={cart.length === 0}
+        >
           Next
         </Button>
       </div>
+      {cart.length === 0 && (
+        <p className="mt-2 text-center text-xs text-red-500">
+          Your cart is empty. Please add at least one item to continue.
+        </p>
+      )}
       {errors.cart && (
         <p className="mt-2 text-xs text-red-500">{errors.cart.message}</p>
       )}
