@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import HourlyTimePicker from "@/features/Events/components/events-form/HourlyTimePicker";
 import { useCreateOrUpdateSettings } from "@/features/Events/hooks/useCreateorUpdateSettings";
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
-import DisableScroll from "@/utils/DisableScroll";
+import { useDisableNumberInputScroll } from "@/features/Menu/hooks/useDisableNumberInputScroll";
 
 // Updated validation schema including the new eventMinPackageOrder field.
 const formSchema = z.object({
@@ -108,7 +108,7 @@ const Settings: React.FC = () => {
     mutate(values);
   };
 
-  <DisableScroll />;
+  useDisableNumberInputScroll();
 
   return (
     <div className="mx-auto max-w-lg p-4">

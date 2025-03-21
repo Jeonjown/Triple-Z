@@ -101,7 +101,7 @@ const UserChat: React.FC = () => {
   if (user?.role === "admin") return null;
 
   return (
-    <div className="fixed bottom-10 right-10 z-20">
+    <div className="fixed bottom-10 right-10 z-30">
       {open ? (
         <div className="flex h-96 w-80 flex-col rounded-lg border bg-white shadow-lg">
           {/* Chat Header */}
@@ -112,7 +112,7 @@ const UserChat: React.FC = () => {
             </button>
           </div>
           {/* Messages Area */}
-          <div className="flex-1 space-y-2 overflow-y-auto p-4">
+          <div className="z-20 flex-1 space-y-2 overflow-y-auto p-4">
             {messages.map((msg, index) => (
               <div
                 key={index}
