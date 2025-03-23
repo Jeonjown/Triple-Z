@@ -1,14 +1,16 @@
-import { useState } from "react";
+// EventStep1.tsx
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { EventFormValues } from "../../pages/EventForm";
 import { useFormContext } from "react-hook-form";
+import { EventFormValues } from "../../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
 import HourlyTimePicker from "./HourlyTimePicker";
 import EventCalendar from "./EventCalendar";
 import useCheckEventReservationConflict from "../../hooks/useCheckEventReservationConflict";
 import useRemainingReservations from "../../hooks/useRemainingReservations";
+import { TriangleAlert } from "lucide-react";
 
 type Step1Props = {
   nextStep: () => void;
@@ -24,33 +26,76 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
     formState: { errors },
   } = useFormContext<EventFormValues>();
 
-  // Watch form fields
+  // Watch the date field from the form
+  const dateStr = watch("date");
+
+  // Get start and end times from form
   const startTime = watch("startTime");
   const endTime = watch("endTime");
-  const dateStr = watch("date"); // expecting format "YYYY-MM-DD"
 
-  // Convert date string to Date (if empty, fallback to current date)
+  // Parse the selected date or fallback to current date
   const selectedDate = dateStr ? new Date(dateStr) : new Date();
-
-  // Normalize the selected date to the first day of its month
   const displayedMonth = new Date(
     selectedDate.getFullYear(),
     selectedDate.getMonth(),
     1,
   );
 
-  // Check for date conflicts
+  // Check if the selected date has a conflict using a custom hook
   const { conflict, isPending: conflictPending } =
     useCheckEventReservationConflict(selectedDate);
-
-  // Get remaining slots for the displayed month from custom hook
   const remainingReservations = useRemainingReservations(displayedMonth);
 
-  // Local state for error messages (e.g. date conflict or no slots)
+  // Local state for error message
   const [errorMsg, setErrorMsg] = useState("");
 
+  // Clear error only when conflict becomes false
+  useEffect(() => {
+    if (!conflict) {
+      setErrorMsg("");
+    }
+  }, [conflict]);
+
+  // Helper function to render an input field with realtime validation
+  const renderInputField = (
+    id: string,
+    label: string,
+    type: string,
+    placeholder?: string,
+    extraProps = {},
+  ) => {
+    const fieldError = errors[id as keyof EventFormValues]?.message as
+      | string
+      | undefined;
+    return (
+      <div className="flex-1">
+        <Label htmlFor={id} className="mb-1 block">
+          {label}
+        </Label>
+        <div className="relative">
+          <Input
+            type={type}
+            id={id}
+            placeholder={placeholder}
+            {...register(id as keyof EventFormValues)}
+            className={`w-full rounded border p-3 focus:outline-secondary ${
+              fieldError ? "border-red-500 bg-red-200 pr-10" : ""
+            }`}
+            {...extraProps}
+          />
+          {fieldError && (
+            <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+          )}
+        </div>
+        {fieldError && (
+          <div className="mt-1 text-sm text-red-700">{fieldError}</div>
+        )}
+      </div>
+    );
+  };
+
+  // Handle moving to the next step, ensuring validations and no conflicts
   const handleNextStep = async () => {
-    // Validate required fields first
     const valid = await trigger([
       "fullName",
       "contactNumber",
@@ -63,23 +108,21 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
     if (!valid) return;
     if (conflictPending) return;
 
-    // Check date conflict
+    // If conflict exists, show error and do not proceed
     if (conflict) {
       setErrorMsg(
         "The selected date conflicts with an existing reservation. Please choose another date.",
       );
       return;
-    } else {
-      setErrorMsg("");
     }
 
-    // If no slots are left, set error message and stop
+    // If no slots remain, show error and do not proceed
     if (remainingReservations === 0) {
       setErrorMsg("There are no slots left for the selected month.");
       return;
     }
 
-    // Clear error message and proceed if everything is valid
+    // Clear any error and move to the next step
     setErrorMsg("");
     nextStep();
   };
@@ -90,111 +133,61 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
       <div className="mt-10 px-4">
         {/* Full Name & Contact Number */}
         <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
-          <div className="flex-1">
-            <Label htmlFor="fullName" className="mb-1 block">
-              Full Name
-            </Label>
-            <Input
-              type="text"
-              id="fullName"
-              {...register("fullName")}
-              className={`w-full rounded border p-3 focus:outline-secondary ${
-                errors.fullName ? "border-red-500" : ""
-              }`}
-            />
-            {errors.fullName && (
-              <div className="text-xs text-red-700">
-                {errors.fullName.message}
-              </div>
-            )}
-          </div>
-          <div className="flex-1">
-            <Label htmlFor="contactNumber" className="mb-1 block">
-              Contact Number
-            </Label>
-            <Input
-              type="text"
-              id="contactNumber"
-              {...register("contactNumber")}
-              className={`w-full rounded border p-3 focus:outline-secondary ${
-                errors.contactNumber ? "border-red-500" : ""
-              }`}
-            />
-            {errors.contactNumber && (
-              <div className="text-xs text-red-700">
-                {errors.contactNumber.message}
-              </div>
-            )}
-          </div>
+          {renderInputField("fullName", "Full Name", "text")}
+          {renderInputField("contactNumber", "Contact Number", "text")}
         </div>
 
         {/* Party Size & Event Type */}
         <div className="mt-4 flex flex-col space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
-          <div className="flex-1">
-            <Label htmlFor="partySize" className="mb-1 block">
-              Party Size
-            </Label>
-            <Input
-              type="number"
-              id="partySize"
-              min={minGuests}
-              placeholder={`Minimum of ${minGuests}`}
-              {...register("partySize")}
-              className={`w-full rounded border p-3 focus:outline-secondary ${
-                errors.partySize ? "border-red-500" : ""
-              }`}
-            />
-            {errors.partySize && (
-              <div className="text-xs text-red-700">
-                {errors.partySize.message}
-              </div>
-            )}
-          </div>
-          <div className="flex-1">
-            <Label htmlFor="eventType" className="mb-1 block">
-              Event Type
-            </Label>
-            <Input
-              type="text"
-              id="eventType"
-              placeholder="Ex. Birthday, Party"
-              {...register("eventType")}
-              className={`w-full rounded border p-3 focus:outline-secondary ${
-                errors.eventType ? "border-red-500" : ""
-              }`}
-            />
-            {errors.eventType && (
-              <div className="text-xs text-red-700">
-                {errors.eventType.message}
-              </div>
-            )}
-          </div>
+          {renderInputField(
+            "partySize",
+            "Party Size",
+            "number",
+            `Minimum of ${minGuests}`,
+            { min: minGuests },
+          )}
+          {renderInputField(
+            "eventType",
+            "Event Type",
+            "text",
+            "Ex. Birthday, Party",
+          )}
         </div>
 
         {/* Calendar & Date Input */}
         <div className="mt-4">
           <EventCalendar />
         </div>
-        <div>
+        <div className="mt-4">
           <Label htmlFor="date" className="mb-1 block">
             Date
           </Label>
-          <Input
-            type="date"
-            id="date"
-            {...register("date")}
-            className={`mb-4 w-full rounded border p-3 text-center focus:outline-secondary ${
-              errors.date ? "border-red-500" : ""
-            }`}
-          />
+          <div className="relative">
+            <Input
+              type="date"
+              id="date"
+              {...register("date")}
+              className={`mb-4 w-full rounded border p-3 text-center focus:outline-secondary ${
+                errors.date ? "border-red-500 bg-red-200 pr-10" : ""
+              }`}
+            />
+            {errors.date && (
+              <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+            )}
+          </div>
           {errors.date && (
-            <div className="text-xs text-red-700">
+            <div className="mt-1 text-sm text-red-700">
               {typeof errors.date.message === "string"
                 ? errors.date.message
                 : ""}
             </div>
           )}
-          {errorMsg && <div className="text-xs text-red-700">{errorMsg}</div>}
+          {errorMsg && (
+            <div className="mt-2 flex items-center text-sm text-red-700">
+              <TriangleAlert className="mr-1 h-5 w-5" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
         </div>
 
         {/* Time Pickers */}
@@ -203,13 +196,18 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
             <Label htmlFor="startTime" className="mb-1 block">
               Start Time
             </Label>
-            <HourlyTimePicker
-              id="startTime"
-              value={startTime}
-              onChange={(time) => setValue("startTime", time)}
-            />
+            <div className="relative">
+              <HourlyTimePicker
+                id="startTime"
+                value={startTime}
+                onChange={(time) => setValue("startTime", time)}
+              />
+              {errors.startTime && (
+                <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+              )}
+            </div>
             {errors.startTime && (
-              <div className="text-xs text-red-700">
+              <div className="mt-1 text-sm text-red-700">
                 {errors.startTime.message}
               </div>
             )}
@@ -218,13 +216,18 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
             <Label htmlFor="endTime" className="mb-1 block">
               End Time
             </Label>
-            <HourlyTimePicker
-              id="endTime"
-              value={endTime}
-              onChange={(time) => setValue("endTime", time)}
-            />
+            <div className="relative">
+              <HourlyTimePicker
+                id="endTime"
+                value={endTime}
+                onChange={(time) => setValue("endTime", time)}
+              />
+              {errors.endTime && (
+                <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+              )}
+            </div>
             {errors.endTime && (
-              <div className="text-xs text-red-700">
+              <div className="mt-1 text-sm text-red-700">
                 {errors.endTime.message}
               </div>
             )}
@@ -236,15 +239,16 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
           <Button
             type="button"
             onClick={handleNextStep}
-            className="w-full"
+            className="w-full disabled:cursor-not-allowed disabled:opacity-50"
             disabled={remainingReservations === 0}
           >
             Next
           </Button>
           {remainingReservations === 0 && (
-            <p className="mt-2 text-xs text-red-700">
-              There are no slots left for the selected month.
-            </p>
+            <div className="mt-2 flex items-center text-sm text-red-700">
+              <TriangleAlert className="mr-1 h-5 w-5" />
+              <span>There are no slots left for the selected month.</span>
+            </div>
           )}
         </div>
       </div>

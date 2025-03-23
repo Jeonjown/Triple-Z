@@ -1,3 +1,4 @@
+// EventForm.tsx
 import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +9,6 @@ import EventStep2 from "../components/events-form/EventStep2";
 import EventStep3 from "../components/events-form/EventStep3";
 import EventStep4 from "../components/events-form/EventStep4";
 import { ProgressBar } from "@/components/ProgressBar";
-// Import the SelectedItem type from EmbeddedMenu
 import { SelectedItem } from "../components/events-form/EmbeddedMenu";
 
 export type CartItem = {
@@ -38,7 +38,6 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
       .refine(
         (val) => {
           const selectedDate = new Date(val);
-          // Create a date-only version (time set to midnight)
           const selectedDateOnly = new Date(
             selectedDate.getFullYear(),
             selectedDate.getMonth(),
@@ -51,8 +50,6 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
             minDate.getMonth(),
             minDate.getDate(),
           );
-          console.log("Selected date (date-only):", selectedDateOnly);
-          console.log("Computed min date (date-only):", minDateOnly);
           return selectedDateOnly >= minDateOnly;
         },
         { message: `Date must be at least ${minDaysPrior} days in advance` },
@@ -74,23 +71,18 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
     specialRequest: z.string().optional(),
   });
 
-// Infer the form data type from the schema
 export type EventFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 
 const EventForm = () => {
-  // Get settings from backend (fallback to default values)
   const { data: settings } = useGetEventReservationSettings();
   const minGuests = settings?.eventMinGuests || defaultMinGuests;
   const minDaysPrior = settings?.eventMinDaysPrior || defaultMinDaysPrior;
 
-  // Create the Zod schema using current settings
   const reservationSchema = useMemo(
     () => getReservationSchema(minGuests, minDaysPrior),
     [minGuests, minDaysPrior],
   );
 
-  // Local state for multi-step form
-  // Change selectedPackageIds type from string[] to SelectedItem[]
   const [selectedPackageIds, setSelectedPackageIds] = useState<SelectedItem[]>(
     [],
   );
@@ -107,7 +99,6 @@ const EventForm = () => {
     { step: 4, label: "Thank You" },
   ];
 
-  // Define text mapping for each step
   const stepTexts = [
     {
       header: "Make a Reservation",
@@ -128,9 +119,10 @@ const EventForm = () => {
     },
   ];
 
-  // Initialize the form with default values. Note the empty cart array.
+  // Set mode to "onChange" for realtime validation
   const methods = useForm<EventFormValues>({
     resolver: zodResolver(reservationSchema),
+    mode: "onChange",
     defaultValues: {
       fullName: "Jon Stewart Doe",
       contactNumber: "6019521325",
@@ -144,7 +136,6 @@ const EventForm = () => {
     },
   });
 
-  // When minGuests changes, reset the form.
   useEffect(() => {
     methods.reset({
       fullName: "Jon Stewart Doe",

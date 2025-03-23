@@ -37,7 +37,7 @@ export interface MenuItem {
   sizes: SizeOption[];
   requiresSizeSelection: boolean;
   description?: string;
-  availability?: boolean; // Optional availability flag
+  availability?: boolean;
 }
 
 export interface SelectedItem {
@@ -51,17 +51,14 @@ interface EmbeddedMenuProps {
 }
 
 const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
-  // Fetch the menu data
   const { data: menuData, isPending: menuPending } = useFetchMenu() as {
     data?: MenuData;
     isPending: boolean;
   };
 
-  // Toast and form context
   const { toast } = useToast();
   const { register } = useFormContext();
 
-  // UI state for selected category/subcategory and search query
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null,
   );
@@ -74,12 +71,11 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // Filter to only use the "Packages" category (case-insensitive)
+  // Filter to use the "Packages" category (case-insensitive)
   const packagesCategory = menuData?.categories.find(
     (cat) => cat.category.toLowerCase() === "packages",
   );
 
-  // Set default category and subcategory from Packages
   useEffect(() => {
     if (packagesCategory) {
       setSelectedCategoryId(packagesCategory._id);
@@ -94,23 +90,19 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     }
   }, [packagesCategory]);
 
-  // Fetch items based on the selected category/subcategory
   const { data: items, isPending: itemsPending } = useFetchItemsByCategories(
     selectedCategoryId ?? "",
     selectedSubcategoryId ?? "",
   ) as { data?: MenuItem[]; isPending: boolean };
 
-  // Filter the items based on the search query
   const filteredItems = (items || []).filter((item) =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  // Update the selected size for an item
   const handleSizeChange = (itemId: string, newSizeId: string) => {
     setSelectedSizes((prev) => ({ ...prev, [itemId]: newSizeId }));
   };
 
-  // Handle adding an item to the cart
   const handleAddClick = (item: MenuItem) => {
     if (item.availability === false) {
       toast({
@@ -123,7 +115,6 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     let sizeId: string | undefined = undefined;
     let price: number | null = item.basePrice;
 
-    // Check for required size selection
     if (item.requiresSizeSelection && item.sizes.length > 0) {
       sizeId = selectedSizes[item._id] || item.sizes[0]._id;
       if (!selectedSizes[item._id]) {
@@ -146,14 +137,13 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     });
   };
 
-  // Display a loading state if data is still fetching
   if (menuPending || itemsPending) return <LoadingPage />;
   if (!packagesCategory) return <></>;
 
   return (
-    // Parent container is set to full viewport height for proper flex behavior.
-    <div className="mt-5 flex h-screen w-full flex-col rounded-md md:flex-row md:border md:p-5">
-      {/* Mobile Sidebar: Only visible on smaller screens */}
+    // Main container: full viewport height on mobile, flex layout for desktop.
+    <div className="mt-5 flex min-h-screen w-full flex-col rounded-md md:flex-row md:border md:p-5">
+      {/* Mobile Sidebar */}
       <div className="block md:hidden">
         <div className="fixed left-0 top-24 z-10 w-full bg-white p-3 shadow-md">
           <button
@@ -181,7 +171,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
           )}
         </div>
       </div>
-      {/* Desktop Sidebar: Only visible on medium and larger screens */}
+      {/* Desktop Sidebar */}
       <div className="hidden w-full md:block md:w-1/4 md:border-r">
         <h3 className="mb-2 text-xl font-bold">Packages</h3>
         {packagesCategory.subcategories && (
@@ -203,7 +193,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
           </div>
         )}
       </div>
-      {/* Main content area for Menu Items */}
+      {/* Main Content */}
       <div className="flex w-full flex-col p-4 md:w-3/4">
         <h3 className="mb-2 text-xl font-bold">Menu Items</h3>
         {/* Search Bar */}
@@ -230,11 +220,11 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
         {filteredItems.length === 0 && (
           <p className="text-gray-500">No items available.</p>
         )}
-        {/* Flex container to allow the grid to take remaining height */}
+        {/* Grid of Items */}
         <div className="flex-1 overflow-hidden">
           <div
             className="grid grid-cols-1 gap-4 overflow-y-auto sm:grid-cols-2 md:grid-cols-3"
-            style={{ maxHeight: "calc(100vh - 200px)" }} // Adjust the calculation as needed
+            style={{ maxHeight: "calc(100vh - 200px)" }}
           >
             {filteredItems.map((item: MenuItem) => (
               <div

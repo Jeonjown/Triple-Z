@@ -1,3 +1,4 @@
+// EventsCart.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,10 +12,9 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { RiShoppingBag3Fill } from "react-icons/ri";
-// Import the unified CartItem type from your EventForm
 import { CartItem } from "../../pages/EventForm";
 
-interface GroupsCartProps {
+interface EventsCartProps {
   cart: CartItem[];
   updateQuantity: (id: string, newQuantity: number) => void;
   removeFromCart: (id: string) => void;
@@ -41,7 +41,6 @@ const QuantityInput: React.FC<{
         if (!isNaN(parsed) && parsed >= 1 && parsed <= 999) {
           onChange(parsed);
         } else {
-          // Reset to the last valid number if the value is invalid or empty
           setInputValue(value.toString());
         }
       }}
@@ -52,17 +51,18 @@ const QuantityInput: React.FC<{
   );
 };
 
-const EventsCart: React.FC<GroupsCartProps> = ({
+const EventsCart: React.FC<EventsCartProps> = ({
   cart,
   updateQuantity,
   removeFromCart,
   tooltipTrigger,
 }) => {
-  // Calculate overall cart total
+  // Calculate overall cart total and overall quantity
   const totalCartPrice = cart.reduce(
     (total, item) => total + item.totalPrice,
     0,
   );
+  const overallQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   // Manage tooltip state for "Item added!"
   const [showTooltip, setShowTooltip] = useState(false);
@@ -89,9 +89,9 @@ const EventsCart: React.FC<GroupsCartProps> = ({
             </div>
           )}
           <RiShoppingBag3Fill className="size-16 rounded-full bg-secondary p-2 text-primary hover:scale-105 hover:cursor-pointer" />
-          {cart.length > 0 && (
+          {overallQuantity > 0 && (
             <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-              {cart.length}
+              {overallQuantity}
             </Badge>
           )}
         </div>

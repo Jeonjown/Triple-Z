@@ -64,7 +64,6 @@ const EventStep2: React.FC<Step2Props> = ({
         { key, _id: item._id, sizeId },
       ]);
       setQuantityMap((prev) => ({ ...prev, [key]: 1 }));
-
       let price = item.basePrice !== null ? item.basePrice : 0;
       let sizeText = "";
       if (item.requiresSizeSelection && item.sizes.length > 0) {
@@ -96,7 +95,7 @@ const EventStep2: React.FC<Step2Props> = ({
   // Get settings to read the required minimum package order.
   const { data: settings } = useGetEventReservationSettings();
 
-  // Calculate the total number of packages ordered.
+  // Calculate total packages ordered.
   const totalPackagesOrdered = cart.reduce(
     (sum, item) => sum + item.quantity,
     0,
@@ -139,7 +138,7 @@ const EventStep2: React.FC<Step2Props> = ({
         tooltipTrigger={tooltipTrigger}
       />
 
-      <div className="mt-4 flex gap-4">
+      <div className="mt-4 flex flex-col gap-4 md:flex-row">
         <Button type="button" onClick={prevStep} className="w-full">
           Previous
         </Button>
@@ -157,12 +156,14 @@ const EventStep2: React.FC<Step2Props> = ({
         </Button>
       </div>
       {settings && totalPackagesOrdered < settings.eventMinPackageOrder && (
-        <p className="mt-2 text-xs text-red-500">
+        <p className="mt-2 text-center text-sm text-red-500">
           Minimum package order of {settings.eventMinPackageOrder} is required.
         </p>
       )}
       {errors.cart && (
-        <p className="mt-2 text-xs text-red-500">{errors.cart.message}</p>
+        <p className="mt-2 text-center text-sm text-red-500">
+          {errors.cart.message}
+        </p>
       )}
     </>
   );
