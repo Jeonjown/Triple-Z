@@ -5,9 +5,9 @@ const Logo = () => {
     <>
       <Link to={"/"}>
         <img
-          src="/triple-z-logo.png"
+          src="/triple-z-logo.svg"
           alt="logo"
-          className="w-14 min-w-[3.5rem]"
+          className="ml-2 w-20 min-w-[3.5rem]"
         />
       </Link>
     </>

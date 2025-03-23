@@ -20,8 +20,8 @@ messaging.onBackgroundMessage((payload) => {
     const notificationTitle = payload.data?.title || 'New Notification';
     const notificationOptions = {
         body: payload.data?.body,
-        icon: payload.data?.icon || '/triple-z-logo.png',
-        badge: payload.data?.badge || '/triple-z-logo.png',
+        icon: payload.data?.icon || '/triple-z-logo.svg',
+        badge: payload.data?.badge || '/triple-z-logo.svg',
         data: {
             click_action: payload.data?.click_action || '/'
         },

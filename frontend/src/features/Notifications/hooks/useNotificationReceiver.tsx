@@ -30,18 +30,11 @@ export const useNotificationReceiver = (
   // Setup socket listeners for notifications.
   useEffect(() => {
     if (!socket || !userId) {
-      console.log("Socket or userId not available for realtime updates");
       return;
     }
 
-    console.log(
-      "Socket connected, setting up realtime listeners for user:",
-      userId,
-    );
-
     // Request the full notifications list from the server.
     socket.emit("get-notifications", userId);
-    console.log("Emitted get-notifications event for user:", userId);
 
     // Listener for receiving the full list of notifications.
     const handleNotifications = (notifs: MyNotification[]) => {

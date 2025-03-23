@@ -15,7 +15,6 @@ export function useFCMToken(
   const [token, setToken] = useState<string | null>(() =>
     localStorage.getItem("fcmToken"),
   );
-  console.log("Current token:", token);
 
   // Request the FCM token, store it in state and localStorage, and send it to the backend
   const requestTokenFn = async (): Promise<void> => {

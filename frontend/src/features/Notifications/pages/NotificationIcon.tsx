@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,9 +22,9 @@ import { useMarkAllNotificationsAsRead } from "../hooks/useMarkAllNotificationAs
 const NotificationIcon: React.FC = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
-  const [showMore, setShowMore] = useState(false);
+  const [showMore, setShowMore] = useState<boolean>(false);
 
-  const handleRedirect = (redirectUrl: string) => {
+  const handleRedirect = (redirectUrl: string): void => {
     if (redirectUrl) {
       navigate(redirectUrl);
     }
@@ -37,12 +37,14 @@ const NotificationIcon: React.FC = () => {
     error,
   } = useNotifications(user?._id || "");
 
-  // Setup realtime notifications.
+  // Memoize initial notifications to ensure a stable reference between renders.
+  const memoizedInitialNotifications = useMemo<MyNotification[]>(() => {
+    return (initialNotifications as MyNotification[]) || [];
+  }, [initialNotifications]);
+
+  // Setup realtime notifications with memoized notifications.
   const { notifications, unreadCount, setNotifications } =
-    useNotificationReceiver(
-      user?._id || "",
-      (initialNotifications as MyNotification[]) || [],
-    );
+    useNotificationReceiver(user?._id || "", memoizedInitialNotifications);
 
   // Single notification mutation hook.
   const { mutate: markAsRead, isPending: isPendingMarkAsRead } =
@@ -52,20 +54,20 @@ const NotificationIcon: React.FC = () => {
   const { mutate: markAllAsRead, isPending: isMarkingAll } =
     useMarkAllNotificationsAsRead();
 
-  // When marking a single notification as read.
-  const handleMarkAsRead = (notificationId: string) => {
+  // Handle marking a single notification as read.
+  const handleMarkAsRead = (notificationId: string): void => {
     markAsRead(notificationId, {
       onSuccess: () => {
         console.log(`Notification ${notificationId} marked as read`);
-        setNotifications((prev) =>
+        setNotifications((prev: MyNotification[]) =>
           prev.filter((notification) => notification._id !== notificationId),
         );
       },
     });
   };
 
-  // When marking all notifications as read.
-  const handleMarkAllAsRead = () => {
+  // Handle marking all notifications as read.
+  const handleMarkAllAsRead = (): void => {
     markAllAsRead(user?._id || "", {
       onSuccess: () => {
         // Clear local notifications.
@@ -77,7 +79,9 @@ const NotificationIcon: React.FC = () => {
   };
 
   // Filter notifications to show only unread ones.
-  const unreadNotifications = notifications.filter((notif) => !notif.read);
+  const unreadNotifications: MyNotification[] = notifications.filter(
+    (notif) => !notif.read,
+  );
 
   return (
     <div className="relative ml-auto gap-2 md:flex">
@@ -104,7 +108,7 @@ const NotificationIcon: React.FC = () => {
               <EllipsisVertical size={16} />
             </button>
           </DropdownMenuLabel>
-          {/* Conditionally render the "Mark All As Read" option */}
+          {/* Render "Mark All As Read" option when showMore is true */}
           {showMore && (
             <DropdownMenuItem
               onClick={handleMarkAllAsRead}

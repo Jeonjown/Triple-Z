@@ -10,7 +10,7 @@ export async function sendPushNotificationToAdmins(notification: {
     data: {
       title: notification.title,
       body: notification.body,
-      icon: "/triple-z-logo.png",
+      icon: "/triple-z-logo.svg",
       click_action: "/",
     },
   };

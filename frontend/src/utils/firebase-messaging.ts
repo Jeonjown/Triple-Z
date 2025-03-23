@@ -50,15 +50,15 @@ onMessage(messaging, (payload) => {
     notificationTitle = payload.notification.title!;
     notificationOptions = {
       body: payload.notification.body,
-      icon: "/triple-z-logo.png",
-      badge: "/triple-z-logo.png",
+      icon: "/triple-z-logo.svg",
+      badge: "/triple-z-logo.svg",
     };
   } else if (payload.data) {
     notificationTitle = payload.data.title;
     notificationOptions = {
       body: payload.data.body,
-      icon: payload.data.icon || "/triple-z-logo.png",
-      badge: payload.data.badge || "/triple-z-logo.png",
+      icon: payload.data.icon || "/triple-z-logo.svg",
+      badge: payload.data.badge || "/triple-z-logo.svg",
     };
     redirectUrl = payload.data.click_action || "/";
   }

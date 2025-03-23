@@ -46,7 +46,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         userId: pushToken,
         title: "New Chat Message",
         body: input, // You can customize the notification message here.
-        icon: "/triple-z-logo.png", // Optional: adjust as needed.
+        icon: "/triple-z-logo.svg", // Optional: adjust as needed.
         click_action: "/", // Optional: URL to navigate on click.
       };
 

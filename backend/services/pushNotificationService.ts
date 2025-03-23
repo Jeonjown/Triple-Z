@@ -19,7 +19,7 @@ export async function sendMulticastPushNotification({
     data: {
       title,
       body,
-      icon: icon || "/triple-z-logo.png",
+      icon: icon || "/triple-z-logo.svg",
       click_action: click_action || "/",
     },
   };

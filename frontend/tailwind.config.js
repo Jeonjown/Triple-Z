@@ -96,7 +96,7 @@ export default {
 			},
 			fontFamily: {
 				heading: 'Playfair Display',
-				body: 'Raleway'
+				body: 'Quicksand'
 			}
 		}
 	},

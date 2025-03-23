@@ -40,6 +40,7 @@ export const useCreateGroupReservation = () => {
         description: "The group reservation was created successfully.",
         variant: "default",
       });
+      console.log(data);
 
       // Send push notification to admins.
       sendPushNotification(

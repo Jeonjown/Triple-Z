@@ -5,14 +5,14 @@
   "icons": [
     {
 
-      "src": "/triple-z-logo.png",
+      "src": "/triple-z-logo.svg",
       "type": "image/png",
       "sizes": "144x144",
       "purpose": "any"
     },
     {
     
-      "src": "/triple-z-logo.png",
+      "src": "/triple-z-logo.svg",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
@@ -21,7 +21,7 @@
   "screenshots": [
     {
       
-      "src": "/triple-z-logo.png",
+      "src": "/triple-z-logo.svg",
       "sizes": "1280x720",
       "type": "image/png",
       "label": "Wide View Screenshot",
@@ -29,7 +29,7 @@
     },
     {
     
-      "src": "/triple-z-logo.png",
+      "src": "/triple-z-logo.svg",
       "sizes": "800x600",
       "type": "image/png",
       "label": "Default Screenshot"
