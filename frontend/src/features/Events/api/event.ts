@@ -18,6 +18,7 @@ export interface EventReservationSettings {
   eventMinGuests: number;
   eventTermsofService: string;
   eventMinPackageOrder: number;
+  eventCorkageFee: number;
   groupReservationLimit: number;
   groupMinDaysPrior: number;
   groupMaxTablesPerDay: number;

@@ -35,11 +35,13 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   const { mutate } = useCreateEventReservations();
   const { watch, handleSubmit, reset } = methods;
   const formValues = watch();
+  const isCorkageSelected = formValues.isCorkage === "true";
+
   const [notifDialogOpen, setNotifDialogOpen] = useState(false);
   const [tosDialogOpen, setTosDialogOpen] = useState(false);
   const [acceptedTOS, setAcceptedTOS] = useState(false);
 
-  // Format date as MM-DD-YYYY
+  // Format date as MM-DD-YYYY for display
   const formatDate = (date: Date) => {
     const d = new Date(date);
     const month = d.getMonth() + 1;
@@ -48,13 +50,16 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     return `${month}-${day}-${year}`;
   };
 
-  // Calculate total price including event fee.
+  // Calculate total price including event fee and corkage fee if selected.
   const calculateTotalPrice = () => {
     const cartTotal = cart.reduce((total, item) => total + item.totalPrice, 0);
-    return cartTotal + (settings?.eventFee ?? 0);
+    const eventFee = settings?.eventFee ?? 0;
+    // Use our fixed boolean value for corkage fee
+    const corkageFee = isCorkageSelected ? (settings?.eventCorkageFee ?? 0) : 0;
+    return cartTotal + eventFee + corkageFee;
   };
 
-  // Submit form and process mutation
+  // Submit form and process mutation.
   const onSubmit = (data: EventFormValues) => {
     mutate(data, {
       onSuccess: () => {
@@ -67,12 +72,12 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     });
   };
 
-  // Trigger form submission
+  // Trigger form submission.
   const handleCheckout = () => {
     handleSubmit(onSubmit)();
   };
 
-  // Render cart items
+  // Render items in the cart.
   const renderCartItems = () => {
     if (cart.length === 0) return <div>No items in your cart.</div>;
     return cart.map((item) => (
@@ -136,7 +141,7 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
           </div>
         </div>
         <div className="mb-4">
-          <span className="font-semibold">Special request:</span>
+          <span className="font-semibold">Special Request:</span>
           <div className="mt-2 border p-2">
             {formValues.specialRequest ?? "None"}
           </div>
@@ -149,6 +154,13 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
           <span className="text-gray-600">Event Fee:</span>
           <p className="font-semibold">₱{settings?.eventFee}</p>
         </div>
+        {/* Render Corkage Fee element only if "Yes" is selected */}
+        {isCorkageSelected && (
+          <div className="mb-4">
+            <span className="text-gray-600">Corkage Fee:</span>
+            <p className="font-semibold">₱{settings?.eventCorkageFee}</p>
+          </div>
+        )}
         <div className="text-right text-xl font-semibold">
           Total Price: ₱{calculateTotalPrice().toFixed(2)}
         </div>
@@ -208,9 +220,8 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
               No, proceed
             </Button>
             <Button
-              onClick={async () => {
+              onClick={() => {
                 setNotifDialogOpen(false);
-
                 handleCheckout();
               }}
             >
@@ -222,10 +233,10 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
 
       {/* Terms of Service Dialog */}
       <Dialog open={tosDialogOpen} onOpenChange={setTosDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[80vh] w-full max-w-md overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-center">Terms of Service</DialogTitle>
-            <DialogDescription style={{ whiteSpace: "pre-wrap" }}>
+            <DialogDescription className="whitespace-pre-wrap">
               {settings?.eventTermsofService || "No Terms of Service provided."}
             </DialogDescription>
           </DialogHeader>

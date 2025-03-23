@@ -24,6 +24,7 @@ export type CartItem = {
 const defaultMinGuests = 24;
 const defaultMinDaysPrior = 14;
 
+// Use enum to accept "true" or "false", then transform to boolean.
 const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
   z.object({
     fullName: z.string().nonempty("Full Name is required."),
@@ -69,6 +70,12 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
       }),
     ),
     specialRequest: z.string().optional(),
+    // Use z.enum to require a selection, then transform the string to boolean.
+    isCorkage: z
+      .enum(["true", "false"], {
+        errorMap: () => ({ message: "Please select an option" }),
+      })
+      .transform((val) => val === "true"),
   });
 
 export type EventFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
@@ -119,33 +126,35 @@ const EventForm = () => {
     },
   ];
 
-  // Set mode to "onChange" for realtime validation
+  // Initialize form with blank values.
   const methods = useForm<EventFormValues>({
     resolver: zodResolver(reservationSchema),
     mode: "onChange",
     defaultValues: {
-      fullName: "Jon Stewart Doe",
-      contactNumber: "6019521325",
-      partySize: minGuests,
-      date: "2025-03-08",
-      startTime: "10:00 AM",
-      endTime: "3:00 PM",
-      eventType: "sdfsdf",
-      specialRequest: "you are my special",
+      fullName: "",
+      contactNumber: "",
+      partySize: 0,
+      date: "",
+      startTime: "",
+      endTime: "",
+      eventType: "",
+      specialRequest: "",
       cart: [],
+      // isCorkage remains unset.
     },
   });
 
+  // Reset to blank values when minGuests changes.
   useEffect(() => {
     methods.reset({
-      fullName: "Jon Stewart Doe",
-      contactNumber: "6019521325",
-      partySize: minGuests,
-      date: "2025-03-08",
-      startTime: "10:00 AM",
-      endTime: "3:00 PM",
-      eventType: "sdfsdf",
-      specialRequest: "you are my special",
+      fullName: "",
+      contactNumber: "",
+      partySize: 0,
+      date: "",
+      startTime: "",
+      endTime: "",
+      eventType: "",
+      specialRequest: "",
       cart: [],
     });
   }, [methods, minGuests]);

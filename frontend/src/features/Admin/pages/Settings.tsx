@@ -18,7 +18,7 @@ import { useCreateOrUpdateSettings } from "@/features/Events/hooks/useCreateorUp
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { useDisableNumberInputScroll } from "@/features/Menu/hooks/useDisableNumberInputScroll";
 
-// Updated validation schema including the new eventMinPackageOrder field.
+// Updated validation schema including the new eventCorkageFee field.
 const formSchema = z.object({
   eventReservationLimit: z.coerce
     .number()
@@ -26,6 +26,10 @@ const formSchema = z.object({
   eventMinDaysPrior: z.coerce.number().min(0, { message: "Must be 0 or more" }),
   eventMinGuests: z.coerce.number().min(1, { message: "Must be at least 1" }),
   eventFee: z.coerce.number().min(0, { message: "Must be a positive fee" }),
+  // New corkage fee field:
+  eventCorkageFee: z.coerce
+    .number()
+    .min(0, { message: "Must be a positive fee" }),
   eventMinPackageOrder: z.coerce
     .number()
     .min(0, { message: "Must be at least 0" }),
@@ -63,6 +67,8 @@ const Settings: React.FC = () => {
       eventMinDaysPrior: 0,
       eventMinGuests: 1,
       eventFee: 0,
+      // Default corkage fee value:
+      eventCorkageFee: 0,
       eventMinPackageOrder: 0,
       groupReservationLimit: 0,
       groupMinDaysPrior: 0,
@@ -85,6 +91,8 @@ const Settings: React.FC = () => {
         eventMinDaysPrior: settings.eventMinDaysPrior ?? 0,
         eventMinGuests: settings.eventMinGuests ?? 1,
         eventFee: settings.eventFee ?? 0,
+        // Reset corkage fee from settings:
+        eventCorkageFee: settings.eventCorkageFee ?? 0,
         eventMinPackageOrder: settings.eventMinPackageOrder ?? 0,
         groupReservationLimit: settings.groupReservationLimit ?? 0,
         groupMinDaysPrior: settings.groupMinDaysPrior ?? 0,
@@ -210,7 +218,25 @@ const Settings: React.FC = () => {
               </FormItem>
             )}
           />
-          {/* New Event Minimum Package Order Field */}
+          {/* New Corkage Fee Field */}
+          <FormField
+            control={form.control}
+            name="eventCorkageFee"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Corkage Fee</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                      ₱
+                    </span>
+                    <Input type="number" {...field} className="pl-6" />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="eventMinPackageOrder"

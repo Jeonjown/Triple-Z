@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Search, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useFormContext } from "react-hook-form";
 import LoadingPage from "@/pages/LoadingPage";
 import { useFetchItemsByCategories } from "@/features/Menu/hooks/useFetchItemsByCategories";
 import { useFetchMenu } from "@/features/Menu/hooks/useFetchMenu";
@@ -57,7 +56,6 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
   };
 
   const { toast } = useToast();
-  const { register } = useFormContext();
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null,
@@ -275,18 +273,6 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
               </div>
             ))}
           </div>
-        </div>
-        {/* Special Request Text Area */}
-        <div className="mt-6">
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Special Request
-          </label>
-          <textarea
-            {...register("specialRequest")}
-            placeholder="Any special requests?"
-            className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            rows={4}
-          ></textarea>
         </div>
       </div>
     </div>

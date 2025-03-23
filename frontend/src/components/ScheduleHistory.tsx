@@ -1,6 +1,7 @@
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import useGetReservations from "@/features/Events/hooks/useGetEventReservations";
 import useGetGroupReservations from "@/features/Events/hooks/useGetGroupReservations";
+import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings"; // <-- Import settings hook
 import { format, compareDesc } from "date-fns";
 import { Copy } from "lucide-react";
 import {
@@ -26,7 +27,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-// Define interfaces for explicit types.
+// Explicit interfaces.
 interface User {
   _id: string;
   username: string;
@@ -60,6 +61,7 @@ export interface Reservation {
   eventFee: number;
   subtotal: number;
   paymentStatus: string;
+  isCorkage: boolean; // <-- Added corkage flag
   __v: number;
 }
 
@@ -67,7 +69,6 @@ interface EventReservationData {
   reservations: Reservation[];
 }
 
-// Raw group reservation interface.
 interface GroupReservationRaw {
   _id: string;
   userId: User;
@@ -93,31 +94,32 @@ const mapGroupToReservation = (group: GroupReservationRaw): Reservation => ({
   eventType: "Group Reservation",
   specialRequest: "",
   eventFee: 0,
+  isCorkage: false, // Set default corkage flag for group reservations.
 });
 
-const ScheduleHistory = () => {
-  // Get event reservations.
+const ScheduleHistory = (): JSX.Element => {
+  // Retrieve event and group reservations.
   const { data } = useGetReservations() as { data?: EventReservationData };
-  // Get group reservations.
   const { data: groupData } = useGetGroupReservations();
   const { user } = useAuthStore();
 
-  // Filter event reservations for the current user.
+  // Retrieve event settings for the corkage fee.
+  const { data: settings } = useGetEventReservationSettings();
+
+  // Filter reservations for the current user.
   const eventReservations: Reservation[] =
     data?.reservations.filter(
       (reservation) => reservation.userId._id === user?._id,
     ) || [];
 
-  // Map group reservations and filter for current user.
   const groupReservations: Reservation[] = groupData
     ? groupData
         .map((group: GroupReservationRaw) => mapGroupToReservation(group))
         .filter((reservation) => reservation.userId._id === user?._id)
     : [];
 
-  // Merge both lists.
+  // Merge and sort reservations descending by date.
   const mergedReservations = [...eventReservations, ...groupReservations];
-  // Sort from recent (upcoming) to older (descending by date).
   const sortedReservations = mergedReservations.sort((a, b) =>
     compareDesc(new Date(a.date), new Date(b.date)),
   );
@@ -140,138 +142,152 @@ const ScheduleHistory = () => {
         </TableHeader>
         <TableBody>
           {sortedReservations.length > 0 ? (
-            sortedReservations.map((reservation: Reservation) => (
-              <TableRow
-                key={reservation._id}
-                className="border-b border-gray-300 hover:bg-gray-50"
-              >
-                <TableCell className="px-4 py-2">
-                  <span className="font-bold">
-                    {format(new Date(reservation.date), "MMMM dd, yyyy")}
-                  </span>
-                  <br />
-                  <span>
-                    {reservation.startTime} - {reservation.endTime}
-                  </span>
-                </TableCell>
-                <TableCell className="px-4 py-2">
-                  <span className="text-xs font-bold">
-                    {reservation.eventType}
-                  </span>
-                </TableCell>
-                <TableCell className="px-4 py-2">
-                  {reservation.partySize} pax
-                </TableCell>
-                <TableCell className="px-4 py-2">
-                  {reservation.specialRequest || "N/A"}
-                </TableCell>
-                <TableCell className="px-4 py-2">
-                  {reservation.eventStatus}
-                </TableCell>
-                <TableCell className="px-4 py-2">
-                  <div>
-                    <span className="block">{reservation.paymentStatus}</span>
-                    <span className="block">₱{reservation.totalPayment}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="px-4 py-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs font-medium text-primary">
-                      {reservation._id}
+            sortedReservations.map((reservation: Reservation) => {
+              // Compute total payment including corkage fee if applicable.
+              const computedTotal =
+                reservation.subtotal +
+                reservation.eventFee +
+                (reservation.isCorkage ? settings?.eventCorkageFee || 0 : 0);
+
+              return (
+                <TableRow
+                  key={reservation._id}
+                  className="border-b border-gray-300 hover:bg-gray-50"
+                >
+                  <TableCell className="px-4 py-2">
+                    <span className="font-bold">
+                      {format(new Date(reservation.date), "MMMM dd, yyyy")}
                     </span>
-                    <TooltipProvider>
-                      <Tooltip delayDuration={100}>
-                        <TooltipTrigger asChild>
-                          <button
-                            onClick={() =>
-                              navigator.clipboard.writeText(reservation._id)
-                            }
-                            className="cursor-pointer text-gray-500 hover:text-gray-700"
-                          >
-                            <Copy size={16} />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Copy Reservation ID</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </TableCell>
-                <TableCell className="px-4 py-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <button className="text-blue-600 hover:underline">
-                        View Cart Details
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Cart Details</DialogTitle>
-                        <DialogDescription>
-                          Order details for this reservation.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <Table className="min-w-full">
-                        <TableHeader>
-                          <TableRow className="border-b border-gray-300">
-                            <TableHead className="w-20 px-4 py-2">
-                              Image
-                            </TableHead>
-                            <TableHead className="px-4 py-2">Item</TableHead>
-                            <TableHead className="px-4 py-2">
-                              Quantity
-                            </TableHead>
-                            <TableHead className="px-4 py-2 text-right">
-                              Price
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {reservation.cart.map((item: CartItem) => (
-                            <TableRow
-                              key={item._id}
-                              className="border-b border-gray-300"
+                    <br />
+                    <span>
+                      {reservation.startTime} - {reservation.endTime}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-4 py-2">
+                    <span className="text-xs font-bold">
+                      {reservation.eventType}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-4 py-2">
+                    {reservation.partySize} pax
+                  </TableCell>
+                  <TableCell className="px-4 py-2">
+                    {reservation.specialRequest || "N/A"}
+                  </TableCell>
+                  <TableCell className="px-4 py-2">
+                    {reservation.eventStatus}
+                  </TableCell>
+                  <TableCell className="px-4 py-2">
+                    <div>
+                      <span className="block">{reservation.paymentStatus}</span>
+                      <span className="block">₱{computedTotal}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-4 py-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-medium text-primary">
+                        {reservation._id}
+                      </span>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={100}>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={() =>
+                                navigator.clipboard.writeText(reservation._id)
+                              }
+                              className="cursor-pointer text-gray-500 hover:text-gray-700"
                             >
-                              <TableCell className="px-4 py-2">
-                                <img
-                                  src={item.image}
-                                  alt={item.title}
-                                  className="h-10 w-10 rounded object-cover"
-                                />
-                              </TableCell>
-                              <TableCell className="px-4 py-2">
-                                {item.title}
-                              </TableCell>
-                              <TableCell className="px-4 py-2">
-                                {item.quantity}
-                              </TableCell>
-                              <TableCell className="px-4 py-2 text-right">
-                                ₱{item.totalPrice}
-                              </TableCell>
+                              <Copy size={16} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Copy Reservation ID</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-4 py-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button className="text-blue-600 hover:underline">
+                          View Cart Details
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Cart Details</DialogTitle>
+                          <DialogDescription>
+                            Order details for this reservation.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Table className="min-w-full">
+                          <TableHeader>
+                            <TableRow className="border-b border-gray-300">
+                              <TableHead className="w-20 px-4 py-2">
+                                Image
+                              </TableHead>
+                              <TableHead className="px-4 py-2">Item</TableHead>
+                              <TableHead className="px-4 py-2">
+                                Quantity
+                              </TableHead>
+                              <TableHead className="px-4 py-2 text-right">
+                                Price
+                              </TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                      <div className="mt-4 space-y-2">
-                        <div className="flex justify-between">
-                          <span className="font-medium">Order Subtotal:</span>
-                          <span>₱{reservation.subtotal}</span>
+                          </TableHeader>
+                          <TableBody>
+                            {reservation.cart.map((item: CartItem) => (
+                              <TableRow
+                                key={item._id}
+                                className="border-b border-gray-300"
+                              >
+                                <TableCell className="px-4 py-2">
+                                  <img
+                                    src={item.image}
+                                    alt={item.title}
+                                    className="h-10 w-10 rounded object-cover"
+                                  />
+                                </TableCell>
+                                <TableCell className="px-4 py-2">
+                                  {item.title}
+                                </TableCell>
+                                <TableCell className="px-4 py-2">
+                                  {item.quantity}
+                                </TableCell>
+                                <TableCell className="px-4 py-2 text-right">
+                                  ₱{item.totalPrice}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                        <div className="mt-4 space-y-2">
+                          <div className="flex justify-between">
+                            <span className="font-medium">Order Subtotal:</span>
+                            <span>₱{reservation.subtotal}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="font-medium">Event Fee:</span>
+                            <span>₱{reservation.eventFee}</span>
+                          </div>
+                          {reservation.isCorkage && (
+                            <div className="flex justify-between">
+                              <span className="font-medium">Corkage Fee:</span>
+                              <span>₱{settings?.eventCorkageFee || 0}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between">
+                            <span className="font-bold">Total Payment:</span>
+                            <span>₱{computedTotal}</span>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="font-medium">Event Fee:</span>
-                          <span>₱{reservation.eventFee}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="font-bold">Total Payment:</span>
-                          <span>₱{reservation.totalPayment}</span>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </TableCell>
-              </TableRow>
-            ))
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow>
               <TableCell className="px-4 py-2 text-center" colSpan={8}>

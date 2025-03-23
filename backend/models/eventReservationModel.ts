@@ -40,6 +40,7 @@ const reservationSchema = new mongoose.Schema(
     },
     specialRequest: { type: String },
     eventFee: { type: Number, required: true },
+    isCorkage: { type: Boolean, requried: true },
     subtotal: { type: Number, required: true },
     totalPayment: { type: Number, required: true },
   },

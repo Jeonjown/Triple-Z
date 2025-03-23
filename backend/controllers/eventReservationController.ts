@@ -26,9 +26,10 @@ export const createReservation = async (
       eventType,
       cart,
       specialRequest,
+      isCorkage, // Expect a boolean from the request body
     } = req.body;
 
-    // Validate required fields
+    // Validate required fields (including isCorkage)
     if (
       !date ||
       !fullName ||
@@ -38,7 +39,8 @@ export const createReservation = async (
       partySize === undefined ||
       !eventType ||
       !cart ||
-      !Array.isArray(cart)
+      !Array.isArray(cart) ||
+      isCorkage === undefined
     ) {
       return next(createError("Missing required fields", 400));
     }
@@ -53,23 +55,28 @@ export const createReservation = async (
 
     // Calculate the total price of the cart
     const cartTotal = cart.reduce(
-      (sum: number, item: { totalPrice: number }) => {
-        return sum + item.totalPrice;
-      },
+      (sum: number, item: { totalPrice: number }) => sum + item.totalPrice,
       0
     );
 
-    // Fetch event settings to retrieve the event fee
+    // Fetch event settings to retrieve the event fee and corkage fee
     const eventSettings = await EventSettings.findOne();
     if (!eventSettings) {
       return next(createError("Event settings not found", 500));
     }
-    const eventFee = eventSettings.eventFee;
 
-    // Calculate the overall total payment (cart total + event fee)
-    const totalPayment = cartTotal + eventFee;
+    // Convert fees to numbers (if they aren't already) and check for validity
+    const eventFee = Number(eventSettings.eventFee);
+    const corkageFee = Number(eventSettings.eventCorkageFee);
+    if (isNaN(eventFee) || isNaN(corkageFee)) {
+      return next(createError("Invalid fee values in event settings", 500));
+    }
 
-    // Create the reservation document including the totalPayment field
+    // Calculate overall total payment:
+    // totalPayment = cart total + event fee + (if corkage then corkage fee)
+    const totalPayment = cartTotal + eventFee + (isCorkage ? corkageFee : 0);
+
+    // Create the reservation document including the totalPayment and isCorkage fields
     const newReservation = new EventReservation({
       userId,
       fullName,
@@ -81,9 +88,10 @@ export const createReservation = async (
       eventType,
       cart,
       specialRequest,
-      totalPayment,
-      subtotal: cartTotal,
       eventFee,
+      isCorkage,
+      subtotal: cartTotal,
+      totalPayment,
     });
 
     // Save the reservation

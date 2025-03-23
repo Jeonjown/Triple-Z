@@ -49,6 +49,7 @@ export interface Reservation {
   totalPayment: number;
   eventFee: number;
   subtotal: number;
+  isCorkage: boolean;
   __v: number;
 }
 

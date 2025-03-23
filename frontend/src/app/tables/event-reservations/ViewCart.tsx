@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { Reservation } from "./columns";
@@ -20,10 +19,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 
-// --- ActionsCell Component ---
 const ViewCart: React.FC<{ reservation: Reservation }> = ({ reservation }) => {
   const [openCartDialog, setOpenCartDialog] = useState(false);
+  const { data: settings } = useGetEventReservationSettings();
+
+  // Get the corkage fee directly from settings if the reservation requires corkage.
+  const corkageFee = reservation.isCorkage
+    ? (settings?.eventCorkageFee ?? 0)
+    : 0;
 
   return (
     <>
@@ -90,6 +95,12 @@ const ViewCart: React.FC<{ reservation: Reservation }> = ({ reservation }) => {
               <span className="text-primary">Event Fee:</span>
               <p className="font-medium">₱{reservation.eventFee}</p>
             </div>
+            {reservation.isCorkage && (
+              <div className="flex justify-between">
+                <span className="text-primary">Corkage Fee:</span>
+                <p className="font-medium">₱{corkageFee}</p>
+              </div>
+            )}
             <hr className="my-1 border-black" />
             <div className="flex justify-between">
               <p className="font-bold">Total Payment:</p>

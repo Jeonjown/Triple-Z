@@ -141,7 +141,7 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
         <div className="mt-4 flex flex-col space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
           {renderInputField(
             "partySize",
-            "Party Size",
+            "Person(s)",
             "number",
             `Minimum of ${minGuests}`,
             { min: minGuests },

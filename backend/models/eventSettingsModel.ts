@@ -10,6 +10,7 @@ const eventSettingsSchema = new mongoose.Schema(
     eventMinGuests: { type: Number, required: true, min: 1 },
     eventTermsofService: { type: String },
     eventMinPackageOrder: { type: Number, required: true, default: 0 },
+    eventCorkageFee: { type: Number, required: true, min: 0 },
 
     // For group reservations:
     groupMinReservation: { type: Number, required: true, min: 1 },
