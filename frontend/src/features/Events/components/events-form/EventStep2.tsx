@@ -230,7 +230,12 @@ const EventStep2: React.FC<Step2Props> = ({
 
       {/* Step Navigation */}
       <div className="mt-4 flex flex-col gap-4 md:flex-row">
-        <Button type="button" onClick={prevStep} className="w-full">
+        <Button
+          type="button"
+          variant={"outline"}
+          onClick={prevStep}
+          className="w-full"
+        >
           Previous
         </Button>
         <Button

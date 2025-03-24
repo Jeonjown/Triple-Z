@@ -131,7 +131,12 @@ const GroupStep2 = ({
         tooltipTrigger={tooltipTrigger}
       />
       <div className="mt-4 flex gap-4">
-        <Button type="button" onClick={prevStep} className="w-full">
+        <Button
+          type="button"
+          variant={"outline"}
+          onClick={prevStep}
+          className="w-full"
+        >
           Previous
         </Button>
         <Button

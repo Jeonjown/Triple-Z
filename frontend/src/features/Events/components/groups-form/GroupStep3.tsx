@@ -134,7 +134,12 @@ const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         </div>
       </div>
       <div className="mt-6 flex max-w-full gap-4">
-        <Button type="button" onClick={prevStep} className="flex-1">
+        <Button
+          type="button"
+          variant={"outline"}
+          onClick={prevStep}
+          className="flex-1"
+        >
           Previous
         </Button>
         <Button type="button" className="flex-1" onClick={handleCheckout}>
