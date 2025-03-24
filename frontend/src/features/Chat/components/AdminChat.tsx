@@ -39,8 +39,10 @@ const AdminChat: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string | undefined>();
 
-  // Mobile toggle for room list sidebar
+  // State for mobile room list visibility
   const [showRooms, setShowRooms] = useState<boolean>(false);
+  // State for controlling the input display
+  const [showInput, setShowInput] = useState<boolean>(true);
 
   // Set up sound preferences and lock body scroll
   useEffect(() => {
@@ -68,11 +70,19 @@ const AdminChat: React.FC = () => {
     if (Notification.permission === "default") setDialogOpen(true);
   }, []);
 
-  // Join room function
+  // Join room function: clear input, hide it, and auto-close room list
   const joinRoom = useCallback(
     (selectedRoomId?: string, roomUserId?: string) => {
       const newRoomId = selectedRoomId || roomId;
       if (!newRoomId.trim() || newRoomId === roomId) return;
+
+      // Clear input and hide it while switching rooms
+      setInput("");
+      setShowInput(false);
+
+      // Auto-close the room list on mobile
+      if (showRooms) setShowRooms(false);
+
       setSelectedUserId(roomUserId || newRoomId.replace("room_", ""));
       if (roomId) socket.emit("leave-room", roomId);
       socket.emit("join-room", newRoomId, (ack: { status: string }) => {
@@ -80,10 +90,12 @@ const AdminChat: React.FC = () => {
           setRoomId(newRoomId);
           setJoined(true);
           setMessages([]);
+          // Show input after room has been joined
+          setShowInput(true);
         }
       });
     },
-    [roomId],
+    [roomId, showRooms],
   );
 
   // Auto-join the first room on mount
@@ -201,7 +213,7 @@ const AdminChat: React.FC = () => {
         </div>
       </div>
 
-      {/* Sidebar: Room List without extra top margin on desktop */}
+      {/* Sidebar: Room List */}
       <aside
         className={`absolute left-0 top-0 mt-20 h-full w-full transform border-r bg-white p-4 transition-transform md:static md:col-span-2 md:mt-0 md:translate-x-0 ${
           showRooms ? "translate-x-0" : "-translate-x-full"
@@ -218,7 +230,7 @@ const AdminChat: React.FC = () => {
         </button>
       </aside>
 
-      {/* Main Chat Window without extra top margin */}
+      {/* Main Chat Window */}
       <main className="flex flex-col md:col-span-7">
         {messagesLoading ? (
           <div className="flex h-full items-center justify-center text-gray-500">
@@ -237,11 +249,13 @@ const AdminChat: React.FC = () => {
             onSendMessage={sendAdminMessage}
             messagesLoading={messagesLoading}
             pushToken={selectedUserId}
+            // Hide input when the room list is open
+            showInput={showInput && !showRooms}
           />
         )}
       </main>
 
-      {/* UserDetails: show only on very large screens */}
+      {/* UserDetails: visible on large screens */}
       <aside className="hidden border-l bg-white p-4 lg:col-span-3 lg:block">
         <UserDetails user={userInfo} />
       </aside>
