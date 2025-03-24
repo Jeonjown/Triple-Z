@@ -65,7 +65,7 @@ export const useCreateEventReservations = () => {
         body: `Reservation for ${data.reservation.fullName} on ${new Date(
           data.reservation.date,
         ).toLocaleDateString()} has been received.`,
-        redirectUrl: "/manage-events",
+        redirectUrl: "admin/manage-events",
       });
     },
   });

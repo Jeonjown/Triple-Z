@@ -8,7 +8,6 @@ import {
   SortingState,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -19,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { DataTablePagination } from "@/components/ui/DataTablePagination";
-import { DataTableViewOptions } from "@/components/ui/DataTableViewOptions ";
+
 import React from "react";
 import {
   Select,
@@ -28,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DataTableViewOptions } from "@/components/ui/DataTableViewOptions ";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -66,8 +66,8 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="rounded-md md:mt-10 md:border">
+      {/* Top Bar remains unchanged */}
       <div className="flex w-full justify-between px-4 py-5">
-        {/* Left side: search input and select */}
         <div className="flex space-x-3">
           <Input
             placeholder="Search..."
@@ -99,21 +99,18 @@ export function DataTable<TData, TValue>({
             </SelectContent>
           </Select>
         </div>
-
-        {/* Right side: view options */}
         <div>
           <DataTableViewOptions table={table} />
         </div>
       </div>
-      {/* Scrollable container for the table */}
-      <div className="max-h-screen overflow-y-auto">
-        {/* Adjust max-h as needed */}
-        <Table>
-          <TableHeader className="">
+      {/* Table container with horizontal scroll on small screens */}
+      <div className="overflow-x-auto">
+        <Table className="min-w-full">
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="whitespace-nowrap">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -133,7 +130,7 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="whitespace-nowrap">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -155,9 +152,8 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-
       {/* Pagination stays outside the scrollable container */}
-      <div>
+      <div className="px-4 py-3">
         <DataTablePagination table={table} />
       </div>
     </div>

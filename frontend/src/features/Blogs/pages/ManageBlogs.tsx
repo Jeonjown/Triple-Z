@@ -154,7 +154,7 @@ const ManageBlogs: React.FC = () => {
                 <Button
                   variant="default"
                   size="sm"
-                  onClick={() => navigate(`/manage-blogs/${post._id}`)}
+                  onClick={() => navigate(`admin/manage-blogs/${post._id}`)}
                 >
                   View
                 </Button>

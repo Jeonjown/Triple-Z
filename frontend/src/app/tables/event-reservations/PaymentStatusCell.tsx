@@ -1,4 +1,3 @@
-// src/components/PaymentStatusCell.tsx
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,19 +24,28 @@ const PaymentStatusCell = ({
   reservation: Reservation;
 }): JSX.Element => {
   const { mutate } = useUpdateEventReservationPaymentStatusWithNotification();
-
-  // State to store the selected payment status and dialog open state.
   const [selectedPaymentStatus, setSelectedPaymentStatus] =
     useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  // Set the payment status and open the confirmation dialog.
+  // Define color mapping for payment statuses
+  const statusColors: Record<string, { border: string; bg: string }> = {
+    "Not Paid": { border: "#EE4549", bg: "#EE454926" },
+    "Partially Paid": { border: "#FABC2C", bg: "#C2FBB8" },
+    Paid: { border: "#3BB537", bg: "#E2F4E1" },
+  };
+
+  // Use current payment status to compute styles.
+  const currentStyle = statusColors[reservation.paymentStatus] || {
+    border: "#ccc",
+    bg: "#ccc",
+  };
+
   const handlePaymentStatusSelection = (status: string) => {
     setSelectedPaymentStatus(status);
     setIsDialogOpen(true);
   };
 
-  // Confirm the payment status change.
   const confirmPaymentStatusChange = () => {
     mutate({
       reservationId: reservation._id,
@@ -51,12 +59,19 @@ const PaymentStatusCell = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="h-8 w-20 px-12">
+          <Button
+            variant="outline"
+            className="h-8 w-28 px-12"
+            style={{
+              borderColor: currentStyle.border,
+              backgroundColor: currentStyle.bg,
+            }}
+          >
             {reservation.paymentStatus}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuLabel>Status</DropdownMenuLabel>
+          <DropdownMenuLabel>Payment</DropdownMenuLabel>
           <DropdownMenuItem
             onClick={() => handlePaymentStatusSelection("Not Paid")}
           >

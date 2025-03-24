@@ -46,8 +46,8 @@ export const useCreateGroupReservation = () => {
       sendPushNotification(
         {
           title: "New Group Reservation Received",
-          body: `Reservation for ${data.reservation.fullName} on ${new Date(
-            data.reservation.date,
+          body: `Reservation for ${data.fullName} on ${new Date(
+            data.date,
           ).toLocaleDateString()} has been received.`,
         },
         {
@@ -69,7 +69,7 @@ export const useCreateGroupReservation = () => {
         body: `Reservation for ${data.fullName} on ${new Date(
           data.date,
         ).toLocaleDateString()} has been received.`,
-        redirectUrl: "/manage-group-reservations",
+        redirectUrl: "admin/manage-groups",
       });
     },
   });

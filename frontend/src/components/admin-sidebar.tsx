@@ -89,7 +89,7 @@ export function AppAdminSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
-                    to="/manage-users"
+                    to="admin/manage-users"
                     className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
                   >
                     <UsersRound />
@@ -104,7 +104,7 @@ export function AppAdminSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="[&>svg]:size-6">
                   <Link
-                    to="/manage-menu"
+                    to="admin/manage-menu"
                     className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
                   >
                     <Coffee />
@@ -115,7 +115,7 @@ export function AppAdminSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
-                    to="/manage-blogs"
+                    to="admin/manage-blogs"
                     className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
                   >
                     <Images />
@@ -149,7 +149,7 @@ export function AppAdminSidebar() {
                       <DropdownMenuGroup>
                         <DropdownMenuItem>
                           <Link
-                            to="/manage-groups"
+                            to="admin/manage-groups"
                             className="flex w-full items-center gap-2 rounded"
                           >
                             <UsersRound className="!size-5" />
@@ -160,7 +160,7 @@ export function AppAdminSidebar() {
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Link
-                            to="/manage-events"
+                            to="admin/manage-events"
                             className="flex w-full items-center gap-2 rounded"
                           >
                             <CalendarDays className="!size-5" />
@@ -192,7 +192,7 @@ export function AppAdminSidebar() {
                       <SidebarMenuSub>
                         <SidebarMenuSubItem>
                           <Link
-                            to="/manage-groups"
+                            to="admin/manage-groups"
                             className="flex w-full items-center gap-2 rounded p-1 hover:bg-muted"
                           >
                             <UsersRound className="!size-5" />
@@ -203,7 +203,7 @@ export function AppAdminSidebar() {
                         </SidebarMenuSubItem>
                         <SidebarMenuSubItem>
                           <Link
-                            to="/manage-events"
+                            to="admin/manage-events"
                             className="flex w-full items-center gap-2 rounded p-1 hover:bg-muted"
                           >
                             <CalendarDays className="!size-5" />
@@ -222,7 +222,7 @@ export function AppAdminSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
-                    to="/admin-chat"
+                    to="admin/admin-chat"
                     className="flex w-full items-center gap-2 rounded p-2"
                   >
                     <MessageCircle />
@@ -235,7 +235,7 @@ export function AppAdminSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
-                    to="/settings"
+                    to="admin/settings"
                     className="flex w-full items-center gap-2 rounded p-2"
                   >
                     <Settings />
