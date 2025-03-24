@@ -49,7 +49,6 @@ export function DataTable<TData, TValue>({
         _id: false,
         userId: false,
         specialRequest: false,
-        createdAt: false,
       },
     },
     onSortingChange: setSorting,

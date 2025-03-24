@@ -53,6 +53,7 @@ export const useUpdateEventReservationStatus = () => {
         description: `Your reservation status has been updated to ${variables.eventStatus}.`,
         redirectUrl: "/profile", // Adjust the redirect URL as needed.
         userId: variables.userId,
+        click_action: "/profile",
       };
 
       // Send realtime notification.

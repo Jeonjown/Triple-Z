@@ -54,7 +54,7 @@ export const useUpdateEventReservationPaymentStatusWithNotification = () => {
         sendRealtimeNotification({
           title: "Reservation Status Updated",
           description: `Your reservation payment status has been updated to ${variables.paymentStatus}.`,
-          redirectUrl: "/profile", // Adjust as needed.
+          redirectUrl: "/profile",
           userId: variables.userId,
         });
         // Build and send push notification.
@@ -62,6 +62,7 @@ export const useUpdateEventReservationPaymentStatusWithNotification = () => {
           userId: variables.userId,
           title: "Reservation Status Updated",
           body: `Your reservation payment status has been updated to ${variables.paymentStatus}.`,
+          click_action: "/profile",
         });
       }
     },

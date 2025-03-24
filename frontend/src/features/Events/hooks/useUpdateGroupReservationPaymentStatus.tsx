@@ -60,6 +60,7 @@ export const useUpdateGroupReservationPaymentStatus = () => {
           userId: variables.userId,
           title: "Reservation Status Updated",
           body: `Your reservation payment status has been updated to ${variables.paymentStatus}.`,
+          click_action: "/profile",
         });
       }
     },

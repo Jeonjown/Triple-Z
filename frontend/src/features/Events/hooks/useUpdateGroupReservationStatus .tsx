@@ -52,7 +52,7 @@ export const useUpdateGroupReservationStatus = () => {
         sendRealtimeNotification({
           title: "Reservation Status Updated",
           description: `Your reservation status has been updated to ${variables.eventStatus}.`,
-          redirectUrl: "/profile", // Adjust as needed.
+          redirectUrl: "/profile",
           userId: variables.userId,
         });
         // Send push notification.
@@ -60,6 +60,7 @@ export const useUpdateGroupReservationStatus = () => {
           userId: variables.userId,
           title: "Reservation Status Updated",
           body: `Your reservation status has been updated to ${variables.eventStatus}.`,
+          click_action: "/profile",
         });
       }
     },

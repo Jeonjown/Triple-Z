@@ -72,14 +72,6 @@ export const columns: MyColumnDef<Reservation>[] = [
     header: "Transaction Id",
   },
   {
-    accessorKey: "createdAt",
-    header: "Created At",
-    cell: ({ row }) => {
-      const rawCreatedAt: string = row.getValue<string>("createdAt");
-      return formatDate(new Date(rawCreatedAt), "MM-dd-yyyy h:mm a");
-    },
-  },
-  {
     accessorKey: "eventStatus",
     header: "Status",
     cell: ({ row }) => <EventStatusCell reservation={row.original} />,
@@ -88,6 +80,23 @@ export const columns: MyColumnDef<Reservation>[] = [
     accessorKey: "paymentStatus",
     header: "Payment",
     cell: ({ row }) => <PaymentStatusCell reservation={row.original} />,
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Created At",
+    cell: ({ row }) => {
+      const rawCreatedAt: string = row.getValue<string>("createdAt");
+      const formattedDate = formatDate(new Date(rawCreatedAt), "MM-dd-yyyy");
+      const formattedTime = formatDate(new Date(rawCreatedAt), "h:mm a");
+      return (
+        <>
+          <div className="text-center">{formattedDate}</div>
+          <div className="text-center text-xs text-gray-500">
+            {formattedTime}
+          </div>
+        </>
+      );
+    },
   },
   {
     accessorKey: "totalPayment",
