@@ -37,7 +37,7 @@ const NotificationIcon: React.FC = () => {
     error,
   } = useNotifications(user?._id || "");
 
-  // Memoize initial notifications to ensure a stable reference between renders.
+  // Memoize initial notifications for a stable reference.
   const memoizedInitialNotifications = useMemo<MyNotification[]>(() => {
     return (initialNotifications as MyNotification[]) || [];
   }, [initialNotifications]);
@@ -46,11 +46,11 @@ const NotificationIcon: React.FC = () => {
   const { notifications, unreadCount, setNotifications } =
     useNotificationReceiver(user?._id || "", memoizedInitialNotifications);
 
-  // Single notification mutation hook.
+  // Mutation hook for marking a single notification as read.
   const { mutate: markAsRead, isPending: isPendingMarkAsRead } =
     useMarkNotificationAsRead();
 
-  // Mark all notifications mutation hook.
+  // Mutation hook for marking all notifications as read.
   const { mutate: markAllAsRead, isPending: isMarkingAll } =
     useMarkAllNotificationsAsRead();
 
@@ -70,10 +70,8 @@ const NotificationIcon: React.FC = () => {
   const handleMarkAllAsRead = (): void => {
     markAllAsRead(user?._id || "", {
       onSuccess: () => {
-        // Clear local notifications.
-        setNotifications([]);
-        // Hide the "more options" section.
-        setShowMore(false);
+        setNotifications([]); // Clear local notifications.
+        setShowMore(false); // Hide the "more options" section.
       },
     });
   };
@@ -84,19 +82,19 @@ const NotificationIcon: React.FC = () => {
   );
 
   return (
-    <div className="relative ml-auto gap-2 md:flex">
+    <div className="relative ml-auto items-center gap-2 md:flex">
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger className="relative">
           <FaBell size={28} className="text-icon hover:scale-105" />
           {unreadCount > 0 && (
-            <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+            <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white sm:text-xs">
               {unreadCount}
             </span>
           )}
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="mr-2 px-5">
+        <DropdownMenuContent className="mr-2 max-h-60 w-[250px] overflow-y-auto px-2 sm:w-auto sm:px-5">
           {/* Header: Notification label and ellipsis icon */}
-          <DropdownMenuLabel className="flex items-center justify-between font-bold">
+          <DropdownMenuLabel className="flex items-center justify-between text-xs font-bold sm:text-sm">
             <span>NOTIFICATIONS</span>
             <button
               onClick={(e) => {
@@ -108,38 +106,42 @@ const NotificationIcon: React.FC = () => {
               <EllipsisVertical size={16} />
             </button>
           </DropdownMenuLabel>
-          {/* Render "Mark All As Read" option when showMore is true */}
+          {/* "Mark All As Read" option */}
           {showMore && (
             <DropdownMenuItem
               onClick={handleMarkAllAsRead}
               disabled={isMarkingAll}
-              className="cursor-pointer text-blue-500"
+              className="cursor-pointer text-xs text-blue-500 sm:text-sm"
             >
               Mark All As Read
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
           {isPending ? (
-            <DropdownMenuItem>Loading notifications...</DropdownMenuItem>
+            <DropdownMenuItem className="text-xs sm:text-sm">
+              Loading notifications...
+            </DropdownMenuItem>
           ) : error ? (
-            <DropdownMenuItem>Error loading notifications</DropdownMenuItem>
+            <DropdownMenuItem className="text-xs sm:text-sm">
+              Error loading notifications
+            </DropdownMenuItem>
           ) : unreadNotifications.length > 0 ? (
             unreadNotifications.map((notification: MyNotification) => (
               <DropdownMenuItem
                 key={notification._id}
-                className="hover:cursor-pointer"
+                className="text-xs hover:cursor-pointer sm:text-sm"
                 onClick={() => handleRedirect(notification.redirectUrl)}
               >
                 <div>
                   <strong>{notification.title}</strong>
-                  <p>{notification.description}</p>
+                  <p className="mt-1">{notification.description}</p>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleMarkAsRead(notification._id);
                     }}
                     disabled={isPendingMarkAsRead}
-                    className="mt-2 text-blue-500 hover:underline"
+                    className="mt-2 text-xs text-blue-500 hover:underline sm:text-sm"
                   >
                     Mark as Read
                   </button>
@@ -147,7 +149,9 @@ const NotificationIcon: React.FC = () => {
               </DropdownMenuItem>
             ))
           ) : (
-            <DropdownMenuItem>No unread notifications</DropdownMenuItem>
+            <DropdownMenuItem className="text-xs sm:text-sm">
+              No unread notifications
+            </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>

@@ -125,19 +125,21 @@ const ScheduleHistory = (): JSX.Element => {
   );
 
   return (
-    <div className="overflow-x-auto p-5">
-      <h3 className="mb-4 text-xl font-semibold">Schedule History</h3>
+    <div className="overflow-x-auto p-4 sm:p-5">
+      <h3 className="mb-4 text-center text-xl font-semibold sm:text-2xl">
+        Schedule History
+      </h3>
       <Table className="min-w-full">
         <TableHeader>
           <TableRow className="border-b border-gray-300 bg-gray-100">
-            <TableHead className="px-4 py-2">Date &amp; Time</TableHead>
-            <TableHead className="px-4 py-2">Type</TableHead>
-            <TableHead className="px-4 py-2">Party Size</TableHead>
-            <TableHead className="px-4 py-2">Special Request</TableHead>
-            <TableHead className="px-4 py-2">Status</TableHead>
-            <TableHead className="px-4 py-2">Payment</TableHead>
-            <TableHead className="px-4 py-2">ID</TableHead>
-            <TableHead className="px-4 py-2">Cart Details</TableHead>
+            <TableHead className="px-3 py-2 sm:px-4">Date &amp; Time</TableHead>
+            <TableHead className="px-3 py-2 sm:px-4">Type</TableHead>
+            <TableHead className="px-3 py-2 sm:px-4">Party Size</TableHead>
+            <TableHead className="px-3 py-2 sm:px-4">Special Request</TableHead>
+            <TableHead className="px-3 py-2 sm:px-4">Status</TableHead>
+            <TableHead className="px-3 py-2 sm:px-4">Payment</TableHead>
+            <TableHead className="px-3 py-2 sm:px-4">ID</TableHead>
+            <TableHead className="px-3 py-2 sm:px-4">Cart Details</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -154,38 +156,38 @@ const ScheduleHistory = (): JSX.Element => {
                   key={reservation._id}
                   className="border-b border-gray-300 hover:bg-gray-50"
                 >
-                  <TableCell className="px-4 py-2">
-                    <span className="font-bold">
+                  <TableCell className="px-3 py-2">
+                    <span className="text-sm font-bold sm:text-base">
                       {format(new Date(reservation.date), "MMMM dd, yyyy")}
                     </span>
                     <br />
-                    <span>
+                    <span className="text-xs sm:text-sm">
                       {reservation.startTime} - {reservation.endTime}
                     </span>
                   </TableCell>
-                  <TableCell className="px-4 py-2">
-                    <span className="text-xs font-bold">
+                  <TableCell className="px-3 py-2">
+                    <span className="text-xs font-bold sm:text-sm">
                       {reservation.eventType}
                     </span>
                   </TableCell>
-                  <TableCell className="px-4 py-2">
+                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
                     {reservation.partySize} pax
                   </TableCell>
-                  <TableCell className="px-4 py-2">
+                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
                     {reservation.specialRequest || "N/A"}
                   </TableCell>
-                  <TableCell className="px-4 py-2">
+                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
                     {reservation.eventStatus}
                   </TableCell>
-                  <TableCell className="px-4 py-2">
+                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
                     <div>
                       <span className="block">{reservation.paymentStatus}</span>
                       <span className="block">₱{computedTotal}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-4 py-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs font-medium text-primary">
+                  <TableCell className="px-3 py-2">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <span className="text-xs font-medium text-primary sm:text-sm">
                         {reservation._id}
                       </span>
                       <TooltipProvider>
@@ -201,37 +203,41 @@ const ScheduleHistory = (): JSX.Element => {
                             </button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Copy Reservation ID</p>
+                            <p className="text-xs">Copy Reservation ID</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
                   </TableCell>
-                  <TableCell className="px-4 py-2">
+                  <TableCell className="px-3 py-2">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <button className="text-blue-600 hover:underline">
+                        <button className="text-xs text-blue-600 hover:underline sm:text-sm">
                           View Cart Details
                         </button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Cart Details</DialogTitle>
-                          <DialogDescription>
+                          <DialogTitle className="text-sm sm:text-base">
+                            Cart Details
+                          </DialogTitle>
+                          <DialogDescription className="text-xs sm:text-sm">
                             Order details for this reservation.
                           </DialogDescription>
                         </DialogHeader>
                         <Table className="min-w-full">
                           <TableHeader>
                             <TableRow className="border-b border-gray-300">
-                              <TableHead className="w-20 px-4 py-2">
+                              <TableHead className="w-20 px-3 py-2 text-xs sm:text-sm">
                                 Image
                               </TableHead>
-                              <TableHead className="px-4 py-2">Item</TableHead>
-                              <TableHead className="px-4 py-2">
+                              <TableHead className="px-3 py-2 text-xs sm:text-sm">
+                                Item
+                              </TableHead>
+                              <TableHead className="px-3 py-2 text-xs sm:text-sm">
                                 Quantity
                               </TableHead>
-                              <TableHead className="px-4 py-2 text-right">
+                              <TableHead className="px-3 py-2 text-right text-xs sm:text-sm">
                                 Price
                               </TableHead>
                             </TableRow>
@@ -242,42 +248,42 @@ const ScheduleHistory = (): JSX.Element => {
                                 key={item._id}
                                 className="border-b border-gray-300"
                               >
-                                <TableCell className="px-4 py-2">
+                                <TableCell className="px-3 py-2">
                                   <img
                                     src={item.image}
                                     alt={item.title}
-                                    className="h-10 w-10 rounded object-cover"
+                                    className="h-8 w-8 rounded object-cover sm:h-10 sm:w-10"
                                   />
                                 </TableCell>
-                                <TableCell className="px-4 py-2">
+                                <TableCell className="px-3 py-2 text-xs sm:text-sm">
                                   {item.title}
                                 </TableCell>
-                                <TableCell className="px-4 py-2">
+                                <TableCell className="px-3 py-2 text-xs sm:text-sm">
                                   {item.quantity}
                                 </TableCell>
-                                <TableCell className="px-4 py-2 text-right">
+                                <TableCell className="px-3 py-2 text-right text-xs sm:text-sm">
                                   ₱{item.totalPrice}
                                 </TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
                         </Table>
-                        <div className="mt-4 space-y-2">
-                          <div className="flex justify-between">
+                        <div className="mt-3 space-y-2">
+                          <div className="flex justify-between text-xs sm:text-sm">
                             <span className="font-medium">Order Subtotal:</span>
                             <span>₱{reservation.subtotal}</span>
                           </div>
-                          <div className="flex justify-between">
+                          <div className="flex justify-between text-xs sm:text-sm">
                             <span className="font-medium">Event Fee:</span>
                             <span>₱{reservation.eventFee}</span>
                           </div>
                           {reservation.isCorkage && (
-                            <div className="flex justify-between">
+                            <div className="flex justify-between text-xs sm:text-sm">
                               <span className="font-medium">Corkage Fee:</span>
                               <span>₱{settings?.eventCorkageFee || 0}</span>
                             </div>
                           )}
-                          <div className="flex justify-between">
+                          <div className="flex justify-between text-xs sm:text-sm">
                             <span className="font-bold">Total Payment:</span>
                             <span>₱{computedTotal}</span>
                           </div>
@@ -290,7 +296,10 @@ const ScheduleHistory = (): JSX.Element => {
             })
           ) : (
             <TableRow>
-              <TableCell className="px-4 py-2 text-center" colSpan={8}>
+              <TableCell
+                className="px-3 py-2 text-center text-xs sm:text-sm"
+                colSpan={8}
+              >
                 No reservations found.
               </TableCell>
             </TableRow>

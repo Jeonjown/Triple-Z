@@ -1,10 +1,12 @@
+// RoomList.tsx
 import React from "react";
+import { X } from "lucide-react";
 
 export interface LatestMessage {
   text?: string;
   createdAt?: string;
   username?: string;
-  userId?: string; // For fetching user details
+  userId?: string;
 }
 
 export interface Room {
@@ -15,14 +17,15 @@ export interface Room {
 interface RoomListProps {
   rooms: Room[];
   activeRoomId: string;
-  // Callback accepts roomId and optionally a userId from the room's latest message.
   onJoinRoom: (roomId: string, userId?: string) => void;
+  onClose?: () => void;
 }
 
 const RoomList: React.FC<RoomListProps> = ({
   rooms,
   activeRoomId,
   onJoinRoom,
+  onClose,
 }) => {
   const handleRoomClick = (room: Room) => {
     const userId = room.latestMessage?.userId;
@@ -31,8 +34,17 @@ const RoomList: React.FC<RoomListProps> = ({
   };
 
   return (
-    <div className="h-full max-h-screen overflow-y-auto p-4">
-      <h1 className="mb-4 text-center text-2xl font-bold">Chats</h1>
+    // Fixed height with overflow-y-auto for scrolling through room list
+    <div className="h-full max-h-screen w-full overflow-y-auto p-4">
+      {/* Header with title and close button */}
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Chats</h1>
+        {onClose && (
+          <button className="md:hidden" onClick={onClose}>
+            <X className="h-6 w-6" />
+          </button>
+        )}
+      </div>
       <div className="space-y-2">
         {rooms.map((room) => (
           <div

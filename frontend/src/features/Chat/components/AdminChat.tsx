@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-
 import RoomList, { Room } from "./RoomList";
 import ChatWindow from "./ChatWindow";
 import UserDetails from "./UserDetails";
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { socket } from "@/socket";
+import { X } from "lucide-react";
 
 export interface Message {
   userId: string;
@@ -36,10 +36,13 @@ const AdminChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
   const [soundEnabled, setSoundEnabled] = useState<boolean>(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string | undefined>();
 
-  // Sound preferences and UI setup
+  // Mobile toggle for room list sidebar
+  const [showRooms, setShowRooms] = useState<boolean>(false);
+
+  // Set up sound preferences and lock body scroll
   useEffect(() => {
     const storedSoundPref = localStorage.getItem("soundEnabled");
     if (storedSoundPref !== null) {
@@ -65,16 +68,13 @@ const AdminChat: React.FC = () => {
     if (Notification.permission === "default") setDialogOpen(true);
   }, []);
 
-  // Room management
+  // Join room function
   const joinRoom = useCallback(
     (selectedRoomId?: string, roomUserId?: string) => {
       const newRoomId = selectedRoomId || roomId;
       if (!newRoomId.trim() || newRoomId === roomId) return;
-
       setSelectedUserId(roomUserId || newRoomId.replace("room_", ""));
-
       if (roomId) socket.emit("leave-room", roomId);
-
       socket.emit("join-room", newRoomId, (ack: { status: string }) => {
         if (ack.status === "joined") {
           setRoomId(newRoomId);
@@ -86,6 +86,7 @@ const AdminChat: React.FC = () => {
     [roomId],
   );
 
+  // Auto-join the first room on mount
   useEffect(() => {
     if (!roomId && rooms?.length) {
       const topRoom = rooms[0] as Room;
@@ -93,7 +94,7 @@ const AdminChat: React.FC = () => {
     }
   }, [rooms, roomId, joinRoom]);
 
-  // Message handling
+  // Update messages when new messages are fetched
   useEffect(() => {
     if (joined && fetchedMessages) {
       setMessages(
@@ -107,7 +108,7 @@ const AdminChat: React.FC = () => {
     }
   }, [fetchedMessages, joined]);
 
-  // Real-time updates
+  // Listen for real-time updates and update room list
   useEffect(() => {
     const updateRoomList = (data: Message) => {
       queryClient.setQueryData<Room[]>(
@@ -117,9 +118,7 @@ const AdminChat: React.FC = () => {
           const roomIndex = updatedRooms.findIndex(
             (room) => room.roomId === data.roomId,
           );
-
           if (roomIndex > -1) {
-            // Preserve original username and user ID, only update message and timestamp
             updatedRooms[roomIndex] = {
               ...updatedRooms[roomIndex],
               latestMessage: {
@@ -129,7 +128,6 @@ const AdminChat: React.FC = () => {
               },
             };
           } else if (data.sender === "user") {
-            // Only create new rooms for user messages
             updatedRooms.push({
               roomId: data.roomId,
               latestMessage: {
@@ -140,8 +138,6 @@ const AdminChat: React.FC = () => {
               },
             });
           }
-
-          // Sort by latest message timestamp
           return updatedRooms.sort((a, b) => {
             const aTime = new Date(a.latestMessage?.createdAt || 0).getTime();
             const bTime = new Date(b.latestMessage?.createdAt || 0).getTime();
@@ -153,7 +149,6 @@ const AdminChat: React.FC = () => {
 
     const handleNewMessage = (data: Message) => {
       updateRoomList(data);
-
       if (data.roomId === roomId) {
         setMessages((prev) => [...prev, data]);
       }
@@ -171,7 +166,7 @@ const AdminChat: React.FC = () => {
     };
   }, [roomId, soundEnabled, queryClient]);
 
-  // Message sending
+  // Send an admin message
   const sendAdminMessage = () => {
     if (!input.trim() || !joined) return;
     const adminMessage: Message = {
@@ -187,27 +182,44 @@ const AdminChat: React.FC = () => {
     setInput("");
   };
 
-  if (!userInfo) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p>No User Messages</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="inset-0 grid h-screen grid-cols-12">
-      <div className="col-span-3 border-r bg-white">
-        {rooms?.length > 0 && (
-          <RoomList
-            rooms={rooms as Room[]}
-            activeRoomId={roomId}
-            onJoinRoom={joinRoom}
-          />
-        )}
+    <div className="flex h-[100dvh] flex-col md:grid md:grid-cols-12">
+      {/* Mobile Header with room toggle */}
+      <div className="flex items-center justify-between border-b bg-white p-2 md:hidden">
+        <div className="flex items-center space-x-2">
+          <button
+            className="rounded border px-2 py-1"
+            onClick={() => setShowRooms((prev) => !prev)}
+          >
+            Chats
+          </button>
+          {showRooms && (
+            <button onClick={() => setShowRooms(false)}>
+              <X className="h-6 w-6" />
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="col-span-6 flex flex-col">
+      {/* Sidebar: Room List without extra top margin on desktop */}
+      <aside
+        className={`absolute left-0 top-0 mt-20 h-full w-full transform border-r bg-white p-4 transition-transform md:static md:col-span-2 md:mt-0 md:translate-x-0 ${
+          showRooms ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <RoomList
+          rooms={rooms as Room[]}
+          activeRoomId={roomId}
+          onJoinRoom={joinRoom}
+          onClose={() => setShowRooms(false)}
+        />
+        <button className="mt-4 md:hidden" onClick={() => setShowRooms(false)}>
+          Close
+        </button>
+      </aside>
+
+      {/* Main Chat Window without extra top margin */}
+      <main className="flex flex-col md:col-span-7">
         {messagesLoading ? (
           <div className="flex h-full items-center justify-center text-gray-500">
             Loading messages...
@@ -227,12 +239,14 @@ const AdminChat: React.FC = () => {
             pushToken={selectedUserId}
           />
         )}
-      </div>
+      </main>
 
-      <div className="col-span-3 border-l bg-white">
+      {/* UserDetails: show only on very large screens */}
+      <aside className="hidden border-l bg-white p-4 lg:col-span-3 lg:block">
         <UserDetails user={userInfo} />
-      </div>
+      </aside>
 
+      {/* Notification Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -257,13 +271,7 @@ const AdminChat: React.FC = () => {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               No
             </Button>
-            <Button
-              onClick={async () => {
-                setDialogOpen(false);
-              }}
-            >
-              OK
-            </Button>
+            <Button onClick={() => setDialogOpen(false)}>OK</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
