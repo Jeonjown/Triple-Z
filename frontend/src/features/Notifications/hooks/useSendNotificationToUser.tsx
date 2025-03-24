@@ -1,5 +1,3 @@
-// hooks/useSendNotificationToUser.ts
-import { toast } from "@/hooks/use-toast";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   createNotification,
@@ -26,21 +24,12 @@ export const useSendNotificationToUser = () => {
     },
     onError: (err: Error) => {
       console.error("Error sending notification:", err);
-      toast({
-        title: "Error sending notification",
-        description:
-          err.message || "An error occurred while sending the notification.",
-        variant: "destructive",
-      });
+      // Removed toast call.
     },
     onSuccess: (data) => {
       console.log("Notification sent and saved successfully:", data);
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      toast({
-        title: "Notification sent",
-        description: "The notification was sent successfully.",
-        variant: "default",
-      });
+      // Removed toast call.
     },
   });
 

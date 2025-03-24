@@ -3,15 +3,17 @@ import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import EmbeddedMenu, { MenuItem, SelectedItem } from "./EmbeddedMenu";
 import ScrollToTop from "@/components/ScrollToTop";
-import EventsCart from "./EventsCart"; // Your custom cart component
+import EventsCart from "./EventsCart";
 import { CartItem, EventFormValues } from "../../pages/EventForm";
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { Info, AlertCircle } from "lucide-react";
-// Import shad cn Tooltip components
+
+// 1. Import TooltipProvider along with other tooltip components
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  TooltipProvider,
 } from "@/components/ui/tooltip";
 
 type Step2Props = {
@@ -42,13 +44,15 @@ const EventStep2: React.FC<Step2Props> = ({
     trigger,
   } = useFormContext<EventFormValues>();
 
-  // Reset tooltip trigger on mount so it doesn't carry over from other steps.
+  // Track how many times we trigger a tooltip (e.g., after adding items)
   const [tooltipTrigger, setTooltipTrigger] = useState<number>(0);
+
   useEffect(() => {
+    // Reset tooltip trigger on mount
     setTooltipTrigger(0);
   }, []);
 
-  // Function to add an item to cart
+  // Function to add an item to the cart
   const addToCart = (item: MenuItem, sizeId?: string) => {
     const key = sizeId ? `${item._id}_${sizeId}` : item._id;
     const exists = selectedPackageIds.find((s) => s.key === key);
@@ -73,14 +77,17 @@ const EventStep2: React.FC<Step2Props> = ({
         { key, _id: item._id, sizeId },
       ]);
       setQuantityMap((prev) => ({ ...prev, [key]: 1 }));
-      let price = item.basePrice !== null ? item.basePrice : 0;
+
+      let price = item.basePrice ?? 0;
       let sizeText = "";
+
       if (item.requiresSizeSelection && item.sizes.length > 0) {
         const sizeOption =
           item.sizes.find((s) => s._id === sizeId) || item.sizes[0];
         price = sizeOption.sizePrice;
         sizeText = sizeOption.size;
       }
+
       const newCartItem: CartItem = {
         _id: key,
         title: item.title,
@@ -92,38 +99,35 @@ const EventStep2: React.FC<Step2Props> = ({
       };
       setCart((prev) => [...prev, newCartItem]);
     }
-    // Increment the tooltip trigger when an item is added
+    // Trigger the tooltip each time an item is added
     setTooltipTrigger((prev) => prev + 1);
   };
 
-  // Update form state when cart changes
+  // Update form state whenever the cart changes
   useEffect(() => {
     setValue("cart", cart);
   }, [cart, setValue]);
 
-  // Get settings for minimum package order and fee values.
+  // Get event reservation settings
   const { data: settings } = useGetEventReservationSettings();
-
-  // Calculate total packages ordered.
   const totalPackagesOrdered = cart.reduce(
     (sum, item) => sum + item.quantity,
     0,
   );
 
-  // Next button handler: validate that the corkage field is answered
+  // Validate "isCorkage" before moving to the next step
   const handleNext = async () => {
     const valid = await trigger("isCorkage");
     if (!valid) return;
     nextStep();
   };
 
+  // 2. Wrap all Tooltip usages in <TooltipProvider>
   return (
-    <>
+    <TooltipProvider>
       <ScrollToTop />
-      {/* EmbeddedMenu for adding items */}
       <EmbeddedMenu onAddToCart={addToCart} />
 
-      {/* Display the cart with tooltip triggered only on add-to-cart events */}
       <EventsCart
         cart={cart}
         updateQuantity={(key, newQuantity) => {
@@ -154,7 +158,7 @@ const EventStep2: React.FC<Step2Props> = ({
         tooltipTrigger={tooltipTrigger}
       />
 
-      {/* Special Request field placed outside the menu */}
+      {/* Special Request Field */}
       <div className="mt-6">
         <label className="mb-2 block font-medium text-gray-700">
           Special Request
@@ -162,7 +166,7 @@ const EventStep2: React.FC<Step2Props> = ({
         <textarea
           {...register("specialRequest")}
           placeholder="Any special requests?"
-          className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm"
           rows={4}
         ></textarea>
         {errors.specialRequest && (
@@ -172,7 +176,7 @@ const EventStep2: React.FC<Step2Props> = ({
         )}
       </div>
 
-      {/* Corkage Fee Radio Button Group with Tooltip and Error Icon */}
+      {/* Corkage Fee with Tooltip */}
       <div className="mt-6">
         <div className="flex items-center">
           <label className="font-medium text-gray-700">Corkage Fee</label>
@@ -189,12 +193,11 @@ const EventStep2: React.FC<Step2Props> = ({
           </Tooltip>
         </div>
         <div className="mt-2 flex space-x-4 text-sm">
-          {/* Yes option: value "true" */}
+          {/* Radio: "true" */}
           <label className="flex items-center space-x-2">
             <input
               type="radio"
               value="true"
-              // Register radio with required validation
               {...register("isCorkage", {
                 required: "Please select an option",
               })}
@@ -204,7 +207,7 @@ const EventStep2: React.FC<Step2Props> = ({
               Yes (A ₱{settings?.eventCorkageFee ?? 500} corkage fee applies)
             </span>
           </label>
-          {/* No option: value "false" */}
+          {/* Radio: "false" */}
           <label className="flex items-center space-x-2">
             <input
               type="radio"
@@ -225,6 +228,7 @@ const EventStep2: React.FC<Step2Props> = ({
         )}
       </div>
 
+      {/* Step Navigation */}
       <div className="mt-4 flex flex-col gap-4 md:flex-row">
         <Button type="button" onClick={prevStep} className="w-full">
           Previous
@@ -242,6 +246,7 @@ const EventStep2: React.FC<Step2Props> = ({
           Next
         </Button>
       </div>
+
       {settings && totalPackagesOrdered < settings.eventMinPackageOrder && (
         <p className="mt-2 text-center text-sm text-red-500">
           Minimum package order of {settings.eventMinPackageOrder} is required.
@@ -252,7 +257,7 @@ const EventStep2: React.FC<Step2Props> = ({
           {errors.cart.message}
         </p>
       )}
-    </>
+    </TooltipProvider>
   );
 };
 
