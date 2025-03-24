@@ -28,7 +28,12 @@ const defaultMinDaysPrior = 14;
 const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
   z.object({
     fullName: z.string().nonempty("Full Name is required."),
-    contactNumber: z.string().nonempty("Contact is required"),
+    contactNumber: z
+      .string()
+      .nonempty("Contact is required")
+      .refine((val) => !isNaN(Number(val)), {
+        message: "Contact number must be a number",
+      }),
     partySize: z.preprocess(
       (val) => Number(val),
       z.number().min(minGuests, `Party size must be at least ${minGuests}`),
