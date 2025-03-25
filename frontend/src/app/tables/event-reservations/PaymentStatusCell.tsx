@@ -32,7 +32,7 @@ const PaymentStatusCell = ({
   const statusColors: Record<string, { border: string; bg: string }> = {
     "Not Paid": { border: "#EE4549", bg: "#EE454926" },
     "Partially Paid": { border: "#FABC2C", bg: "#FABC2C26" },
-    Paid: { border: "#3BB537", bg: "#E2F4E1" },
+    ["Paid"]: { border: "#3BB537", bg: "#E2F4E1" },
   };
 
   // Use current payment status to compute styles.

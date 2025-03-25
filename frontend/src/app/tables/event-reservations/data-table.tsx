@@ -1,13 +1,4 @@
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getFilteredRowModel,
-  getSortedRowModel,
-  SortingState,
-  getPaginationRowModel,
-} from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -16,100 +7,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { DataTablePagination } from "@/components/ui/DataTablePagination";
+import { DataTablePagination } from "@/components/ui/DataTablePagination"; // import pagination component
 
-import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { DataTableViewOptions } from "@/components/ui/DataTableViewOptions ";
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+// Explicit generic type for table prop without implicit any
+interface DataTableProps<TData> {
+  table: ReturnType<
+    typeof import("@tanstack/react-table").useReactTable<TData>
+  >;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
-  const [globalFilter, setGlobalFilter] = React.useState<string>("");
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-
-  const table = useReactTable({
-    data,
-    columns,
-    initialState: {
-      columnVisibility: {
-        _id: false,
-        userId: false,
-        specialRequest: false,
-      },
-    },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      globalFilter,
-      sorting,
-    },
-  });
-
+export function DataTable<TData>({
+  table,
+}: DataTableProps<TData>): JSX.Element {
   return (
     <div className="rounded-md md:mt-10 md:border">
-      {/* Top Bar remains unchanged */}
-      <div className="flex w-full justify-between px-4 py-5">
-        <div className="flex space-x-3">
-          <Input
-            placeholder="Search..."
-            value={globalFilter}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className="max-w-sm"
-          />
-          <Select
-            value={
-              (table.getColumn("eventStatus")?.getFilterValue() as string) ||
-              "All"
-            }
-            onValueChange={(value) =>
-              table
-                .getColumn("eventStatus")
-                ?.setFilterValue(value === "All" ? undefined : value)
-            }
-            aria-label="Filter by status"
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All</SelectItem>
-              <SelectItem value="Pending">Pending</SelectItem>
-              <SelectItem value="Confirmed">Confirmed</SelectItem>
-              <SelectItem value="Cancelled">Cancelled</SelectItem>
-              <SelectItem value="Completed">Completed</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <DataTableViewOptions table={table} />
-        </div>
-      </div>
-      {/* Table container with horizontal scroll on small screens */}
+      {/* Table container with horizontal scroll */}
       <div className="overflow-x-auto">
         <Table className="min-w-full">
-          <TableHeader>
+          <TableHeader className="bg-primary">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="whitespace-nowrap">
+                  <TableHead
+                    key={header.id}
+                    className="whitespace-nowrap text-white"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -126,7 +48,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() ? "selected" : ""}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="whitespace-nowrap">
@@ -141,7 +63,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={table.getHeaderGroups()[0].headers.length}
                   className="h-24 text-center"
                 >
                   No results.
@@ -151,9 +73,9 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      {/* Pagination stays outside the scrollable container */}
+      {/* Pagination control restored at the bottom */}
       <div className="px-4 py-3">
-        <DataTablePagination table={table} />
+        <DataTablePagination />
       </div>
     </div>
   );

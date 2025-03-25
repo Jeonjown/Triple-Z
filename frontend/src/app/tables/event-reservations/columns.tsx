@@ -1,63 +1,32 @@
-import { Column, ColumnDef, ColumnMeta, Row } from "@tanstack/react-table";
+// columns.ts
+import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/ui/DataTableColumnHeader";
 import { formatDate } from "date-fns";
 import EventStatusCell from "./EventStatusCell";
 import PaymentStatusCell from "./PaymentStatusCell";
 import ViewCart from "./ViewCart";
 
-// Module augmentation for custom meta type
-declare module "@tanstack/react-table" {
-  export interface ColumnMeta<TData = unknown, TValue = unknown> {
-    title: string;
-    _dummyData?: TData;
-    _dummyValue?: TValue;
-  }
-}
-
-// Updated Reservation-related interfaces
-export interface User {
-  _id: string;
-  username: string;
-  email: string;
-}
-
-export interface CartItem {
-  _id: string;
-  title: string;
-  quantity: number;
-  totalPrice: number;
-  image: string;
-}
-
 export interface Reservation {
   _id: string;
-  userId: User;
+  userId: { _id: string; email: string };
   fullName: string;
   contactNumber: string;
   partySize: number;
   date: string;
   startTime: string;
   endTime: string;
-  eventType: string;
-  cart: CartItem[];
   eventStatus: string;
   paymentStatus: string;
   specialRequest: string;
   createdAt: string;
-  updatedAt: string;
   totalPayment: number;
-  eventFee: number;
-  subtotal: number;
-  isCorkage: boolean;
-  __v: number;
+  // other fields...
 }
 
-// Extend ColumnDef with our custom meta type
 export type MyColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
-  meta?: ColumnMeta<TData, TValue>;
+  meta?: { title: string };
 };
 
-// --- Columns Definition ---
 export const columns: MyColumnDef<Reservation>[] = [
   {
     id: "userId",
@@ -65,21 +34,25 @@ export const columns: MyColumnDef<Reservation>[] = [
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="User Id" />
     ),
-    meta: { title: "userId" },
+    meta: { title: "User Id" },
   },
   {
     accessorKey: "_id",
     header: "Transaction Id",
+    meta: { title: "Transaction Id" },
   },
   {
     accessorKey: "eventStatus",
     header: "Status",
     cell: ({ row }) => <EventStatusCell reservation={row.original} />,
+    meta: { title: "Status" },
   },
   {
     accessorKey: "paymentStatus",
     header: "Payment",
+    filterFn: "equals",
     cell: ({ row }) => <PaymentStatusCell reservation={row.original} />,
+    meta: { title: "Payment" },
   },
   {
     accessorKey: "createdAt",
@@ -97,6 +70,7 @@ export const columns: MyColumnDef<Reservation>[] = [
         </>
       );
     },
+    meta: { title: "Created At" },
   },
   {
     accessorKey: "totalPayment",
@@ -107,12 +81,14 @@ export const columns: MyColumnDef<Reservation>[] = [
       const value = getValue<number>();
       return `₱${value.toLocaleString()}`;
     },
+    meta: { title: "Total Payment" },
   },
   {
     accessorKey: "fullName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Full Name" />
     ),
+    meta: { title: "Full Name" },
   },
   {
     id: "email",
@@ -134,9 +110,13 @@ export const columns: MyColumnDef<Reservation>[] = [
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="Party Size" />
     ),
+    meta: { title: "Party Size" },
   },
   {
     id: "dateTime",
+    // Combine date, startTime, and endTime into a single string for accessor
+    accessorFn: (row: Reservation) =>
+      `${row.date} ${row.startTime} ${row.endTime}`, // Added accessorFn
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="Date & Time" />
     ),
@@ -146,18 +126,23 @@ export const columns: MyColumnDef<Reservation>[] = [
       return (
         <>
           <div className="text-center">{formattedDate}</div>
-          <div className="text-xs text-gray-500">{`${startTime} - ${endTime}`}</div>
+          <div className="text-xs text-gray-500">
+            {startTime} - {endTime}
+          </div>
         </>
       );
     },
+    meta: { title: "Date & Time" },
   },
   {
     accessorKey: "specialRequest",
     header: "Special Request",
+    meta: { title: "Special Request" },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => <ViewCart reservation={row.original} />,
+    meta: { title: "Actions" },
   },
 ];

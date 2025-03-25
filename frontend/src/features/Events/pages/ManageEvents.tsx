@@ -1,10 +1,10 @@
-import EventReservationsTable from "@/app/tables/event-reservations/page";
+import EventReservationsControlPanel from "@/app/tables/event-reservations/EventReservationsControlPanel";
 
 const ManageEvents = () => {
   return (
     <div className="flex justify-center">
       <div className="w-auto min-w-96">
-        <EventReservationsTable />
+        <EventReservationsControlPanel />
       </div>
     </div>
   );
