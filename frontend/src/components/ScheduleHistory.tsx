@@ -1,7 +1,8 @@
+// ScheduleHistory.tsx
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import useGetReservations from "@/features/Events/hooks/useGetEventReservations";
 import useGetGroupReservations from "@/features/Events/hooks/useGetGroupReservations";
-import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings"; // <-- Import settings hook
+import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { format, compareDesc } from "date-fns";
 import { Copy } from "lucide-react";
 import {
@@ -61,7 +62,7 @@ export interface Reservation {
   eventFee: number;
   subtotal: number;
   paymentStatus: string;
-  isCorkage: boolean; // <-- Added corkage flag
+  isCorkage: boolean;
   __v: number;
 }
 
@@ -94,7 +95,7 @@ const mapGroupToReservation = (group: GroupReservationRaw): Reservation => ({
   eventType: "Group Reservation",
   specialRequest: "",
   eventFee: 0,
-  isCorkage: false, // Set default corkage flag for group reservations.
+  isCorkage: false,
 });
 
 const ScheduleHistory = (): JSX.Element => {
@@ -124,6 +125,21 @@ const ScheduleHistory = (): JSX.Element => {
     compareDesc(new Date(a.date), new Date(b.date)),
   );
 
+  // Define color mapping for event statuses.
+  const eventStatusColors: Record<string, { border: string; bg: string }> = {
+    Pending: { border: "#FABC2C", bg: "#FABC2C26" },
+    Confirmed: { border: "#3BB537", bg: "#E2F4E1" },
+    Cancelled: { border: "#EE4549", bg: "#EE454926" },
+    Completed: { border: "#043A7B", bg: "#043A7B26" },
+  };
+
+  // Define color mapping for payment statuses.
+  const paymentStatusColors: Record<string, { border: string; bg: string }> = {
+    "Not Paid": { border: "#EE4549", bg: "#EE454926" },
+    "Partially Paid": { border: "#FABC2C", bg: "#FABC2C26" },
+    Paid: { border: "#3BB537", bg: "#E2F4E1" },
+  };
+
   return (
     <div className="overflow-x-auto p-4 sm:p-5">
       <h3 className="mb-4 text-center text-xl font-semibold sm:text-2xl">
@@ -131,7 +147,7 @@ const ScheduleHistory = (): JSX.Element => {
       </h3>
       <Table className="min-w-full">
         <TableHeader>
-          <TableRow className="border-b border-gray-300 bg-gray-100">
+          <TableRow className="border border-gray-300 bg-gray-100">
             <TableHead className="px-3 py-2 sm:px-4">Date &amp; Time</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Type</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Party Size</TableHead>
@@ -151,12 +167,20 @@ const ScheduleHistory = (): JSX.Element => {
                 reservation.eventFee +
                 (reservation.isCorkage ? settings?.eventCorkageFee || 0 : 0);
 
+              // Get colors for event and payment statuses.
+              const currentEventStyle = eventStatusColors[
+                reservation.eventStatus
+              ] || { border: "#ccc", bg: "#ccc" };
+              const currentPaymentStyle = paymentStatusColors[
+                reservation.paymentStatus
+              ] || { border: "#ccc", bg: "#ccc" };
+
               return (
                 <TableRow
                   key={reservation._id}
                   className="border-b border-gray-300 hover:bg-gray-50"
                 >
-                  <TableCell className="px-3 py-2">
+                  <TableCell className="px-3 py-2 sm:px-4">
                     <span className="text-sm font-bold sm:text-base">
                       {format(new Date(reservation.date), "MMMM dd, yyyy")}
                     </span>
@@ -165,7 +189,7 @@ const ScheduleHistory = (): JSX.Element => {
                       {reservation.startTime} - {reservation.endTime}
                     </span>
                   </TableCell>
-                  <TableCell className="px-3 py-2">
+                  <TableCell className="px-3 py-2 sm:px-4">
                     <span className="text-xs font-bold sm:text-sm">
                       {reservation.eventType}
                     </span>
@@ -177,15 +201,43 @@ const ScheduleHistory = (): JSX.Element => {
                     {reservation.specialRequest || "N/A"}
                   </TableCell>
                   <TableCell className="px-3 py-2 text-xs sm:text-sm">
-                    {reservation.eventStatus}
+                    {/* Event Status Badge */}
+                    <span
+                      style={{
+                        display: "inline-block",
+                        border: `1px solid ${currentEventStyle.border}`,
+                        backgroundColor: currentEventStyle.bg,
+                        borderRadius: "9999px",
+                        padding: "0.125rem 0.5rem",
+                        fontWeight: "bold",
+                        fontSize: "0.75rem",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {reservation.eventStatus}
+                    </span>
                   </TableCell>
-                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
-                    <div>
-                      <span className="block">{reservation.paymentStatus}</span>
-                      <span className="block">₱{computedTotal}</span>
+                  <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
+                    {/* Payment Column: Total Payment on Top & Payment Status Below */}
+                    <div className="flex flex-col text-center">
+                      <span className="block font-bold">₱{computedTotal}</span>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          border: `1px solid ${currentPaymentStyle.border}`,
+                          backgroundColor: currentPaymentStyle.bg,
+                          borderRadius: "9999px",
+                          padding: "0.125rem 0.5rem",
+                          fontWeight: "bold",
+                          fontSize: "0.75rem",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {reservation.paymentStatus}
+                      </span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-3 py-2">
+                  <TableCell className="px-3 py-2 sm:px-4">
                     <div className="flex items-center space-x-1 sm:space-x-2">
                       <span className="text-xs font-medium text-primary sm:text-sm">
                         {reservation._id}
@@ -209,7 +261,7 @@ const ScheduleHistory = (): JSX.Element => {
                       </TooltipProvider>
                     </div>
                   </TableCell>
-                  <TableCell className="px-3 py-2">
+                  <TableCell className="px-3 py-2 sm:px-4">
                     <Dialog>
                       <DialogTrigger asChild>
                         <button className="text-xs text-blue-600 hover:underline sm:text-sm">

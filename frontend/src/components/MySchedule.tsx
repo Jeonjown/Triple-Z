@@ -1,3 +1,4 @@
+// MySchedule.tsx
 import { startOfDay, compareDesc, format, isBefore } from "date-fns";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { CalendarDays, Copy } from "lucide-react";
@@ -9,7 +10,6 @@ import {
 } from "./ui/tooltip";
 import useGetEventReservations from "@/features/Events/hooks/useGetEventReservations";
 import useGetGroupReservations from "@/features/Events/hooks/useGetGroupReservations";
-// Import hook for event settings (contains eventCorkageFee)
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 
 // Define interfaces explicitly.
@@ -87,8 +87,6 @@ const MySchedule = (): JSX.Element => {
   const { data } = useGetEventReservations() as { data?: EventReservationData };
   const { data: groupData } = useGetGroupReservations();
   const { user } = useAuthStore();
-
-  // Get event settings for the corkage fee.
   const { data: settings } = useGetEventReservationSettings();
 
   // Normalize today's date.
@@ -126,6 +124,20 @@ const MySchedule = (): JSX.Element => {
     (a, b) => compareDesc(new Date(a.date), new Date(b.date)),
   );
 
+  // Define color mapping for statuses.
+  const paymentStatusColors: Record<string, { border: string; bg: string }> = {
+    "Not Paid": { border: "#EE4549", bg: "#EE454926" },
+    "Partially Paid": { border: "#FABC2C", bg: "#FABC2C26" },
+    Paid: { border: "#3BB537", bg: "#E2F4E1" },
+  };
+
+  const eventStatusColors: Record<string, { border: string; bg: string }> = {
+    Pending: { border: "#FABC2C", bg: "#FABC2C26" },
+    Confirmed: { border: "#3BB537", bg: "#E2F4E1" },
+    Cancelled: { border: "#EE4549", bg: "#EE454926" },
+    Completed: { border: "#043A7B", bg: "#043A7B26" },
+  };
+
   return (
     <div className="p-4 sm:p-5">
       <h3 className="mb-4 text-center text-xl font-semibold sm:text-2xl">
@@ -138,6 +150,15 @@ const MySchedule = (): JSX.Element => {
             reservation.subtotal +
             reservation.eventFee +
             (reservation.isCorkage ? settings?.eventCorkageFee || 0 : 0);
+
+          // Get computed styles based on status
+          const currentPaymentStyle = paymentStatusColors[
+            reservation.paymentStatus
+          ] || { border: "#ccc", bg: "#ccc" };
+
+          const currentEventStyle = eventStatusColors[
+            reservation.eventStatus
+          ] || { border: "#ccc", bg: "#ccc" };
 
           return (
             <div
@@ -191,15 +212,33 @@ const MySchedule = (): JSX.Element => {
                     <p className="text-sm text-primary sm:text-base">
                       Event Status:
                     </p>
-                    <p className="font-medium">{reservation.eventStatus}</p>
+                    {/* Render event status as a colored badge */}
+                    <span
+                      className="rounded-full px-2 py-1 text-xs font-bold"
+                      style={{
+                        border: `1px solid ${currentEventStyle.border}`,
+                        backgroundColor: currentEventStyle.bg,
+                      }}
+                    >
+                      {reservation.eventStatus}
+                    </span>
                   </div>
                   {/* Payment Details */}
                   <div className="mt-4 space-y-2">
-                    <div>
+                    <div className="mb-6">
                       <p className="text-sm text-primary sm:text-base">
                         Payment Status:
                       </p>
-                      <p className="font-medium">{reservation.paymentStatus}</p>
+                      {/* Render payment status as a colored badge */}
+                      <span
+                        className="rounded-full px-2 py-1 text-xs font-bold"
+                        style={{
+                          border: `1px solid ${currentPaymentStyle.border}`,
+                          backgroundColor: currentPaymentStyle.bg,
+                        }}
+                      >
+                        {reservation.paymentStatus}
+                      </span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <p className="text-xs font-medium text-primary sm:text-sm">

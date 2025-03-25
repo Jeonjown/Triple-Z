@@ -1,3 +1,4 @@
+// Cancelled.tsx
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import useGetReservations from "@/features/Events/hooks/useGetEventReservations";
 import useGetGroupReservations from "@/features/Events/hooks/useGetGroupReservations";
@@ -90,7 +91,7 @@ interface GroupReservationRaw {
   __v: number;
 }
 
-// Map group reservations into the unified Reservation format.
+// Map group reservations into the unified Reservation interface.
 // Default isCorkage is set to false for group reservations.
 const mapGroupToReservation = (group: GroupReservationRaw): Reservation => ({
   ...group,
@@ -133,6 +134,21 @@ const Cancelled = (): JSX.Element => {
     (a, b) => compareDesc(new Date(a.date), new Date(b.date)),
   );
 
+  // Define color mapping for event statuses.
+  const eventStatusColors: Record<string, { border: string; bg: string }> = {
+    Pending: { border: "#FABC2C", bg: "#FABC2C26" },
+    Confirmed: { border: "#3BB537", bg: "#E2F4E1" },
+    Cancelled: { border: "#EE4549", bg: "#EE454926" },
+    Completed: { border: "#043A7B", bg: "#043A7B26" },
+  };
+
+  // Define color mapping for payment statuses.
+  const paymentStatusColors: Record<string, { border: string; bg: string }> = {
+    "Not Paid": { border: "#EE4549", bg: "#EE454926" },
+    "Partially Paid": { border: "#FABC2C", bg: "#FABC2C26" },
+    Paid: { border: "#3BB537", bg: "#E2F4E1" },
+  };
+
   return (
     <div className="overflow-x-auto p-4 sm:p-5">
       <h3 className="mb-4 text-center text-xl font-semibold sm:text-2xl">
@@ -140,7 +156,7 @@ const Cancelled = (): JSX.Element => {
       </h3>
       <Table className="min-w-full">
         <TableHeader>
-          <TableRow className="border-b border-gray-300 bg-gray-100">
+          <TableRow className="border border-gray-300 bg-gray-100">
             <TableHead className="px-3 py-2 sm:px-4">Date &amp; Time</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Event</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Party Size</TableHead>
@@ -159,6 +175,14 @@ const Cancelled = (): JSX.Element => {
                 reservation.subtotal +
                 reservation.eventFee +
                 (reservation.isCorkage ? settings?.eventCorkageFee || 0 : 0);
+
+              // Render event and payment statuses as badges with nowrap.
+              const currentEventStyle = eventStatusColors[
+                reservation.eventStatus
+              ] || { border: "#ccc", bg: "#ccc" };
+              const currentPaymentStyle = paymentStatusColors[
+                reservation.paymentStatus
+              ] || { border: "#ccc", bg: "#ccc" };
 
               return (
                 <TableRow
@@ -186,12 +210,40 @@ const Cancelled = (): JSX.Element => {
                     {reservation.specialRequest || "N/A"}
                   </TableCell>
                   <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
-                    {reservation.eventStatus}
+                    {/* Event Status Badge */}
+                    <span
+                      style={{
+                        display: "inline-block",
+                        border: `1px solid ${currentEventStyle.border}`,
+                        backgroundColor: currentEventStyle.bg,
+                        borderRadius: "9999px",
+                        padding: "0.125rem 0.5rem",
+                        fontWeight: "bold",
+                        fontSize: "0.75rem",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {reservation.eventStatus}
+                    </span>
                   </TableCell>
                   <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
-                    <div>
-                      <span className="block">{reservation.paymentStatus}</span>
-                      <span className="block">₱{computedTotal}</span>
+                    {/* Payment Column: Total Payment on Top & Payment Status Below */}
+                    <div className="flex flex-col text-center">
+                      <span className="block font-bold">₱{computedTotal}</span>
+                      <span
+                        className="inline-block w-auto"
+                        style={{
+                          border: `1px solid ${currentPaymentStyle.border}`,
+                          backgroundColor: currentPaymentStyle.bg,
+                          borderRadius: "9999px",
+                          padding: "0.125rem 0.5rem",
+                          fontWeight: "bold",
+                          fontSize: "0.75rem",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {reservation.paymentStatus}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell className="px-3 py-2 sm:px-4">

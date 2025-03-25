@@ -12,7 +12,7 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState("myschedule");
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-5xl px-2 sm:px-4 md:px-6 lg:px-8">
+    <div className="mx-auto min-h-screen w-full max-w-7xl px-2 sm:px-4 md:px-6 lg:px-8">
       {/* Header Section */}
       <div className="relative h-24 w-full bg-primary sm:h-28 md:h-32"></div>
 

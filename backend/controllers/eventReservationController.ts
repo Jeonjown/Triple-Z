@@ -3,8 +3,10 @@ import { EventReservation } from "../models/eventReservationModel";
 import { createError } from "../utils/createError";
 import User from "../models/userModel";
 import { EventSettings } from "../models/eventSettingsModel";
+import { format } from "date-fns";
+import { createNotification } from "./notificationController";
 
-//  createReservation
+// createReservation
 export const createReservation = async (
   req: Request,
   res: Response,
@@ -26,10 +28,9 @@ export const createReservation = async (
       eventType,
       cart,
       specialRequest,
-      isCorkage, // Expect a boolean from the request body
+      isCorkage,
     } = req.body;
 
-    // Validate required fields (including isCorkage)
     if (
       !date ||
       !fullName ||
@@ -45,7 +46,6 @@ export const createReservation = async (
       return next(createError("Missing required fields", 400));
     }
 
-    // Fetch the user to ensure it exists
     const user = await User.findById(userId);
     if (!user) {
       return next(
@@ -53,30 +53,24 @@ export const createReservation = async (
       );
     }
 
-    // Calculate the total price of the cart
     const cartTotal = cart.reduce(
       (sum: number, item: { totalPrice: number }) => sum + item.totalPrice,
       0
     );
 
-    // Fetch event settings to retrieve the event fee and corkage fee
     const eventSettings = await EventSettings.findOne();
     if (!eventSettings) {
       return next(createError("Event settings not found", 500));
     }
 
-    // Convert fees to numbers (if they aren't already) and check for validity
     const eventFee = Number(eventSettings.eventFee);
     const corkageFee = Number(eventSettings.eventCorkageFee);
     if (isNaN(eventFee) || isNaN(corkageFee)) {
       return next(createError("Invalid fee values in event settings", 500));
     }
 
-    // Calculate overall total payment:
-    // totalPayment = cart total + event fee + (if corkage then corkage fee)
     const totalPayment = cartTotal + eventFee + (isCorkage ? corkageFee : 0);
 
-    // Create the reservation document including the totalPayment and isCorkage fields
     const newReservation = new EventReservation({
       userId,
       fullName,
@@ -94,10 +88,8 @@ export const createReservation = async (
       totalPayment,
     });
 
-    // Save the reservation
     await newReservation.save();
 
-    // Populate the user field for the response
     const populatedReservation = await EventReservation.findById(
       newReservation._id
     ).populate("userId", "username email", User);
@@ -120,15 +112,89 @@ export const createReservation = async (
   }
 };
 
-// Controller to get all reservations
+// Controller to get all reservations with auto‑update and notifications
 export const getReservations = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Fetch reservations, sort by createdAt (newest first),
-    // and populate the 'userId' field with username and email from the User model
+    const now = new Date();
+
+    // --- Process Confirmed Reservations ---
+    const confirmedReservations = await EventReservation.find({
+      date: { $lt: now },
+      eventStatus: "Confirmed",
+    });
+    if (confirmedReservations.length > 0) {
+      const confirmedIds = confirmedReservations.map((r) => r._id);
+      await EventReservation.updateMany(
+        { _id: { $in: confirmedIds } },
+        { eventStatus: "Completed" }
+      );
+      console.log(
+        `Auto-updated ${confirmedReservations.length} confirmed reservations to Completed.`
+      );
+
+      // For each reservation, call createNotification by simulating req/res objects.
+      for (const reservation of confirmedReservations) {
+        const fakeReq = {
+          body: {
+            title: "Reservation Completed",
+            description: `Your reservation on ${format(
+              reservation.date,
+              "MMMM dd, yyyy"
+            )} has been automatically marked as Completed.`,
+            userId: String(reservation.userId),
+            redirectUrl: "/profile",
+          },
+        } as Request;
+        // Create a fake response object that does nothing.
+        const fakeRes = {
+          status: () => ({
+            json: () => {},
+          }),
+        } as unknown as Response;
+        await createNotification(fakeReq, fakeRes, next);
+      }
+    }
+
+    // --- Process Pending Reservations ---
+    const pendingReservations = await EventReservation.find({
+      date: { $lt: now },
+      eventStatus: "Pending",
+    });
+    if (pendingReservations.length > 0) {
+      const pendingIds = pendingReservations.map((r) => r._id);
+      await EventReservation.updateMany(
+        { _id: { $in: pendingIds } },
+        { eventStatus: "Cancelled" }
+      );
+      console.log(
+        `Auto-updated ${pendingReservations.length} pending reservations to Cancelled.`
+      );
+      for (const reservation of pendingReservations) {
+        const fakeReq = {
+          body: {
+            title: "Reservation Cancelled",
+            description: `Your reservation on ${format(
+              reservation.date,
+              "MMMM dd, yyyy"
+            )} has been automatically cancelled as it was not confirmed.`,
+            userId: String(reservation.userId),
+            redirectUrl: "/profile", // Adjust as needed
+          },
+        } as Request;
+        const fakeRes = {
+          status: () => ({
+            json: () => {},
+          }),
+        } as unknown as Response;
+        await createNotification(fakeReq, fakeRes, next);
+      }
+    }
+
+    // Fetch all reservations after auto-updates
     const reservations = await EventReservation.find()
       .sort({ createdAt: -1 })
       .populate("userId", "username email", User);
@@ -142,7 +208,6 @@ export const getReservations = async (
     next(createError("Failed to fetch reservations.", 500));
   }
 };
-
 // Update a reservation's status (confirming, canceling, or completing)
 export const updateReservationStatus = async (
   req: Request,
@@ -152,7 +217,6 @@ export const updateReservationStatus = async (
   try {
     const { eventStatus, reservationId } = req.body;
 
-    // Validate status against the allowed enum values
     if (
       !["Pending", "Confirmed", "Completed", "Cancelled"].includes(eventStatus)
     ) {
@@ -164,7 +228,6 @@ export const updateReservationStatus = async (
       );
     }
 
-    // Find and update the reservation
     const updatedReservation = await EventReservation.findByIdAndUpdate(
       reservationId,
       { eventStatus },
@@ -185,7 +248,7 @@ export const updateReservationStatus = async (
   }
 };
 
-// update a payment status
+// Update payment status
 export const updatePaymentStatus = async (
   req: Request,
   res: Response,
@@ -194,7 +257,6 @@ export const updatePaymentStatus = async (
   try {
     const { paymentStatus, reservationId } = req.body;
 
-    // Validate allowed payment status values
     if (!["Not Paid", "Partially Paid", "Paid"].includes(paymentStatus)) {
       return next(
         createError(
@@ -204,7 +266,6 @@ export const updatePaymentStatus = async (
       );
     }
 
-    // Update the reservation's payment status
     const updatedReservation = await EventReservation.findByIdAndUpdate(
       reservationId,
       { paymentStatus },
@@ -233,7 +294,6 @@ export const deleteReservation = async (
   try {
     const { reservationId } = req.body;
 
-    // Delete the reservation
     const deletedReservation = await EventReservation.findByIdAndDelete(
       reservationId
     );
