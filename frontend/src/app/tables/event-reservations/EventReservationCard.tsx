@@ -37,7 +37,7 @@ const EventReservationsCard: React.FC<EventReservationsCardProps> = ({
         return (
           <Card
             key={reservation._id}
-            className="shadow transition hover:shadow-lg"
+            className="w-full shadow transition hover:shadow-lg"
           >
             <CardContent className="flex h-full flex-col p-4">
               <div className="flex items-center justify-between">

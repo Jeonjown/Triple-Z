@@ -73,7 +73,7 @@ const EventReservationsControlPanel: React.FC = () => {
 
   return (
     // Outer container: full width on mobile, max-width on desktop
-    <div className="mx-auto w-full max-w-[1400px] p-4 md:w-screen">
+    <div className="mx-auto p-4 md:w-5/6">
       {/* Top Panel with three layers */}
       <div className="top-[105px] z-10 mx-auto mb-5 flex w-full flex-col gap-4 rounded border bg-white px-6 py-2 pt-6 shadow-md md:sticky">
         {/* Layer 1: Searchbar (always separate on mobile) */}
