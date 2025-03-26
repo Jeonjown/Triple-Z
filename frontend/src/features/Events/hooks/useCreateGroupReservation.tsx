@@ -40,7 +40,6 @@ export const useCreateGroupReservation = () => {
         description: "The group reservation was created successfully.",
         variant: "default",
       });
-      console.log(data);
 
       // Send push notification to admins.
       sendPushNotification(
@@ -49,7 +48,7 @@ export const useCreateGroupReservation = () => {
           body: `Reservation for ${data.fullName} on ${new Date(
             data.date,
           ).toLocaleDateString()} has been received.`,
-          click_action: "/profile",
+          click_action: "/admin/manage-groups",
         },
         {
           onSuccess: () => {
@@ -70,7 +69,7 @@ export const useCreateGroupReservation = () => {
         body: `Reservation for ${data.fullName} on ${new Date(
           data.date,
         ).toLocaleDateString()} has been received.`,
-        redirectUrl: "admin/manage-groups",
+        redirectUrl: "/admin/manage-groups",
       });
     },
   });

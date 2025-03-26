@@ -46,7 +46,7 @@ export const useCreateEventReservations = () => {
           body: `Reservation for ${data.reservation.fullName} on ${new Date(
             data.reservation.date,
           ).toLocaleDateString()} has been received.`,
-          click_action: "/profile",
+          click_action: "/admin/manage-events",
         },
         {
           onSuccess: () => {
@@ -66,7 +66,7 @@ export const useCreateEventReservations = () => {
         body: `Reservation for ${data.reservation.fullName} on ${new Date(
           data.reservation.date,
         ).toLocaleDateString()} has been received.`,
-        redirectUrl: "admin/manage-events",
+        redirectUrl: "/admin/manage-events",
       });
     },
   });
