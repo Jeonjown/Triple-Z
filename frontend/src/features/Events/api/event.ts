@@ -16,6 +16,7 @@ export interface EventReservationSettings {
   eventMinDaysPrior: number;
   eventFee: number;
   eventMinGuests: number;
+  eventMaxGuests: number;
   eventTermsofService: string;
   eventMinPackageOrder: number;
   eventCorkageFee: number;
@@ -58,6 +59,7 @@ export interface Reservation {
   cart: CartItem[];
   eventStatus: string;
   createdAt: string;
+  reservationType: string;
   specialRequest: string;
   totalPayment: number;
   eventFee: number;
@@ -89,6 +91,7 @@ export interface Reservation {
     startTime: string;
     endTime: string;
     eventType: string;
+    reservationType: string;
     partySize: number;
     specialRequest?: string;
     status: string;
@@ -263,6 +266,33 @@ export const adminRescheduleEventReservation = async (updateData: {
           axiosError.response?.data?.error ||
           "An error occurred",
       );
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
+interface CancelReservationResponse {
+  message: string;
+  reservation: Reservation;
+}
+
+interface ReservationError {
+  error: string;
+}
+
+export const cancelReservation = async (
+  reservationId: string,
+): Promise<CancelReservationResponse> => {
+  try {
+    const response: AxiosResponse<CancelReservationResponse> = await api.patch(
+      "/api/events/event-reservations/cancel-reservation",
+      { reservationId },
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<ReservationError>;
+      throw new Error(axiosError.response?.data?.error || "An error occurred");
     }
     throw new Error("An unexpected error occurred");
   }

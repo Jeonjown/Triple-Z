@@ -3,7 +3,7 @@ import { EventReservation } from "../models/eventReservationModel";
 import { createError } from "../utils/createError";
 import User from "../models/userModel";
 import { EventSettings } from "../models/eventSettingsModel";
-import { format } from "date-fns";
+import { differenceInDays, format, isBefore, parse, subHours } from "date-fns";
 import { createNotification } from "./notificationController";
 import { GroupReservation } from "../models/groupReservationModel";
 
@@ -435,5 +435,76 @@ export const getAllReservations = async (
   } catch (error) {
     console.error(error);
     next(createError("Failed to fetch reservations.", 500));
+  }
+};
+
+export const cancelReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { reservationId } = req.body;
+    // Fetch the reservation (it can be Event or Group based on your implementation)
+    let reservation = await EventReservation.findById(reservationId);
+    let reservationType = "Event";
+    if (!reservation) {
+      reservation = await GroupReservation.findById(reservationId);
+      reservationType = "Groups";
+    }
+    if (!reservation) {
+      return next(createError("Reservation not found.", 404));
+    }
+
+    const now = new Date();
+    const reservationDate = new Date(reservation.date);
+
+    // Apply cancellation rules based on reservation type.
+    if (reservationType === "Event") {
+      // Check if the difference is at least 7 days.
+      const daysDifference = differenceInDays(reservationDate, now);
+      if (daysDifference < 7) {
+        return next(
+          createError(
+            "Event reservations must be cancelled at least 1 week in advance.",
+            400
+          )
+        );
+      }
+    } else if (reservationType === "Groups") {
+      // For Groups, cancellation is allowed only if it's at least 3 hours before the openingHours.
+      const eventSettings = await EventSettings.findOne();
+      if (!eventSettings) {
+        return next(createError("Event settings not found", 500));
+      }
+      // Parse openingHours (e.g., "4:00 PM") into a Date object based on the reservationDate.
+      const openingTime = parse(
+        eventSettings.openingHours,
+        "h:mm a",
+        reservationDate
+      );
+      // Calculate cutoff: 3 hours before openingTime.
+      const cutoffTime = subHours(openingTime, 3);
+      if (!isBefore(now, cutoffTime)) {
+        return next(
+          createError(
+            "Group reservations can only be cancelled at least 3 hours before opening time.",
+            400
+          )
+        );
+      }
+    }
+
+    // If rules pass, update the reservation status to "Cancelled".
+    reservation.eventStatus = "Cancelled";
+    await reservation.save();
+
+    res.status(200).json({
+      message: "Reservation cancelled successfully!",
+      reservation,
+    });
+  } catch (error) {
+    console.error(error);
+    next(createError("Failed to cancel reservation.", 500));
   }
 };

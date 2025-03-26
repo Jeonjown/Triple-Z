@@ -8,6 +8,7 @@ const eventSettingsSchema = new mongoose.Schema(
     eventMinDaysPrior: { type: Number, required: true, min: 0 },
     eventFee: { type: Number, required: true },
     eventMinGuests: { type: Number, required: true, min: 1 },
+    eventMaxGuests: { type: Number, required: true },
     eventTermsofService: { type: String },
     eventMinPackageOrder: { type: Number, required: true, default: 0 },
     eventCorkageFee: { type: Number, required: true, min: 0 },

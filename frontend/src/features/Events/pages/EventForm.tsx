@@ -1,4 +1,3 @@
-// EventForm.tsx
 import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,9 +22,14 @@ export type CartItem = {
 
 const defaultMinGuests = 24;
 const defaultMinDaysPrior = 14;
+const defaultMaxGuests = 100; // Provide a sensible default if settings are missing
 
-// Use enum to accept "true" or "false", then transform to boolean.
-const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
+// Updated: Added a third parameter for maxGuests and included a max constraint for partySize.
+const getReservationSchema = (
+  minGuests: number,
+  maxGuests: number,
+  minDaysPrior: number,
+) =>
   z.object({
     fullName: z.string().nonempty("Full Name is required."),
     contactNumber: z
@@ -36,7 +40,11 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
       }),
     partySize: z.preprocess(
       (val) => Number(val),
-      z.number().min(minGuests, `Party size must be at least ${minGuests}`),
+      // Now partySize must be between minGuests and maxGuests
+      z
+        .number()
+        .min(minGuests, `Party size must be at least ${minGuests}`)
+        .max(maxGuests, `Party size must be at most ${maxGuests}`),
     ),
     date: z
       .string()
@@ -75,7 +83,7 @@ const getReservationSchema = (minGuests: number, minDaysPrior: number) =>
       }),
     ),
     specialRequest: z.string().optional(),
-    // Use z.enum to require a selection, then transform the string to boolean.
+    // Use z.enum to require a selection then transform to boolean.
     isCorkage: z
       .enum(["true", "false"], {
         errorMap: () => ({ message: "Please select an option" }),
@@ -88,11 +96,13 @@ export type EventFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 const EventForm = () => {
   const { data: settings } = useGetEventReservationSettings();
   const minGuests = settings?.eventMinGuests || defaultMinGuests;
+  const maxGuests = settings?.eventMaxGuests || defaultMaxGuests; // New max guests from settings
   const minDaysPrior = settings?.eventMinDaysPrior || defaultMinDaysPrior;
 
+  // Pass maxGuests to the schema.
   const reservationSchema = useMemo(
-    () => getReservationSchema(minGuests, minDaysPrior),
-    [minGuests, minDaysPrior],
+    () => getReservationSchema(minGuests, maxGuests, minDaysPrior),
+    [minGuests, maxGuests, minDaysPrior],
   );
 
   const [selectedPackageIds, setSelectedPackageIds] = useState<SelectedItem[]>(
@@ -149,7 +159,7 @@ const EventForm = () => {
     },
   });
 
-  // Reset to blank values when minGuests changes.
+  // Reset form when minGuests changes.
   useEffect(() => {
     methods.reset({
       fullName: "",

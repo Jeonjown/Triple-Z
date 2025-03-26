@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+// Import UI components
 import {
   Form,
   FormField,
@@ -18,15 +19,16 @@ import { useCreateOrUpdateSettings } from "@/features/Events/hooks/useCreateorUp
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { useDisableNumberInputScroll } from "@/features/Menu/hooks/useDisableNumberInputScroll";
 
-// Updated validation schema including the new eventCorkageFee field.
+// --- Define the validation schema with Zod ---
+// Added new field: eventMaxGuests with a minimum of 1.
 const formSchema = z.object({
   eventReservationLimit: z.coerce
     .number()
     .min(0, { message: "Must be at least 0" }),
   eventMinDaysPrior: z.coerce.number().min(0, { message: "Must be 0 or more" }),
   eventMinGuests: z.coerce.number().min(1, { message: "Must be at least 1" }),
+  eventMaxGuests: z.coerce.number().min(1, { message: "Must be at least 1" }), // New field
   eventFee: z.coerce.number().min(0, { message: "Must be a positive fee" }),
-  // New corkage fee field:
   eventCorkageFee: z.coerce
     .number()
     .min(0, { message: "Must be a positive fee" }),
@@ -54,20 +56,22 @@ const formSchema = z.object({
   eventTermsofService: z.string().optional(),
 });
 
+// Infer the form values type explicitly (no implicit any)
 type SettingsFormValues = z.infer<typeof formSchema>;
 
 const Settings: React.FC = () => {
   const { mutate } = useCreateOrUpdateSettings();
   const { data: settings } = useGetEventReservationSettings();
 
+  // Initialize the form with default values including the new field eventMaxGuests.
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       eventReservationLimit: 0,
       eventMinDaysPrior: 0,
       eventMinGuests: 1,
+      eventMaxGuests: 1, // Default value for maximum guests
       eventFee: 0,
-      // Default corkage fee value:
       eventCorkageFee: 0,
       eventMinPackageOrder: 0,
       groupReservationLimit: 0,
@@ -82,16 +86,18 @@ const Settings: React.FC = () => {
     },
   });
 
+  // Helper to format time strings (removes a leading 0)
   const formatTime = (time: string): string => time.replace(/^0/, "");
 
+  // Reset form values when settings data is available, including eventMaxGuests.
   useEffect(() => {
     if (settings) {
       form.reset({
         eventReservationLimit: settings.eventReservationLimit ?? 0,
         eventMinDaysPrior: settings.eventMinDaysPrior ?? 0,
         eventMinGuests: settings.eventMinGuests ?? 1,
+        eventMaxGuests: settings.eventMaxGuests ?? 1, // Reset maximum guests from settings
         eventFee: settings.eventFee ?? 0,
-        // Reset corkage fee from settings:
         eventCorkageFee: settings.eventCorkageFee ?? 0,
         eventMinPackageOrder: settings.eventMinPackageOrder ?? 0,
         groupReservationLimit: settings.groupReservationLimit ?? 0,
@@ -111,11 +117,13 @@ const Settings: React.FC = () => {
     }
   }, [settings, form]);
 
+  // Form submission handler
   const onSubmit = async (values: SettingsFormValues) => {
-    console.log("form submitted: ", values);
+    console.log("Form submitted:", values);
     mutate(values);
   };
 
+  // Disable scroll on number inputs to avoid accidental changes
   useDisableNumberInputScroll();
 
   return (
@@ -200,6 +208,20 @@ const Settings: React.FC = () => {
               </FormItem>
             )}
           />
+          {/* New Field: Maximum Guests */}
+          <FormField
+            control={form.control}
+            name="eventMaxGuests"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Event Maximum Guests</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="eventFee"
@@ -218,7 +240,7 @@ const Settings: React.FC = () => {
               </FormItem>
             )}
           />
-          {/* New Corkage Fee Field */}
+          {/* Corkage Fee Field */}
           <FormField
             control={form.control}
             name="eventCorkageFee"
@@ -332,7 +354,7 @@ const Settings: React.FC = () => {
             )}
           />
 
-          {/* New Terms of Service Field */}
+          {/* Terms of Service Field */}
           <FormField
             control={form.control}
             name="eventTermsofService"

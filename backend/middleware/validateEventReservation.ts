@@ -82,7 +82,6 @@ export const validateEventReservation = async (
     }
 
     const now = new Date();
-
     // Calculate the minimum valid date by adding eventMinDaysPrior days
     const minValidDate = new Date(now);
     minValidDate.setDate(now.getDate() + settings.eventMinDaysPrior);
@@ -108,11 +107,21 @@ export const validateEventReservation = async (
       );
     }
 
-    // 7. Validate partySize meets minimum guests requirement (if defined)
+    // 7. Validate partySize meets minimum guests requirement
     if (settings.eventMinGuests && partySize < settings.eventMinGuests) {
       return next(
         createError(
           `Party size must be at least ${settings.eventMinGuests}.`,
+          400
+        )
+      );
+    }
+
+    // NEW: Validate partySize does not exceed the maximum allowed guests.
+    if (settings.eventMaxGuests && partySize > settings.eventMaxGuests) {
+      return next(
+        createError(
+          `Party size must be at most ${settings.eventMaxGuests}.`,
           400
         )
       );

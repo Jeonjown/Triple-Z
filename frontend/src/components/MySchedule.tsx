@@ -1,20 +1,27 @@
-// src/components/MySchedule.tsx
 import React from "react";
 import { startOfDay, compareDesc, format, isBefore } from "date-fns";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
-import { CalendarDays, Copy } from "lucide-react";
+import { CalendarDays, Copy, Info } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { Button } from "@/components/ui/button";
 import { useGetAllReservations } from "@/features/Events/hooks/useGetAllReservations";
+import { useCancelReservation } from "@/features/Events/hooks/useCancelReservation";
 
-// Define interfaces
 export interface CartItem {
   _id: string;
   title: string;
@@ -25,28 +32,27 @@ export interface CartItem {
 
 export interface Reservation {
   _id: string;
-  userId: string; // normalized as string
+  userId: string;
   fullName: string;
   contactNumber: string;
   partySize: number;
   date: string;
   startTime: string;
   endTime: string;
-  eventType?: string; // optional if not provided
+  eventType?: string;
   cart: CartItem[];
   eventStatus: string;
   createdAt: string;
   specialRequest: string;
   totalPayment: number;
-  eventFee?: number; // optional if not provided
+  eventFee?: number;
   subtotal: number;
   paymentStatus: string;
   isCorkage: boolean;
-  reservationType?: string; // e.g., "Event" or "Group"
+  reservationType?: string;
   __v: number;
 }
 
-// The raw reservation type where userId might be an object.
 interface ReservationRaw {
   _id: string;
   userId: { _id: string } | string;
@@ -74,13 +80,14 @@ const MySchedule: React.FC = () => {
   const { user } = useAuthStore();
   const { data, isLoading, error } = useGetAllReservations();
   const { data: settings } = useGetEventReservationSettings();
+  const { mutate: cancelReservationMutate, isPending: isCanceling } =
+    useCancelReservation();
 
   if (isLoading) return <p>Loading reservations...</p>;
   if (error) return <p>Error loading reservations: {error.message}</p>;
 
-  // Normalize raw reservations
+  // Normalize raw reservations.
   const rawReservations = (data?.reservations || []) as ReservationRaw[];
-
   const allReservations: Reservation[] = rawReservations.map((r) => {
     const normalizedUserId: string =
       typeof r.userId === "object" ? r.userId._id.toString() : r.userId;
@@ -211,7 +218,6 @@ const MySchedule: React.FC = () => {
                       {reservation.eventStatus}
                     </span>
                   </div>
-                  {/* Payment Status rendered in the left column as before */}
                   <div className="pb-3">
                     <p className="mb-1 text-sm text-primary sm:text-base">
                       Payment Status:
@@ -310,13 +316,64 @@ const MySchedule: React.FC = () => {
                       <p className="font-medium">₱{computedTotal}</p>
                     </div>
                   </div>
-                  {/* Button aligned to bottom right using ml-auto and mt-auto */}
-                  <Button
-                    variant={"outline"}
-                    className="ml-auto mt-auto text-xs"
-                  >
-                    Cancel Reservation
-                  </Button>
+                  {/* Cancel Reservation Confirmation Dialog with Info Tooltip */}
+                  <div className="flex items-center space-x-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className="ml-auto mt-auto text-xs"
+                          disabled={isCanceling}
+                        >
+                          {isCanceling ? "Cancelling..." : "Cancel Reservation"}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Confirm Cancellation</DialogTitle>
+                          <DialogDescription>
+                            Are you sure you want to cancel this reservation?
+                            <br />
+                            <span className="text-xs text-gray-500">
+                              {reservation.reservationType === "Groups"
+                                ? "(Group reservations can only be cancelled at least 3 hours before opening time.)"
+                                : "(Event reservations must be cancelled at least 1 week in advance.)"}
+                            </span>
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="outline">Keep Reservation</Button>
+                          <Button
+                            variant="destructive"
+                            onClick={() => {
+                              cancelReservationMutate(reservation._id);
+                            }}
+                          >
+                            Confirm Cancel
+                          </Button>
+                        </div>
+                        <DialogClose />
+                      </DialogContent>
+                    </Dialog>
+                    {/* Info Icon with Tooltip */}
+                    <TooltipProvider>
+                      <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                          <Info
+                            className="cursor-pointer text-gray-500 hover:text-gray-700"
+                            size={24}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-md">
+                            {reservation.reservationType === "Groups"
+                              ? "Group reservations can only be cancelled at least 3 hours before opening time."
+                              : "Event reservations must be cancelled at least 1 week in advance."}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </div>
               </div>
             </div>
