@@ -53,6 +53,22 @@ export const createReservation = async (
       );
     }
 
+    // Step 2: Check if there's an upcoming reservation for this user
+    const existingReservation = await EventReservation.findOne({
+      userId,
+      date: { $gte: new Date() },
+      eventStatus: { $in: ["Pending", "Confirmed"] },
+    });
+
+    if (existingReservation) {
+      return next(
+        createError(
+          "You already have an upcoming reservation. Please complete or cancel it before creating a new one.",
+          400
+        )
+      );
+    }
+
     const cartTotal = cart.reduce(
       (sum: number, item: { totalPrice: number }) => sum + item.totalPrice,
       0
@@ -309,5 +325,75 @@ export const deleteReservation = async (
   } catch (error) {
     console.error(error);
     next(createError("Failed to delete reservation.", 500));
+  }
+};
+
+// Admin controller to update a user reservation (notification removed)
+export const adminRescheduleReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { reservationId, ...updateData } = req.body;
+    if (!reservationId) {
+      return next(
+        createError("ReservationId is required in the request body.", 400)
+      );
+    }
+
+    // Step 1: Fetch the current reservation for comparison.
+    const currentReservation = await EventReservation.findById(reservationId);
+    if (!currentReservation) {
+      return next(createError("Reservation not found.", 404));
+    }
+
+    // Step 2: Filter only the scheduling-related fields for rescheduling.
+    const allowedUpdates = ["date", "startTime", "endTime"];
+    const filteredUpdates = Object.keys(updateData).reduce((acc, key) => {
+      if (allowedUpdates.includes(key)) {
+        acc[key] = updateData[key];
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Step 3: Update the reservation.
+    const updatedReservation = await EventReservation.findByIdAndUpdate(
+      reservationId,
+      { $set: filteredUpdates },
+      { new: true }
+    );
+    if (!updatedReservation) {
+      return next(createError("Reservation not found.", 404));
+    }
+
+    // Step 4: Determine what scheduling fields have changed.
+    let changes: string[] = [];
+    Object.keys(filteredUpdates).forEach((key) => {
+      // Cast currentReservation to any for dynamic property access.
+      const oldValue = String((currentReservation as any)[key]);
+      const newValue = String(filteredUpdates[key]);
+      if (oldValue !== newValue) {
+        changes.push(`${key} changed from "${oldValue}" to "${newValue}"`);
+      }
+    });
+
+    const changesDescription = changes.length
+      ? `The following changes were made: ${changes.join(", ")}.`
+      : "No changes were detected.";
+    console.log(changesDescription);
+
+    // Step 5: Populate the reservation with user details and return it.
+    const populatedReservation = await EventReservation.findById(
+      updatedReservation._id
+    ).populate("userId", "username email", User);
+
+    res.status(200).json({
+      message: "Reservation rescheduled successfully!",
+      reservation: populatedReservation,
+    });
+  } catch (error) {
+    console.error(error);
+    next(createError("Failed to reschedule reservation.", 500));
   }
 };

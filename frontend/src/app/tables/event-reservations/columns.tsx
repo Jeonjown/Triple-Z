@@ -4,7 +4,16 @@ import { DataTableColumnHeader } from "@/components/ui/DataTableColumnHeader";
 import { formatDate } from "date-fns";
 import EventStatusCell from "./EventStatusCell";
 import PaymentStatusCell from "./PaymentStatusCell";
-import ViewCart from "./ViewCart";
+
+import EventReservationActions from "./EventReservationActions";
+
+export interface CartItem {
+  _id: string;
+  title: string;
+  quantity: number;
+  totalPrice: number;
+  image: string;
+}
 
 export interface Reservation {
   _id: string;
@@ -20,7 +29,10 @@ export interface Reservation {
   specialRequest: string;
   createdAt: string;
   totalPayment: number;
-  // other fields...
+  cart: CartItem[];
+  subtotal: number;
+  eventFee: number;
+  isCorkage: boolean;
 }
 
 export type MyColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
@@ -142,7 +154,7 @@ export const columns: MyColumnDef<Reservation>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => <ViewCart reservation={row.original} />,
+    cell: ({ row }) => <EventReservationActions reservation={row.original} />,
     meta: { title: "Actions" },
   },
 ];

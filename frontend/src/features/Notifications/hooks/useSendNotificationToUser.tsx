@@ -24,12 +24,10 @@ export const useSendNotificationToUser = () => {
     },
     onError: (err: Error) => {
       console.error("Error sending notification:", err);
-      // Removed toast call.
     },
     onSuccess: (data) => {
       console.log("Notification sent and saved successfully:", data);
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      // Removed toast call.
     },
   });
 

@@ -9,7 +9,7 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { Reservation } from "./columns";
-import DeleteReservationAction from "./DeleteReservationAction";
+import DeleteReservationAction from "./DeleteReservationDialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

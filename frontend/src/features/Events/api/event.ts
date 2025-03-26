@@ -37,6 +37,36 @@ interface EventReservationSettingsResponse {
   data: EventReservationSettings;
 }
 
+export interface CartItem {
+  _id: string;
+  title: string;
+  quantity: number;
+  totalPrice: number;
+  image: string;
+}
+
+export interface Reservation {
+  _id: string;
+  userId: string;
+  fullName: string;
+  contactNumber: string;
+  partySize: number;
+  date: string;
+  startTime: string;
+  endTime: string;
+  eventType: string;
+  cart: CartItem[];
+  eventStatus: string;
+  createdAt: string;
+  specialRequest: string;
+  totalPayment: number;
+  eventFee: number;
+  subtotal: number;
+  paymentStatus: string;
+  isCorkage: boolean;
+  __v: number;
+}
+
 interface UserReservation {
   _id: string;
   username: string;
@@ -203,6 +233,36 @@ export const createOrUpdateEventSettings = async (
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<ReservationError>;
       throw new Error(axiosError.response?.data?.error || "An error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};
+
+export const adminRescheduleEventReservation = async (updateData: {
+  reservationId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+}): Promise<Reservation> => {
+  try {
+    // Use a leading slash so the URL is absolute relative to the baseURL.
+    const response: AxiosResponse<Reservation> = await api.patch(
+      `/api/events/event-reservations/reschedule`,
+      updateData,
+      { withCredentials: true }, // if needed
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<{
+        message: string;
+        error?: string;
+      }>;
+      throw new Error(
+        axiosError.response?.data?.message ||
+          axiosError.response?.data?.error ||
+          "An error occurred",
+      );
     }
     throw new Error("An unexpected error occurred");
   }

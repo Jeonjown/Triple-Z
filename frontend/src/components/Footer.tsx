@@ -30,11 +30,11 @@ const Footer = () => {
         </ul>
         <hr className="mx-3" />
         <p className="w-fit px-2 pt-3 text-sm font-extralight">
-          Biárence Leonor Triple Z Coffeeshop is an open rooftop café that is
-          located at the heart of Baranggay Palingon Tipas. The Business Owners
-          intended to provide the local residents of the Baranggay and its
-          nearby community an alternative hang out place with a new taste of
-          variety of foods that are not common to the culture of the city
+          Triple Z Coffeeshop is an open rooftop café that is located at the
+          heart of Baranggay Palingon Tipas. The Business Owners intended to
+          provide the local residents of the Baranggay and its nearby community
+          an alternative hang out place with a new taste of variety of foods
+          that are not common to the culture of the city
         </p>
         <div className="h-13 mr-4 flex justify-center space-x-4 py-5">
           <FaMeta size={24} />
