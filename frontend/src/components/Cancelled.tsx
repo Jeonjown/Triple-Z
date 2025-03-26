@@ -157,6 +157,7 @@ const Cancelled = (): JSX.Element => {
       <Table className="min-w-full">
         <TableHeader>
           <TableRow className="border border-gray-300 bg-gray-100">
+            {/* Updated Date & Time cell with whitespace-nowrap and min-width */}
             <TableHead className="px-3 py-2 sm:px-4">Date &amp; Time</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Event</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Party Size</TableHead>
@@ -172,11 +173,11 @@ const Cancelled = (): JSX.Element => {
             mergedReservations.map((reservation: Reservation) => {
               // Compute total payment including corkage fee if applicable.
               const computedTotal =
-                reservation.subtotal +
-                reservation.eventFee +
+                (reservation.subtotal || 0) +
+                (reservation.eventFee || 0) +
                 (reservation.isCorkage ? settings?.eventCorkageFee || 0 : 0);
 
-              // Render event and payment statuses as badges with nowrap.
+              // Render event and payment statuses as badges.
               const currentEventStyle = eventStatusColors[
                 reservation.eventStatus
               ] || { border: "#ccc", bg: "#ccc" };
@@ -189,7 +190,8 @@ const Cancelled = (): JSX.Element => {
                   key={reservation._id}
                   className="border-b border-gray-300 hover:bg-gray-50"
                 >
-                  <TableCell className="px-3 py-2 sm:px-4">
+                  {/* Updated Date & Time cell */}
+                  <TableCell className="min-w-[150px] whitespace-nowrap px-3 py-2 sm:px-4">
                     <span className="text-sm font-bold sm:text-base">
                       {format(new Date(reservation.date), "MMMM dd, yyyy")}
                     </span>
@@ -210,7 +212,6 @@ const Cancelled = (): JSX.Element => {
                     {reservation.specialRequest || "N/A"}
                   </TableCell>
                   <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
-                    {/* Event Status Badge */}
                     <span
                       style={{
                         display: "inline-block",
@@ -227,12 +228,11 @@ const Cancelled = (): JSX.Element => {
                     </span>
                   </TableCell>
                   <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
-                    {/* Payment Column: Total Payment on Top & Payment Status Below */}
                     <div className="flex flex-col text-center">
                       <span className="block font-bold">₱{computedTotal}</span>
                       <span
-                        className="inline-block w-auto"
                         style={{
+                          display: "inline-block",
                           border: `1px solid ${currentPaymentStyle.border}`,
                           backgroundColor: currentPaymentStyle.bg,
                           borderRadius: "9999px",
@@ -336,7 +336,7 @@ const Cancelled = (): JSX.Element => {
                           </div>
                           <div className="flex justify-between text-xs sm:text-sm">
                             <span className="font-medium">Event Fee:</span>
-                            <span>₱{reservation.eventFee}</span>
+                            <span>₱{reservation.eventFee || 0}</span>
                           </div>
                           {reservation.isCorkage && (
                             <div className="flex justify-between text-xs sm:text-sm">

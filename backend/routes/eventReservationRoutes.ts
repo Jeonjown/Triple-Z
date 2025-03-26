@@ -6,6 +6,7 @@ import {
   updateReservationStatus,
   updatePaymentStatus,
   adminRescheduleReservation,
+  getAllReservations,
 } from "../controllers/eventReservationController";
 import { validateEventReservation } from "../middleware/validateEventReservation";
 import { verifyAdminToken } from "../middleware/verifyAdminToken";
@@ -14,6 +15,7 @@ import { verifyToken } from "../middleware/verifyToken";
 const router = Router();
 
 router.get("/", getReservations);
+router.get("/all", getAllReservations);
 router.post(
   "/:userId",
   verifyToken,

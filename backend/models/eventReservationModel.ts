@@ -43,6 +43,11 @@ const reservationSchema = new mongoose.Schema(
     isCorkage: { type: Boolean, requried: true },
     subtotal: { type: Number, required: true },
     totalPayment: { type: Number, required: true },
+    reservationType: {
+      type: String,
+      enum: ["Event"],
+      default: "Event",
+    },
   },
   { timestamps: true }
 );

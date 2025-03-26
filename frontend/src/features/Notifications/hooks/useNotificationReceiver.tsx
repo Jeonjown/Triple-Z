@@ -9,6 +9,7 @@ export interface MyNotification {
   description: string;
   redirectUrl: string;
   read: boolean;
+  createdAt: string;
 }
 
 export const useNotificationReceiver = (

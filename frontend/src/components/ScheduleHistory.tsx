@@ -1,7 +1,6 @@
 // ScheduleHistory.tsx
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
-import useGetReservations from "@/features/Events/hooks/useGetEventReservations";
-import useGetGroupReservations from "@/features/Events/hooks/useGetGroupReservations";
+import { useGetAllReservations } from "@/features/Events/hooks/useGetAllReservations";
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { format, compareDesc } from "date-fns";
 import { Copy } from "lucide-react";
@@ -57,71 +56,39 @@ export interface Reservation {
   eventStatus: string;
   createdAt: string;
   updatedAt: string;
-  specialRequest: string;
+  specialRequest?: string;
   totalPayment: number;
   eventFee: number;
   subtotal: number;
   paymentStatus: string;
   isCorkage: boolean;
+  reservationType: string;
   __v: number;
 }
 
-interface EventReservationData {
+interface AllReservationsResponse {
+  message: string;
   reservations: Reservation[];
 }
 
-interface GroupReservationRaw {
-  _id: string;
-  userId: User;
-  fullName: string;
-  contactNumber: string;
-  partySize: number;
-  date: string;
-  startTime: string;
-  endTime: string;
-  cart: CartItem[];
-  eventStatus: string;
-  paymentStatus: string;
-  subtotal: number;
-  totalPayment: number;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
-
-// Map a raw group reservation into the unified Reservation interface.
-const mapGroupToReservation = (group: GroupReservationRaw): Reservation => ({
-  ...group,
-  eventType: "Group Reservation",
-  specialRequest: "",
-  eventFee: 0,
-  isCorkage: false,
-});
-
 const ScheduleHistory = (): JSX.Element => {
-  // Retrieve event and group reservations.
-  const { data } = useGetReservations() as { data?: EventReservationData };
-  const { data: groupData } = useGetGroupReservations();
+  // Retrieve all reservations using the new hook.
+  const { data } = useGetAllReservations() as {
+    data?: AllReservationsResponse;
+  };
   const { user } = useAuthStore();
 
   // Retrieve event settings for the corkage fee.
   const { data: settings } = useGetEventReservationSettings();
 
   // Filter reservations for the current user.
-  const eventReservations: Reservation[] =
+  const userReservations: Reservation[] =
     data?.reservations.filter(
       (reservation) => reservation.userId._id === user?._id,
     ) || [];
 
-  const groupReservations: Reservation[] = groupData
-    ? groupData
-        .map((group: GroupReservationRaw) => mapGroupToReservation(group))
-        .filter((reservation) => reservation.userId._id === user?._id)
-    : [];
-
-  // Merge and sort reservations descending by date.
-  const mergedReservations = [...eventReservations, ...groupReservations];
-  const sortedReservations = mergedReservations.sort((a, b) =>
+  // Sort reservations descending by date.
+  const sortedReservations = userReservations.sort((a, b) =>
     compareDesc(new Date(a.date), new Date(b.date)),
   );
 
@@ -148,8 +115,13 @@ const ScheduleHistory = (): JSX.Element => {
       <Table className="min-w-full">
         <TableHeader>
           <TableRow className="border border-gray-300 bg-gray-100">
+            {/* Updated Date & Time cell */}
             <TableHead className="px-3 py-2 sm:px-4">Date &amp; Time</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Type</TableHead>
+            {/* New Reservation Type Column */}
+            <TableHead className="px-3 py-2 sm:px-4">
+              Reservation Type
+            </TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Party Size</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Special Request</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Status</TableHead>
@@ -163,8 +135,8 @@ const ScheduleHistory = (): JSX.Element => {
             sortedReservations.map((reservation: Reservation) => {
               // Compute total payment including corkage fee if applicable.
               const computedTotal =
-                reservation.subtotal +
-                reservation.eventFee +
+                (reservation.subtotal || 0) +
+                (reservation.eventFee || 0) +
                 (reservation.isCorkage ? settings?.eventCorkageFee || 0 : 0);
 
               // Get colors for event and payment statuses.
@@ -180,7 +152,8 @@ const ScheduleHistory = (): JSX.Element => {
                   key={reservation._id}
                   className="border-b border-gray-300 hover:bg-gray-50"
                 >
-                  <TableCell className="px-3 py-2 sm:px-4">
+                  {/* Updated Date & Time TableCell */}
+                  <TableCell className="min-w-[150px] whitespace-nowrap px-3 py-2 sm:px-4">
                     <span className="text-sm font-bold sm:text-base">
                       {format(new Date(reservation.date), "MMMM dd, yyyy")}
                     </span>
@@ -191,7 +164,15 @@ const ScheduleHistory = (): JSX.Element => {
                   </TableCell>
                   <TableCell className="px-3 py-2 sm:px-4">
                     <span className="text-xs font-bold sm:text-sm">
-                      {reservation.eventType}
+                      {reservation.eventType || "N/A"}
+                    </span>
+                  </TableCell>
+                  {/* New Column for Reservation Type */}
+                  <TableCell className="px-3 py-2 sm:px-4">
+                    <span className="text-xs font-bold sm:text-sm">
+                      {reservation.reservationType
+                        ? reservation.reservationType
+                        : "N/A"}
                     </span>
                   </TableCell>
                   <TableCell className="px-3 py-2 text-xs sm:text-sm">
@@ -201,7 +182,6 @@ const ScheduleHistory = (): JSX.Element => {
                     {reservation.specialRequest || "N/A"}
                   </TableCell>
                   <TableCell className="px-3 py-2 text-xs sm:text-sm">
-                    {/* Event Status Badge */}
                     <span
                       style={{
                         display: "inline-block",
@@ -218,7 +198,6 @@ const ScheduleHistory = (): JSX.Element => {
                     </span>
                   </TableCell>
                   <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
-                    {/* Payment Column: Total Payment on Top & Payment Status Below */}
                     <div className="flex flex-col text-center">
                       <span className="block font-bold">₱{computedTotal}</span>
                       <span
@@ -327,7 +306,7 @@ const ScheduleHistory = (): JSX.Element => {
                           </div>
                           <div className="flex justify-between text-xs sm:text-sm">
                             <span className="font-medium">Event Fee:</span>
-                            <span>₱{reservation.eventFee}</span>
+                            <span>₱{reservation.eventFee || 0}</span>
                           </div>
                           {reservation.isCorkage && (
                             <div className="flex justify-between text-xs sm:text-sm">
@@ -350,7 +329,7 @@ const ScheduleHistory = (): JSX.Element => {
             <TableRow>
               <TableCell
                 className="px-3 py-2 text-center text-xs sm:text-sm"
-                colSpan={8}
+                colSpan={9}
               >
                 No reservations found.
               </TableCell>

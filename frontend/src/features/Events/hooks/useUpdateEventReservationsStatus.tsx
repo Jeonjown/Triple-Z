@@ -64,6 +64,7 @@ export const useUpdateEventReservationStatus = () => {
         title: "Reservation Status Updated",
         body: `Your reservation status has been updated to ${variables.eventStatus}.`,
         userId: variables.userId,
+        redirectUrl: "/profile",
       };
 
       // Send push notification.

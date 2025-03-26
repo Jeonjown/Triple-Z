@@ -18,6 +18,7 @@ import {
 import { useMarkNotificationAsRead } from "@/features/Notifications/hooks/useMarkNotificationasRead";
 import { useNotifications } from "../hooks/useNotification";
 import { useMarkAllNotificationsAsRead } from "../hooks/useMarkAllNotificationAsRead";
+import { format } from "date-fns";
 
 const NotificationIcon: React.FC = () => {
   const { user } = useAuthStore();
@@ -135,6 +136,13 @@ const NotificationIcon: React.FC = () => {
                 <div>
                   <strong>{notification.title}</strong>
                   <p className="mt-1">{notification.description}</p>
+                  {/* Display date and time based on createdAt */}
+                  <p className="mt-1 text-xs text-gray-500">
+                    {format(
+                      new Date(notification.createdAt),
+                      "MMM dd, yyyy, h:mm a",
+                    )}
+                  </p>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

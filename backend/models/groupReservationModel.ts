@@ -41,7 +41,13 @@ const reservationSchema = new mongoose.Schema(
     },
     subtotal: { type: Number, required: true },
     totalPayment: { type: Number, required: true },
+    reservationType: {
+      type: String,
+      enum: ["Groups"],
+      default: "Groups",
+    },
   },
+
   { timestamps: true }
 );
 

@@ -5,6 +5,7 @@ import User from "../models/userModel";
 import { EventSettings } from "../models/eventSettingsModel";
 import { format } from "date-fns";
 import { createNotification } from "./notificationController";
+import { GroupReservation } from "../models/groupReservationModel";
 
 // createReservation
 export const createReservation = async (
@@ -395,5 +396,44 @@ export const adminRescheduleReservation = async (
   } catch (error) {
     console.error(error);
     next(createError("Failed to reschedule reservation.", 500));
+  }
+};
+
+export const getAllReservations = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    // Fetch individual event reservations.
+    const eventReservations = await EventReservation.find().populate(
+      "userId",
+      "username email",
+      User
+    );
+
+    // Fetch group reservations.
+    const groupReservations = await GroupReservation.find().populate(
+      "userId",
+      "username email",
+      User
+    );
+
+    // Merge both arrays.
+    const allReservations = [...eventReservations, ...groupReservations];
+
+    // Sort by the 'createdAt' field in descending order (most recent first).
+    allReservations.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    res.status(200).json({
+      message: "Reservations fetched successfully!",
+      reservations: allReservations,
+    });
+  } catch (error) {
+    console.error(error);
+    next(createError("Failed to fetch reservations.", 500));
   }
 };
