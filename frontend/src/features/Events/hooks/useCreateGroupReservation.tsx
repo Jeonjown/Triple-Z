@@ -49,6 +49,7 @@ export const useCreateGroupReservation = () => {
           body: `Reservation for ${data.fullName} on ${new Date(
             data.date,
           ).toLocaleDateString()} has been received.`,
+          click_action: "/profile",
         },
         {
           onSuccess: () => {

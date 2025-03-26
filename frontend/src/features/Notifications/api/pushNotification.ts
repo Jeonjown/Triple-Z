@@ -12,6 +12,7 @@ const api = axios.create({
 export interface AdminPushNotificationPayload {
   title: string;
   body: string;
+  click_action?: string;
 }
 
 // Payload for sending a push notification to a user

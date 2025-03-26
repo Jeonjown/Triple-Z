@@ -1,4 +1,4 @@
-// src/app/tables/event-reservations/RescheduleReservationDialog.tsx
+import { format, parseISO } from "date-fns";
 import React, { useState } from "react";
 import {
   Dialog,
@@ -17,12 +17,17 @@ const RescheduleReservationDialog: React.FC<{
   onOpenChange: (open: boolean) => void;
   reservation: Reservation;
 }> = ({ open, onOpenChange, reservation }) => {
+  // Convert the reservation date to "YYYY-MM-DD" format
+  const formattedDate = format(parseISO(reservation.date), "yyyy-MM-dd");
+
   // Pre-populate form state with the reservation's current scheduling values.
   const [formData, setFormData] = useState({
-    date: reservation.date,
+    date: formattedDate,
     startTime: reservation.startTime,
     endTime: reservation.endTime,
   });
+
+  console.log(formData.date);
 
   const { mutate, isPending } = useRescheduleEventReservation();
 
@@ -43,7 +48,6 @@ const RescheduleReservationDialog: React.FC<{
   // Handle form submission.
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Use the userId from the reservation, not an admin id.
     mutate({
       userId: reservation.userId._id,
       updateData: {
