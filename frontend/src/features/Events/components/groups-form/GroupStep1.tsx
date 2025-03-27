@@ -1,3 +1,4 @@
+// GroupStep1.tsx
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { useGetEventReservationSettings } from "../../hooks/useGetEventReservati
 import { GroupFormValues } from "../../pages/GroupForm";
 import TableOccupancyProgress from "../TableOccupancyProgress";
 import useGetGroupReservations from "../../hooks/useGetGroupReservations";
+import { TriangleAlert } from "lucide-react";
 
 export type EventReservationSettings = {
   eventReservationLimit: number;
@@ -50,7 +52,7 @@ const GroupStep1 = ({
   const startTime = watch("startTime");
   const endTime = watch("endTime");
   const partySize = watch("partySize");
-  const dateInput = watch("date"); // Date entered by the user
+  const dateInput = watch("date");
 
   const maxGuestsPerTable = settings?.groupMaxGuestsPerTable || 6;
   const totalTables = settings?.groupMaxTablesPerDay ?? 0;
@@ -58,11 +60,10 @@ const GroupStep1 = ({
     ? Math.ceil(partySize / maxGuestsPerTable)
     : 0;
 
-  // State to store available tables computed solely from the date input.
+  // State for available tables and full booking error message.
   const [inputAvailableTables, setInputAvailableTables] = useState<
     number | null
   >(null);
-  // Error message if the input date is fully booked.
   const [fullyBookedError, setFullyBookedError] = useState<string | null>(null);
 
   const { data: reservations } = useGetGroupReservations();
@@ -72,36 +73,30 @@ const GroupStep1 = ({
     if (dateInput && reservations && settingsData) {
       const d = new Date(dateInput);
       if (!isNaN(d.getTime())) {
-        // Define start and end of the selected day.
         const startOfDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
         const endOfDay = new Date(
           d.getFullYear(),
           d.getMonth(),
           d.getDate() + 1,
         );
-        // Filter reservations for that day.
         const reservationsForDay = reservations.filter(
           (r: { date: string; partySize: number }) => {
             const resDate = new Date(r.date);
             return resDate >= startOfDay && resDate < endOfDay;
           },
         );
-        // Sum tables required by all reservations (using same logic as in the calendar).
         const totalBookedTables = reservationsForDay.reduce((sum, r) => {
           return (
             sum + Math.ceil(r.partySize / settingsData.groupMaxGuestsPerTable)
           );
         }, 0);
-        // Compute available tables.
         const available = settingsData.groupMaxTablesPerDay - totalBookedTables;
         setInputAvailableTables(available);
-        if (available === 0) {
-          setFullyBookedError(
-            "The date you picked is fully booked. Please choose another date.",
-          );
-        } else {
-          setFullyBookedError(null);
-        }
+        setFullyBookedError(
+          available === 0
+            ? "The date you picked is fully booked. Please choose another date."
+            : null,
+        );
       } else {
         setInputAvailableTables(null);
         setFullyBookedError(null);
@@ -118,7 +113,6 @@ const GroupStep1 = ({
       "startTime",
       "endTime",
     ]);
-    // Prevent moving to the next step if available tables are 0.
     if (inputAvailableTables === 0) {
       setFullyBookedError(
         "The date you picked is fully booked. Please choose another date.",
@@ -134,7 +128,8 @@ const GroupStep1 = ({
     <>
       <ScrollToTop />
       <div className="mt-10 lg:flex lg:space-x-2">
-        <div className="flex-1">
+        {/* Full Name Field */}
+        <div className="relative flex-1">
           <Label
             htmlFor="fullName"
             className="block text-sm font-medium text-gray-700"
@@ -144,17 +139,25 @@ const GroupStep1 = ({
           <Input
             id="fullName"
             {...register("fullName")}
-            className={`mb-4 mt-1 w-full ${errors.fullName ? "border-red-500" : ""}`}
+            // Error styling applied when an error exists
+            className={`mb-4 mt-1 w-full rounded border p-3 focus:outline-secondary ${
+              errors.fullName ? "border-red-500 bg-red-200 pr-10" : ""
+            }`}
           />
           {errors.fullName && (
-            <div className="text-xs text-red-700">
+            <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+          )}
+          {errors.fullName && (
+            <div className="text-sm text-red-700">
               {typeof errors.fullName.message === "string"
                 ? errors.fullName.message
                 : ""}
             </div>
           )}
         </div>
-        <div className="flex-1">
+
+        {/* Contact Number Field */}
+        <div className="relative flex-1">
           <Label
             htmlFor="contactNumber"
             className="block text-sm font-medium text-gray-700"
@@ -164,10 +167,15 @@ const GroupStep1 = ({
           <Input
             id="contactNumber"
             {...register("contactNumber")}
-            className={`mb-4 mt-1 w-full ${errors.contactNumber ? "border-red-500" : ""}`}
+            className={`mb-4 mt-1 w-full rounded border p-3 focus:outline-secondary ${
+              errors.contactNumber ? "border-red-500 bg-red-200 pr-10" : ""
+            }`}
           />
           {errors.contactNumber && (
-            <div className="text-xs text-red-700">
+            <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+          )}
+          {errors.contactNumber && (
+            <div className="text-sm text-red-700">
               {typeof errors.contactNumber.message === "string"
                 ? errors.contactNumber.message
                 : ""}
@@ -175,8 +183,10 @@ const GroupStep1 = ({
           )}
         </div>
       </div>
+
+      {/* Party Size Field */}
       <div className="lg:flex lg:space-x-2">
-        <div className="flex-1">
+        <div className="relative flex-1">
           <Label
             htmlFor="partySize"
             className="block text-sm font-medium text-gray-700"
@@ -190,10 +200,15 @@ const GroupStep1 = ({
             max={maxReservation}
             placeholder={`Allowed: ${minReservation} to ${maxReservation}`}
             {...register("partySize")}
-            className={`mt-1 w-full ${errors.partySize ? "border-red-500" : ""}`}
+            className={`mt-1 w-full rounded border p-3 focus:outline-secondary ${
+              errors.partySize ? "border-red-500 bg-red-200 pr-10" : ""
+            }`}
           />
           {errors.partySize && (
-            <div className="mt-2 text-xs text-red-700">
+            <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+          )}
+          {errors.partySize && (
+            <div className="mt-2 text-sm text-red-700">
               {typeof errors.partySize.message === "string"
                 ? errors.partySize.message
                 : ""}
@@ -219,9 +234,12 @@ const GroupStep1 = ({
           </div>
         </div>
       </div>
-      {/* Calendar for visual feedback only */}
+
+      {/* Calendar for visual feedback */}
       <GroupCalendar />
-      <div className="mt-6">
+
+      {/* Date Field */}
+      <div className="relative mt-6">
         <Label
           htmlFor="date"
           className="block text-sm font-medium text-gray-700"
@@ -232,16 +250,23 @@ const GroupStep1 = ({
           type="date"
           id="date"
           {...register("date")}
-          className={`mb-4 mt-1 w-full ${errors.date ? "border-red-500" : ""}`}
+          className={`mb-4 mt-1 w-full rounded border p-3 focus:outline-secondary ${
+            errors.date ? "border-red-500 bg-red-200 pr-10" : ""
+          }`}
         />
         {errors.date && (
-          <div className="text-xs text-red-700">
+          <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+        )}
+        {errors.date && (
+          <div className="text-sm text-red-700">
             {typeof errors.date.message === "string" ? errors.date.message : ""}
           </div>
         )}
       </div>
+
+      {/* Start and End Time Fields */}
       <div className="flex gap-4">
-        <div className="flex-1">
+        <div className="relative flex-1">
           <Label
             htmlFor="startTime"
             className="block text-sm font-medium text-gray-700"
@@ -253,14 +278,14 @@ const GroupStep1 = ({
             onChange={(time) => setValue("startTime", time)}
           />
           {errors.startTime && (
-            <div className="text-xs text-red-700">
+            <div className="text-sm text-red-700">
               {typeof errors.startTime.message === "string"
                 ? errors.startTime.message
                 : ""}
             </div>
           )}
         </div>
-        <div className="flex-1">
+        <div className="relative flex-1">
           <Label
             htmlFor="endTime"
             className="block text-sm font-medium text-gray-700"
@@ -272,7 +297,7 @@ const GroupStep1 = ({
             onChange={(time) => setValue("endTime", time)}
           />
           {errors.endTime && (
-            <div className="text-xs text-red-700">
+            <div className="text-sm text-red-700">
               {typeof errors.endTime.message === "string"
                 ? errors.endTime.message
                 : ""}
@@ -280,6 +305,8 @@ const GroupStep1 = ({
           )}
         </div>
       </div>
+
+      {/* Next Button */}
       <Button
         type="button"
         onClick={handleNextStep}
@@ -289,7 +316,7 @@ const GroupStep1 = ({
         Next
       </Button>
       {fullyBookedError && (
-        <p className="mt-2 text-center text-xs text-red-500">
+        <p className="mt-2 text-center text-sm text-red-500">
           {fullyBookedError}
         </p>
       )}

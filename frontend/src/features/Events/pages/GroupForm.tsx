@@ -111,25 +111,26 @@ const GroupForm = () => {
 
   const methods = useForm<GroupFormValues>({
     resolver: zodResolver(reservationSchema),
+    mode: "onChange",
     defaultValues: {
-      fullName: "Jon Stewart Doe",
-      contactNumber: "6019521325",
+      fullName: "",
+      contactNumber: "",
       partySize: minReservation,
-      date: "2025-03-08",
-      startTime: "10:00 AM",
-      endTime: "3:00 PM",
+      date: "",
+      startTime: "",
+      endTime: "",
       cart: [],
     },
   });
 
   useEffect(() => {
     methods.reset({
-      fullName: "Jon Stewart Doe",
-      contactNumber: "6019521325",
+      fullName: "",
+      contactNumber: "",
       partySize: minReservation,
-      date: "2025-03-08",
-      startTime: "10:00 AM",
-      endTime: "3:00 PM",
+      date: "",
+      startTime: "",
+      endTime: "",
       cart: [],
     });
   }, [methods, minReservation]);

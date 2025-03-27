@@ -1,61 +1,74 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import useGetGroupReservations from "../../hooks/useGetGroupReservations";
 import { useGetEventReservationSettings } from "../../hooks/useGetEventReservationSettings";
 import LoadingPage from "@/pages/LoadingPage";
+import { useFormContext } from "react-hook-form";
+import { GroupFormValues } from "../../pages/GroupForm";
 
 const GroupCalendar: React.FC = () => {
   const { data, isPending, isError } = useGetGroupReservations();
   const { data: settings } = useGetEventReservationSettings();
+  // Import setValue and trigger from form context
+  const { setValue, trigger } = useFormContext<GroupFormValues>();
+
   const [reservedDates, setReservedDates] = useState<Date[]>([]);
   const [fullDates, setFullDates] = useState<Date[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [availableTables, setAvailableTables] = useState<number | null>(null);
 
-  const handleSelect = (day: Date | undefined) => {
+  // Updated handleSelect: update both local state and form date
+  const handleSelect = (day: Date | undefined): void => {
     setSelectedDate(day);
-    if (day && data && settings) {
-      // Define start and end of the day.
-      const startOfDay = new Date(
-        day.getFullYear(),
-        day.getMonth(),
-        day.getDate(),
-      );
-      const endOfDay = new Date(
-        day.getFullYear(),
-        day.getMonth(),
-        day.getDate() + 1,
-      );
+    if (!day || !data || !settings) return;
 
-      // Filter reservations for the day.
-      const reservationsForDay = data.filter(
-        (reservation: { date: string; partySize: number }) => {
-          const resDate = new Date(reservation.date);
-          return resDate >= startOfDay && resDate < endOfDay;
-        },
-      );
+    // Update form date input similar to EventCalendar logic
+    const normalizedDay = new Date(
+      day.getFullYear(),
+      day.getMonth(),
+      day.getDate(),
+    );
+    const localDate = new Date(
+      normalizedDay.getTime() - normalizedDay.getTimezoneOffset() * 60000,
+    );
+    const formatted = localDate.toISOString().split("T")[0];
+    setValue("date", formatted); // update the form's date field
+    trigger("date"); // trigger validation if needed
 
-      // Sum tables required by all reservations.
-      const totalBookedTables = reservationsForDay.reduce(
-        (sum, reservation) => {
-          return (
-            sum +
-            Math.ceil(reservation.partySize / settings.groupMaxGuestsPerTable)
-          );
-        },
-        0,
-      );
+    // Compute available tables as before
+    const startOfDay = new Date(
+      day.getFullYear(),
+      day.getMonth(),
+      day.getDate(),
+    );
+    const endOfDay = new Date(
+      day.getFullYear(),
+      day.getMonth(),
+      day.getDate() + 1,
+    );
 
-      // Calculate available tables ignoring the current party's requirement.
-      const available = settings.groupMaxTablesPerDay - totalBookedTables;
-      setAvailableTables(available);
-      // Note: We do not propagate this value to disable the next button.
-    } else {
-      setAvailableTables(null);
-    }
+    const reservationsForDay = data.filter(
+      (reservation: { date: string; partySize: number }) => {
+        const resDate = new Date(reservation.date);
+        return resDate >= startOfDay && resDate < endOfDay;
+      },
+    );
+
+    const totalBookedTables = reservationsForDay.reduce(
+      (sum: number, reservation: { date: string; partySize: number }) => {
+        return (
+          sum +
+          Math.ceil(reservation.partySize / settings.groupMaxGuestsPerTable)
+        );
+      },
+      0,
+    );
+
+    const available = settings.groupMaxTablesPerDay - totalBookedTables;
+    setAvailableTables(available);
   };
 
-  // Set reserved dates for styling.
+  // The rest of your code remains unchanged
   useEffect(() => {
     if (data) {
       const dates = data.map((reservation: { date: string }) => {
@@ -66,7 +79,6 @@ const GroupCalendar: React.FC = () => {
     }
   }, [data]);
 
-  // Compute fully booked dates for styling.
   useEffect(() => {
     if (data && settings) {
       const dateCountMap = new Map<string, number>();
