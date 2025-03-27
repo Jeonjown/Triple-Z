@@ -45,8 +45,8 @@ export const useCreateGroupReservation = () => {
       sendPushNotification(
         {
           title: "New Group Reservation Received",
-          body: `Reservation for ${data.fullName} on ${new Date(
-            data.date,
+          body: `Reservation for ${data.reservation.fullName} on ${new Date(
+            data.reservation.date,
           ).toLocaleDateString()} has been received.`,
           click_action: "/admin/manage-groups",
         },
@@ -66,8 +66,8 @@ export const useCreateGroupReservation = () => {
       // Emit a realtime notification via the socket instance.
       socket.emit("send-admins-notification", {
         title: "New Group Reservation Received",
-        body: `Reservation for ${data.fullName} on ${new Date(
-          data.date,
+        body: `Reservation for ${data.reservation.fullName} on ${new Date(
+          data.reservation.date,
         ).toLocaleDateString()} has been received.`,
         redirectUrl: "/admin/manage-groups",
       });

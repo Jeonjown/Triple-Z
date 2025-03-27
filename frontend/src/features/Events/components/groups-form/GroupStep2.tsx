@@ -1,12 +1,13 @@
+// GroupStep2.tsx
 import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import useFetchAllMenuItems from "@/features/Menu/hooks/useFetchAllMenuItems";
 import EmbeddedMenu, { MenuItem, SelectedItem } from "./EmbeddedMenu";
+import GroupsCart from "./GroupsCart";
 import { CartItem as UnifiedCartItem } from "../../pages/GroupForm";
 import { EventFormValues } from "../../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
-import GroupsCart from "./GroupsCart";
 
 type Step2Props = {
   nextStep: () => void;
@@ -32,7 +33,11 @@ const GroupStep2 = ({
   const {
     formState: { errors },
     setValue,
+    watch,
   } = useFormContext<EventFormValues>();
+
+  // Watch partySize for dynamic error messaging and validation.
+  const partySize = watch("partySize");
 
   const { data } = useFetchAllMenuItems();
 
@@ -66,7 +71,7 @@ const GroupStep2 = ({
             _id: selected.key, // Use the unique composite key for the cart item.
             title: menuItem.title,
             quantity,
-            price, // Include the unit price here.
+            price, // Unit price
             image: menuItem.image,
             size: sizeText,
             totalPrice: quantity * price,
@@ -120,6 +125,12 @@ const GroupStep2 = ({
     console.log("Current Cart Data:", cart);
   }, [cart]);
 
+  // Calculate the total quantity of items in the cart.
+  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Determine whether the Next button should be disabled.
+  const nextDisabled = totalQuantity < partySize;
+
   return (
     <>
       <ScrollToTop />
@@ -143,18 +154,23 @@ const GroupStep2 = ({
           type="button"
           onClick={nextStep}
           className="w-full"
-          disabled={cart.length === 0}
+          disabled={nextDisabled}
         >
           Next
         </Button>
       </div>
-      {cart.length === 0 && (
-        <p className="mt-2 text-center text-xs text-red-500">
-          Your cart is empty. Please add at least one item to continue.
+      {nextDisabled && (
+        <p className="mt-2 text-center text-sm text-red-700">
+          Your cart has {totalQuantity} {totalQuantity === 1 ? "item" : "items"}
+          . Please add at least {partySize - totalQuantity} more{" "}
+          {partySize - totalQuantity === 1 ? "item" : "items"} to reach your
+          party size of {partySize}.
         </p>
       )}
       {errors.cart && (
-        <p className="mt-2 text-xs text-red-500">{errors.cart.message}</p>
+        <p className="mt-2 text-center text-sm text-red-700">
+          {errors.cart.message}
+        </p>
       )}
     </>
   );
