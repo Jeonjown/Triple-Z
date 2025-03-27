@@ -145,7 +145,7 @@ const GroupStep1 = ({
             }`}
           />
           {errors.fullName && (
-            <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+            <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-[80%] text-red-700" />
           )}
           {errors.fullName && (
             <div className="text-sm text-red-700">
@@ -172,7 +172,7 @@ const GroupStep1 = ({
             }`}
           />
           {errors.contactNumber && (
-            <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+            <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-[80%] text-red-700" />
           )}
           {errors.contactNumber && (
             <div className="text-sm text-red-700">
@@ -205,7 +205,7 @@ const GroupStep1 = ({
             }`}
           />
           {errors.partySize && (
-            <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+            <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-[80%] text-red-700" />
           )}
           {errors.partySize && (
             <div className="mt-2 text-sm text-red-700">
@@ -274,6 +274,7 @@ const GroupStep1 = ({
             Start Time
           </Label>
           <HourlyTimePicker
+            isStartTime
             value={startTime}
             onChange={(time) => setValue("startTime", time)}
           />

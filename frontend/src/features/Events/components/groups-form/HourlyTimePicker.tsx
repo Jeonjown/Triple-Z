@@ -12,7 +12,7 @@ import { useGetEventReservationSettings } from "../../hooks/useGetEventReservati
 type HourlyTimePickerProps = {
   value: string;
   onChange: (time: string) => void;
-  // Flag indicating this picker is for start time so we can limit options.
+  // When true, limits options so the last available start time is at least 2 hours before closing.
   isStartTime?: boolean;
 };
 
@@ -21,14 +21,14 @@ const HourlyTimePicker = ({
   value,
   isStartTime = false,
 }: HourlyTimePickerProps) => {
-  // Fetch settings including opening and closing hours.
+  // Fetch business hours settings.
   const { data: settings, isPending } = useGetEventReservationSettings();
 
-  // Use fallback defaults if API data is missing.
+  // Use default hours if API data is missing.
   const openingHours = settings?.openingHours || "10:00 AM";
   const closingHours = settings?.closingHours || "8:00 PM";
 
-  // Convert a "HH:MM AM/PM" string into minutes since midnight.
+  // Convert a "HH:MM AM/PM" string to minutes since midnight.
   const parseTimeString = (timeStr: string): number => {
     const [time, modifier] = timeStr.split(" ");
     const [hoursStr, minutesStr] = time.split(":");
@@ -41,25 +41,24 @@ const HourlyTimePicker = ({
 
   // Format minutes since midnight back to a "h:MM AM/PM" string.
   const formatTime = (minutes: number): string => {
-    // Adjust minutes to be within a 24-hour format for display.
-    const normalizedMinutes = minutes % (24 * 60);
-    let hours = Math.floor(normalizedMinutes / 60);
-    const mins = normalizedMinutes % 60;
+    const normalized = minutes % (24 * 60);
+    let hours = Math.floor(normalized / 60);
+    const mins = normalized % 60;
     const modifier = hours >= 12 ? "PM" : "AM";
     hours = hours % 12;
     if (hours === 0) hours = 12;
     return `${hours}:${mins.toString().padStart(2, "0")} ${modifier}`;
   };
 
-  // Generate valid time slots, accounting for the possibility of overnight closing.
+  // Generate time slots. For start time, exclude the final 2 hours of business hours.
   const workingHours = useMemo(() => {
     const start = parseTimeString(openingHours);
     let end = parseTimeString(closingHours);
-    // If closing time is less than or equal to opening time, assume it's the next day.
+    // Handle overnight closing (e.g., 6:00 PM to 12:00 AM)
     if (end <= start) {
       end += 24 * 60;
     }
-    // For start time picker, limit options so that the last slot is 2 hours before closing.
+    // For start time, last available slot is 2 hours before closing.
     const lastSlot = isStartTime ? end - 120 : end;
     const times: string[] = [];
     for (let time = start; time <= lastSlot; time += 60) {
