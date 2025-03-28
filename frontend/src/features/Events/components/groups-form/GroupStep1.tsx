@@ -255,7 +255,7 @@ const GroupStep1 = ({
           }`}
         />
         {errors.date && (
-          <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+          <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-[80%] text-red-700" />
         )}
         {errors.date && (
           <div className="text-sm text-red-700">

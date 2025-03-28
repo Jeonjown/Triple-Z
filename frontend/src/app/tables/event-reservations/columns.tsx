@@ -104,7 +104,7 @@ export const columns: MyColumnDef<Reservation>[] = [
   },
   {
     id: "email",
-    accessorFn: (row: Reservation) => row.userId.email,
+    accessorFn: (row: Reservation) => row.userId?.email || "No Email",
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),

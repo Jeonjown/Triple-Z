@@ -93,16 +93,16 @@ function App(): JSX.Element {
   // Define admin-only routes.
   const adminRoutes = (
     <>
-      <Route path="admin/admin-dashboard" element={<AdminDashboard />} />
-      <Route path="admin/manage-users" element={<ManageUsers />} />
-      <Route path="admin/settings" element={<Settings />} />
-      <Route path="admin/reports" element={<Reports />} />
-      <Route path="admin/manage-menu" element={<ManageMenu />} />
-      <Route path="admin/manage-events" element={<ManageEvents />} />
-      <Route path="admin/manage-blogs" element={<ManageBlogs />} />
-      <Route path="admin/manage-blogs/:id" element={<AdminBlog />} />
-      <Route path="admin/manage-groups" element={<ManageGroups />} />
-      <Route path="admin/admin-chat" element={<AdminChat />} />
+      <Route path="/admin/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/manage-users" element={<ManageUsers />} />
+      <Route path="/admin/settings" element={<Settings />} />
+      <Route path="/admin/reports" element={<Reports />} />
+      <Route path="/admin/manage-menu" element={<ManageMenu />} />
+      <Route path="/admin/manage-events" element={<ManageEvents />} />
+      <Route path="/admin/manage-blogs" element={<ManageBlogs />} />
+      <Route path="/admin/manage-blogs/:id" element={<AdminBlog />} />
+      <Route path="/admin/manage-groups" element={<ManageGroups />} />
+      <Route path="/admin/admin-chat" element={<AdminChat />} />
     </>
   );
 
