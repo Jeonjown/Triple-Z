@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 dotenv.config();
 import helmet from "helmet";
+// Remove permissionsPolicy from Helmet if it's causing issues and set it manually if needed.
 import { ResponseError } from "./utils/createError";
 import passport from "./config/passport";
 
@@ -24,7 +25,6 @@ import emailRoutes from "./routes/emailRoutes";
 import blogRoutes from "./routes/blogRoutes";
 import pushNotificationRoutes from "./routes/pushNotificationRoutes";
 import subscriptionRoutes from "./routes/subscriptionRoutes";
-import permissionsPolicy from "permissions-policy";
 
 import http from "http";
 import { initSocket } from "./socket/socket";
@@ -32,48 +32,59 @@ import { initSocket } from "./socket/socket";
 const server = express();
 
 // --- Security Headers Middleware via Helmet ---
-// Configure Helmet to set a custom Content Security Policy and other headers
 server.use(
   helmet({
+    // Configure Content Security Policy
     contentSecurityPolicy: {
       directives: {
-        // Only allow resources from the same origin
         defaultSrc: ["'self'"],
-        // Customize as needed; here we only allow self for scripts
         scriptSrc: ["'self'"],
-        // Allow inline styles if necessary; otherwise remove "'unsafe-inline'" for stricter security
         styleSrc: ["'self'", "'unsafe-inline'"],
-        // Allow images from the same origin and data URIs
         imgSrc: ["'self'", "data:"],
-        // Restrict connections (AJAX, WebSocket, etc.) to self
         connectSrc: ["'self'"],
-        // Allow fonts from self and data URIs
         fontSrc: ["'self'", "data:"],
-        // Disallow plugins and objects
         objectSrc: ["'none'"],
-        // Automatically upgrade insecure requests
         upgradeInsecureRequests: [],
       },
     },
+    // Set Referrer-Policy header
     referrerPolicy: { policy: "no-referrer" },
   })
 );
 
-// Additional Helmet middleware (Helmet already disables X-Powered-By by default)
+// Helmet also provides these headers:
 server.use(helmet.frameguard({ action: "sameorigin" }));
 server.use(helmet.noSniff());
-// Set Permissions-Policy to disable unneeded browser features
-server.use(
-  permissionsPolicy({
-    features: {
-      geolocation: [],
-      camera: [],
-      microphone: [],
-    },
-  })
-);
-// Optionally, set Cross-Origin-Resource-Policy to restrict resource embedding
+// Set Cross-Origin-Resource-Policy
 server.use(helmet.crossOriginResourcePolicy({ policy: "same-site" }));
+
+// --- Manual Middleware for Missing Security Headers ---
+// In case any header is missing, we add them manually.
+server.use((req: Request, res: Response, next: NextFunction) => {
+  // Referrer-Policy header (if not already set)
+  if (!res.getHeader("Referrer-Policy")) {
+    res.setHeader("Referrer-Policy", "no-referrer");
+  }
+  // X-Content-Type-Options header
+  if (!res.getHeader("X-Content-Type-Options")) {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+  }
+  // Content-Security-Policy header
+  if (!res.getHeader("Content-Security-Policy")) {
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self' data:; object-src 'none'; upgrade-insecure-requests;"
+    );
+  }
+  // Permissions-Policy header: adjust the features as needed
+  if (!res.getHeader("Permissions-Policy")) {
+    res.setHeader(
+      "Permissions-Policy",
+      "geolocation=(), camera=(), microphone=()"
+    );
+  }
+  next();
+});
 
 // --- Standard Middleware ---
 server.use(express.json());
