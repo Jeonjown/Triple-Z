@@ -1,4 +1,3 @@
-// ScheduleHistory.tsx
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import { useGetAllReservations } from "@/features/Events/hooks/useGetAllReservations";
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
@@ -44,7 +43,7 @@ interface CartItem {
 
 export interface Reservation {
   _id: string;
-  userId: User;
+  userId: User | null;
   fullName: string;
   contactNumber: string;
   partySize: number;
@@ -72,7 +71,7 @@ interface AllReservationsResponse {
 }
 
 const ScheduleHistory = (): JSX.Element => {
-  // Retrieve all reservations using the new hook.
+  // Retrieve all reservations using the hook.
   const { data } = useGetAllReservations() as {
     data?: AllReservationsResponse;
   };
@@ -81,10 +80,12 @@ const ScheduleHistory = (): JSX.Element => {
   // Retrieve event settings for the corkage fee.
   const { data: settings } = useGetEventReservationSettings();
 
-  // Filter reservations for the current user.
+  // Filter reservations for the current user,
+  // adding a check to ensure reservation.userId is not null.
   const userReservations: Reservation[] =
     data?.reservations.filter(
-      (reservation) => reservation.userId._id === user?._id,
+      (reservation) =>
+        reservation.userId !== null && reservation.userId._id === user?._id,
     ) || [];
 
   // Sort reservations descending by date.
@@ -115,10 +116,8 @@ const ScheduleHistory = (): JSX.Element => {
       <Table className="min-w-full">
         <TableHeader>
           <TableRow className="border border-gray-300 bg-gray-100">
-            {/* Updated Date & Time cell */}
             <TableHead className="px-3 py-2 sm:px-4">Date &amp; Time</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Type</TableHead>
-            {/* New Reservation Type Column */}
             <TableHead className="px-3 py-2 sm:px-4">
               Reservation Type
             </TableHead>
@@ -142,17 +141,23 @@ const ScheduleHistory = (): JSX.Element => {
               // Get colors for event and payment statuses.
               const currentEventStyle = eventStatusColors[
                 reservation.eventStatus
-              ] || { border: "#ccc", bg: "#ccc" };
+              ] || {
+                border: "#ccc",
+                bg: "#ccc",
+              };
               const currentPaymentStyle = paymentStatusColors[
                 reservation.paymentStatus
-              ] || { border: "#ccc", bg: "#ccc" };
+              ] || {
+                border: "#ccc",
+                bg: "#ccc",
+              };
 
               return (
                 <TableRow
                   key={reservation._id}
                   className="border-b border-gray-300 hover:bg-gray-50"
                 >
-                  {/* Updated Date & Time TableCell */}
+                  {/* Date & Time */}
                   <TableCell className="min-w-[150px] whitespace-nowrap px-3 py-2 sm:px-4">
                     <span className="text-sm font-bold sm:text-base">
                       {format(new Date(reservation.date), "MMMM dd, yyyy")}
@@ -162,25 +167,27 @@ const ScheduleHistory = (): JSX.Element => {
                       {reservation.startTime} - {reservation.endTime}
                     </span>
                   </TableCell>
+                  {/* Event Type */}
                   <TableCell className="px-3 py-2 sm:px-4">
                     <span className="text-xs font-bold sm:text-sm">
                       {reservation.eventType || "N/A"}
                     </span>
                   </TableCell>
-                  {/* New Column for Reservation Type */}
+                  {/* Reservation Type */}
                   <TableCell className="px-3 py-2 sm:px-4">
                     <span className="text-xs font-bold sm:text-sm">
-                      {reservation.reservationType
-                        ? reservation.reservationType
-                        : "N/A"}
+                      {reservation.reservationType || "N/A"}
                     </span>
                   </TableCell>
+                  {/* Party Size */}
                   <TableCell className="px-3 py-2 text-xs sm:text-sm">
                     {reservation.partySize} pax
                   </TableCell>
+                  {/* Special Request */}
                   <TableCell className="px-3 py-2 text-xs sm:text-sm">
                     {reservation.specialRequest || "N/A"}
                   </TableCell>
+                  {/* Event Status */}
                   <TableCell className="px-3 py-2 text-xs sm:text-sm">
                     <span
                       style={{
@@ -197,6 +204,7 @@ const ScheduleHistory = (): JSX.Element => {
                       {reservation.eventStatus}
                     </span>
                   </TableCell>
+                  {/* Payment */}
                   <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
                     <div className="flex flex-col text-center">
                       <span className="block font-bold">₱{computedTotal}</span>
@@ -216,6 +224,7 @@ const ScheduleHistory = (): JSX.Element => {
                       </span>
                     </div>
                   </TableCell>
+                  {/* Reservation ID with copy functionality */}
                   <TableCell className="px-3 py-2 sm:px-4">
                     <div className="flex items-center space-x-1 sm:space-x-2">
                       <span className="text-xs font-medium text-primary sm:text-sm">
@@ -240,6 +249,7 @@ const ScheduleHistory = (): JSX.Element => {
                       </TooltipProvider>
                     </div>
                   </TableCell>
+                  {/* Cart Details */}
                   <TableCell className="px-3 py-2 sm:px-4">
                     <Dialog>
                       <DialogTrigger asChild>

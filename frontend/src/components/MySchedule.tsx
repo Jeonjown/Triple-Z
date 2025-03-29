@@ -55,7 +55,7 @@ export interface Reservation {
 
 interface ReservationRaw {
   _id: string;
-  userId: { _id: string } | string;
+  userId: { _id: string } | string | null;
   fullName: string;
   contactNumber: string;
   partySize: number;
@@ -86,11 +86,18 @@ const MySchedule: React.FC = () => {
   if (isLoading) return <p>Loading reservations...</p>;
   if (error) return <p>Error loading reservations: {error.message}</p>;
 
+  // Filter out reservations with null/undefined userId
+  const validReservations = (data?.reservations || []).filter(
+    (r: ReservationRaw | null) =>
+      r && r.userId !== null && r.userId !== undefined,
+  ) as ReservationRaw[];
+
   // Normalize raw reservations.
-  const rawReservations = (data?.reservations || []) as ReservationRaw[];
-  const allReservations: Reservation[] = rawReservations.map((r) => {
+  const allReservations: Reservation[] = validReservations.map((r) => {
     const normalizedUserId: string =
-      typeof r.userId === "object" ? r.userId._id.toString() : r.userId;
+      typeof r.userId === "object" && r.userId !== null
+        ? r.userId._id.toString()
+        : (r.userId as string);
     return { ...r, userId: normalizedUserId };
   });
 
@@ -134,6 +141,7 @@ const MySchedule: React.FC = () => {
       </h3>
       {sortedReservations.length > 0 ? (
         sortedReservations.map((reservation) => {
+          if (!reservation) return null;
           // Calculate computed total payment.
           const computedTotal =
             reservation.subtotal +

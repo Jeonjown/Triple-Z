@@ -1,4 +1,3 @@
-// Cancelled.tsx
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 import useGetReservations from "@/features/Events/hooks/useGetEventReservations";
 import useGetGroupReservations from "@/features/Events/hooks/useGetGroupReservations";
@@ -43,10 +42,10 @@ interface CartItem {
   image: string;
 }
 
-// Added isCorkage field to decide if corkage fee applies.
+// For event reservations.
 export interface Reservation {
   _id: string;
-  userId: User;
+  userId: User | null;
   fullName: string;
   contactNumber: string;
   partySize: number;
@@ -67,6 +66,7 @@ export interface Reservation {
   __v: number;
 }
 
+// Interface for event reservation data.
 interface EventReservationData {
   reservations: Reservation[];
 }
@@ -74,7 +74,7 @@ interface EventReservationData {
 // Raw group reservation interface.
 interface GroupReservationRaw {
   _id: string;
-  userId: User;
+  userId: User | null;
   fullName: string;
   contactNumber: string;
   partySize: number;
@@ -114,6 +114,8 @@ const Cancelled = (): JSX.Element => {
   const eventCancelled: Reservation[] =
     data?.reservations.filter(
       (reservation: Reservation) =>
+        // Only include if userId is not null and matches.
+        reservation.userId !== null &&
         reservation.userId._id === user?._id &&
         reservation.eventStatus === "Cancelled",
     ) || [];
@@ -124,6 +126,8 @@ const Cancelled = (): JSX.Element => {
         .map((group: GroupReservationRaw) => mapGroupToReservation(group))
         .filter(
           (reservation) =>
+            // Again, check that userId exists before accessing _id.
+            reservation.userId !== null &&
             reservation.userId._id === user?._id &&
             reservation.eventStatus === "Cancelled",
         )
@@ -157,7 +161,6 @@ const Cancelled = (): JSX.Element => {
       <Table className="min-w-full">
         <TableHeader>
           <TableRow className="border border-gray-300 bg-gray-100">
-            {/* Updated Date & Time cell with whitespace-nowrap and min-width */}
             <TableHead className="px-3 py-2 sm:px-4">Date &amp; Time</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Event</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Party Size</TableHead>
@@ -180,17 +183,23 @@ const Cancelled = (): JSX.Element => {
               // Render event and payment statuses as badges.
               const currentEventStyle = eventStatusColors[
                 reservation.eventStatus
-              ] || { border: "#ccc", bg: "#ccc" };
+              ] || {
+                border: "#ccc",
+                bg: "#ccc",
+              };
               const currentPaymentStyle = paymentStatusColors[
                 reservation.paymentStatus
-              ] || { border: "#ccc", bg: "#ccc" };
+              ] || {
+                border: "#ccc",
+                bg: "#ccc",
+              };
 
               return (
                 <TableRow
                   key={reservation._id}
                   className="border-b border-gray-300 hover:bg-gray-50"
                 >
-                  {/* Updated Date & Time cell */}
+                  {/* Date & Time */}
                   <TableCell className="min-w-[150px] whitespace-nowrap px-3 py-2 sm:px-4">
                     <span className="text-sm font-bold sm:text-base">
                       {format(new Date(reservation.date), "MMMM dd, yyyy")}
@@ -200,17 +209,21 @@ const Cancelled = (): JSX.Element => {
                       {reservation.startTime} - {reservation.endTime}
                     </span>
                   </TableCell>
+                  {/* Event Type */}
                   <TableCell className="px-3 py-2 sm:px-4">
                     <span className="text-xs font-bold sm:text-sm">
                       {reservation.eventType}
                     </span>
                   </TableCell>
+                  {/* Party Size */}
                   <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
                     {reservation.partySize} pax
                   </TableCell>
+                  {/* Special Request */}
                   <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
                     {reservation.specialRequest || "N/A"}
                   </TableCell>
+                  {/* Event Status */}
                   <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
                     <span
                       style={{
@@ -227,6 +240,7 @@ const Cancelled = (): JSX.Element => {
                       {reservation.eventStatus}
                     </span>
                   </TableCell>
+                  {/* Payment */}
                   <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
                     <div className="flex flex-col text-center">
                       <span className="block font-bold">₱{computedTotal}</span>
@@ -246,6 +260,7 @@ const Cancelled = (): JSX.Element => {
                       </span>
                     </div>
                   </TableCell>
+                  {/* Reservation ID with copy functionality */}
                   <TableCell className="px-3 py-2 sm:px-4">
                     <div className="flex items-center space-x-1 sm:space-x-2">
                       <span className="text-xs font-medium text-primary sm:text-sm">
@@ -270,6 +285,7 @@ const Cancelled = (): JSX.Element => {
                       </TooltipProvider>
                     </div>
                   </TableCell>
+                  {/* Cart Details */}
                   <TableCell className="px-3 py-2 sm:px-4">
                     <Dialog>
                       <DialogTrigger asChild>
