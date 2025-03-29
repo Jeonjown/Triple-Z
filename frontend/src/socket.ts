@@ -1,8 +1,9 @@
 import { io } from "socket.io-client";
 
-export const socket = io(
-  import.meta.env.VITE_SOCKET_URL || "ws://localhost:3000",
-  {
-    withCredentials: true,
-  },
-);
+const endpoint = import.meta.env.VITE_SOCKET_URL || "wss://localhost:3000";
+
+export const socket = io(endpoint, {
+  path: "/socket",
+  withCredentials: true,
+  transports: ["websocket"],
+});
