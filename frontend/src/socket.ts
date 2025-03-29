@@ -7,3 +7,5 @@ export const socket = io(endpoint, {
   withCredentials: true,
   transports: ["websocket"],
 });
+
+console.log(endpoint);
