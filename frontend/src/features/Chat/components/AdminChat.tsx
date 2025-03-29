@@ -65,6 +65,7 @@ const AdminChat: React.FC = () => {
   const { data: fetchedMessages, isPending: messagesLoading } =
     useMessagesForRoom(roomId);
   const { data: userInfo } = useGetUser(selectedUserId);
+  console.log("message from AdminChat,", fetchedMessages);
 
   useEffect(() => {
     if (Notification.permission === "default") setDialogOpen(true);
@@ -277,6 +278,7 @@ const AdminChat: React.FC = () => {
               checked={soundEnabled}
               onChange={(e) => setSoundEnabled(e.target.checked)}
             />
+
             <label htmlFor="soundNotifications">
               Enable sound notifications
             </label>

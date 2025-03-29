@@ -34,6 +34,7 @@ const UserChat: React.FC = () => {
   // Fetch chat history for the room (custom hook)
   const { data } = useMessagesForRoom(roomId);
   const [messages, setMessages] = useState<Message[]>([]);
+  console.log("message from userchat,", messages);
   const [input, setInput] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
 
