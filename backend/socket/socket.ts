@@ -16,7 +16,6 @@ export let io: SocketIOServer;
 
 export const initSocket = (httpServer: any) => {
   io = new SocketIOServer(httpServer, {
-    path: "/socket",
     cors: {
       origin: [
         "http://localhost:5173",
