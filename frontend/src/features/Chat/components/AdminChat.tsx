@@ -64,8 +64,9 @@ const AdminChat: React.FC = () => {
   const { data: rooms = [] } = useRoomsWithLatestMessage();
   const { data: fetchedMessages, isPending: messagesLoading } =
     useMessagesForRoom(roomId);
+
+  console.log(fetchedMessages);
   const { data: userInfo } = useGetUser(selectedUserId);
-  console.log("message from AdminChat,", fetchedMessages);
 
   useEffect(() => {
     if (Notification.permission === "default") setDialogOpen(true);
