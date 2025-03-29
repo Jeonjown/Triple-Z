@@ -20,7 +20,7 @@ export const initSocket = (httpServer: any) => {
       origin: [
         "http://localhost:5173",
         // "https://triple-z.vercel.app",
-        "https://triplez.shop",
+        "https://triplez.shop/",
       ],
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
       credentials: true,
