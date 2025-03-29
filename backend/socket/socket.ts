@@ -19,6 +19,7 @@ export const initSocket = (httpServer: any) => {
     cors: {
       origin: [
         "http://localhost:5173",
+        "https://www.triplez.shop",
         // "https://triple-z.vercel.app",
         "https://triplez.shop",
       ],

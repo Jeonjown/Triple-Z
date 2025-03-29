@@ -110,7 +110,8 @@ const AdminChat: React.FC = () => {
 
   // Update messages when new messages are fetched
   useEffect(() => {
-    if (joined && fetchedMessages) {
+    if (fetchedMessages && roomId) {
+      // Remove joined dependency
       setMessages(
         fetchedMessages.map((msg) => ({
           ...msg,
@@ -120,7 +121,7 @@ const AdminChat: React.FC = () => {
         })),
       );
     }
-  }, [fetchedMessages, joined]);
+  }, [fetchedMessages, roomId]); // Removed joined from dependencies
 
   // Listen for real-time updates and update room list
   useEffect(() => {
