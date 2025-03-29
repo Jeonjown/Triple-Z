@@ -1,8 +1,11 @@
 import { io } from "socket.io-client";
 
-export const socket = io(
-  import.meta.env.VITE_API_URL || "http://localhost:3000",
-  {
-    withCredentials: true,
-  },
-);
+const endpoint =
+  process.env.NODE_ENV === "production"
+    ? "wss://api.triplez.shop"
+    : "ws://localhost:3000";
+
+export const socket = io(endpoint, {
+  transports: ["websocket"],
+  withCredentials: true,
+});
