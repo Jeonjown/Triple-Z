@@ -94,7 +94,10 @@ server.use(cookieParser());
 // CORS configuration
 server.use(
   cors({
-    origin: ["http://localhost:5173", "https://triple-z.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "https://triple-z.vercel.app, https://triplez.shop",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true,
