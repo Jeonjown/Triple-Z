@@ -1,24 +1,17 @@
-// useSocket.ts
-import { useEffect, useState } from "react";
-import io, { Socket } from "socket.io-client";
+// src/hooks/useSocket.tsx
+import { useEffect } from "react";
+import { socket } from "@/socket"; // adjust the import path as needed
+import { Socket } from "socket.io-client";
 
-const SOCKET_SERVER_URL =
-  `${import.meta.env.VITE_API_URL}` || "http://localhost:3000";
-
-export const useSocket = (roomId: string): Socket | null => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-
+export const useSocket = (roomId: string): Socket => {
   useEffect(() => {
-    const socketInstance = io(SOCKET_SERVER_URL, {
-      withCredentials: true,
-    });
-    setSocket(socketInstance);
+    // Join the room when the component mounts
+    socket.emit("join-room", roomId);
 
-    socketInstance.emit("join-room", roomId);
-
+    // Clean up: leave the room when the component unmounts
     return () => {
-      socketInstance.emit("leave-room", roomId);
-      socketInstance.disconnect();
+      socket.emit("leave-room", roomId);
+      // Note: Do not disconnect the socket here if it's shared across your app.
     };
   }, [roomId]);
 
