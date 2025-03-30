@@ -30,14 +30,7 @@ export function DataTable<TData>({
   onDelete,
 }: DataTableProps<TData>): JSX.Element {
   // Define columns that should render as plain text (i.e. no sorting)
-  const plainTextColumns = [
-    "image",
-    "subcategoryName",
-    "categoryName",
-    "title",
-    "sizes",
-    "basePrice",
-  ];
+  const plainTextColumns = ["image"];
 
   return (
     <div className="rounded-md md:mt-5 md:border">
