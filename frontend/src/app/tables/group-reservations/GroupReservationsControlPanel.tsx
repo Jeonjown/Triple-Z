@@ -33,17 +33,15 @@ import { columns } from "./columns";
 import { DataTableViewOptions } from "@/components/ui/DataTableViewOptions";
 
 const GroupReservationsControlPanel: React.FC = () => {
-  // Fetch reservations (default to an empty array)
-  const { data = { message: "", reservations: [] }, isPending } =
-    useGetGroupReservations();
-  const reservations = data.reservations;
+  // Step 1. Fetch the reservations data and default to an empty array if undefined.
+  const { data: reservations = [], isPending } = useGetGroupReservations();
 
-  // Local state for filtering, sorting, and view toggle
+  // Step 2. Local state for filtering, sorting, and view toggle.
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [view, setView] = useState<"table" | "card">("table");
 
-  // Create table instance using the fetched reservations
+  // Step 3. Create table instance using the fetched reservations.
   const table = useReactTable({
     data: reservations,
     columns,
@@ -64,10 +62,14 @@ const GroupReservationsControlPanel: React.FC = () => {
     },
   });
 
+  // Step 4. If data is still loading, show the loading page.
   if (isPending) return <LoadingPage />;
 
+  // Step 5. Safely retrieve the row model and default to an empty array if undefined.
+  const rowModel = table.getRowModel();
+  const rows = rowModel?.rows || [];
+
   return (
-    // Outer container with same width and padding as EventReservationsControlPanel
     <div className="mx-auto p-4 md:w-5/6">
       {/* Top Panel: Search, Filters & View Options */}
       <div className="top-[105px] z-10 mx-auto mb-5 flex w-full flex-col gap-4 rounded border bg-white px-6 py-2 pt-6 shadow-md md:sticky">
@@ -90,7 +92,6 @@ const GroupReservationsControlPanel: React.FC = () => {
         {/* Layer 2: Filters & Toggle Columns */}
         <div className="flex justify-between gap-3">
           <div className="flex space-x-3">
-            {/* Example Filter (adapt as needed) */}
             <Select
               value={
                 (table.getColumn("eventStatus")?.getFilterValue() as string) ||
@@ -107,7 +108,7 @@ const GroupReservationsControlPanel: React.FC = () => {
                 <SelectValue placeholder="Filter by event status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="All"> All Groups</SelectItem>
+                <SelectItem value="All">All Groups</SelectItem>
                 <SelectItem value="Pending">Pending</SelectItem>
                 <SelectItem value="Confirmed">Confirmed</SelectItem>
                 <SelectItem value="Cancelled">Cancelled</SelectItem>
@@ -132,7 +133,7 @@ const GroupReservationsControlPanel: React.FC = () => {
                 <SelectValue placeholder="Filter by payment status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="All"> All Payments</SelectItem>
+                <SelectItem value="All">All Payments</SelectItem>
                 <SelectItem value="Not Paid">Not Paid</SelectItem>
                 <SelectItem value="Paid">Paid</SelectItem>
               </SelectContent>
@@ -234,17 +235,15 @@ const GroupReservationsControlPanel: React.FC = () => {
         {view === "table" ? (
           <GroupReservationsTable table={table} />
         ) : (
-          // Wrap the cards in a grid to display three per row on large screens
+          // Render the cards in a grid
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {table.getRowModel().rows.length > 0 ? (
-              table
-                .getRowModel()
-                .rows.map((row) => (
-                  <GroupReservationCard
-                    key={row.original._id}
-                    reservation={row.original}
-                  />
-                ))
+            {rows.length > 0 ? (
+              rows.map((row) => (
+                <GroupReservationCard
+                  key={row.original._id}
+                  reservation={row.original}
+                />
+              ))
             ) : (
               <p>No reservations found.</p>
             )}
