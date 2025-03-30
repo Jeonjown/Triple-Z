@@ -28,7 +28,6 @@ const PaymentStatusCell = ({
   const [selectedPaymentStatus, setSelectedPaymentStatus] =
     useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  console.log(reservation);
 
   // Define color mapping for payment statuses (sync with event style)
   const statusColors: Record<string, { border: string; bg: string }> = {

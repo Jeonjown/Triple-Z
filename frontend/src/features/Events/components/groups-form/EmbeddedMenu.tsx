@@ -55,7 +55,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
     data?: MenuData;
     isPending: boolean;
   };
-
+  console.log(menuData);
   // Initialize the toast function
   const { toast } = useToast();
 

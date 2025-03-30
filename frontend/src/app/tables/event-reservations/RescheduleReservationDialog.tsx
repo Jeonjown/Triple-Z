@@ -27,8 +27,6 @@ const RescheduleReservationDialog: React.FC<{
     endTime: reservation.endTime,
   });
 
-  console.log(formData.date);
-
   const { mutate, isPending } = useRescheduleEventReservation();
 
   // Handle changes for the date input.

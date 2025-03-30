@@ -8,6 +8,7 @@ import { GroupFormValues } from "../../pages/GroupForm";
 
 const GroupCalendar: React.FC = () => {
   const { data, isPending, isError } = useGetGroupReservations();
+
   const { data: settings } = useGetEventReservationSettings();
   // Import setValue and trigger from form context
   const { setValue, trigger } = useFormContext<GroupFormValues>();

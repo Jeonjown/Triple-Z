@@ -1,4 +1,3 @@
-// GroupStep2.tsx
 import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
@@ -45,6 +44,7 @@ const GroupStep2 = ({
   const [tooltipTrigger, setTooltipTrigger] = useState(0);
 
   // Update the cart ensuring each item includes a valid 'price' field.
+  // Here we also add an "isAddOn" flag if the menu item belongs to the "Add-ons" subcategory.
   const updateCart = useCallback(() => {
     const updatedCart: UnifiedCartItem[] =
       (selectedPackageIds
@@ -67,6 +67,11 @@ const GroupStep2 = ({
             // If no size selection is required, use the base price (or 0 if null).
             price = menuItem.basePrice !== null ? menuItem.basePrice : 0;
           }
+          // Determine if the item is an add-on by checking the subcategoryName field.
+          const isAddOn =
+            menuItem.subcategoryName &&
+            menuItem.subcategoryName.toLowerCase() === "add-ons";
+
           return {
             _id: selected.key, // Use the unique composite key for the cart item.
             title: menuItem.title,
@@ -75,6 +80,7 @@ const GroupStep2 = ({
             image: menuItem.image,
             size: sizeText,
             totalPrice: quantity * price,
+            isAddOn, // Flag to indicate add-on items
           };
         })
         .filter((item) => item !== null) as UnifiedCartItem[]) || [];
@@ -125,10 +131,14 @@ const GroupStep2 = ({
     console.log("Current Cart Data:", cart);
   }, [cart]);
 
-  // Calculate the total quantity of items in the cart.
-  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+  // Calculate the total quantity of items in the cart, excluding add-ons.
+  const totalQuantity = cart.reduce((sum, item) => {
+    if (item.isAddOn) return sum;
+    return sum + item.quantity;
+  }, 0);
 
   // Determine whether the Next button should be disabled.
+  // The Next button is disabled if the quantity (excluding add-ons) is less than the party size.
   const nextDisabled = totalQuantity < partySize;
 
   return (

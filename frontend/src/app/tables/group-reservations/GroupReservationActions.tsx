@@ -20,7 +20,7 @@ const GroupReservationActions: React.FC<{ reservation: GroupReservation }> = ({
 }) => {
   const [openCartDialog, setOpenCartDialog] = useState(false);
   const [openRescheduleDialog, setOpenRescheduleDialog] = useState(false);
-  console.log(reservation);
+
   const handleCopyId = (): void => {
     navigator.clipboard.writeText(reservation._id);
   };

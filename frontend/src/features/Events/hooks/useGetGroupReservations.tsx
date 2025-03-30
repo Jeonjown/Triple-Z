@@ -9,7 +9,9 @@ const useGetGroupReservations = () => {
     retry: 1,
   });
 
-  return { data, isPending, isError, error };
+  const reservations = data?.reservations;
+
+  return { data: reservations, isPending, isError, error };
 };
 
 export default useGetGroupReservations;

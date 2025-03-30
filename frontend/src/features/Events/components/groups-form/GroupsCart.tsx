@@ -1,4 +1,3 @@
-// GroupsCart.tsx
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -65,8 +64,11 @@ const GroupsCart: React.FC<GroupsCartProps> = ({
     0,
   );
 
-  // Calculate total quantity of items in the cart (summing up each item's quantity)
-  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+  // Calculate total quantity excluding add-on items.
+  const totalQuantity = cart.reduce(
+    (sum, item) => (item.isAddOn ? sum : sum + item.quantity),
+    0,
+  );
 
   // Manage tooltip state for "Item added!" notification
   const [showTooltip, setShowTooltip] = useState(false);
@@ -74,7 +76,7 @@ const GroupsCart: React.FC<GroupsCartProps> = ({
   const lastTooltipTrigger = useRef(tooltipTrigger);
 
   useEffect(() => {
-    // Only trigger tooltip if the new tooltipTrigger is greater than the last value
+    // Only trigger tooltip if the new tooltipTrigger is greater than the last value.
     if (!didMount.current) {
       didMount.current = true;
       lastTooltipTrigger.current = tooltipTrigger;
@@ -100,7 +102,7 @@ const GroupsCart: React.FC<GroupsCartProps> = ({
             </div>
           )}
           <RiShoppingBag3Fill className="size-16 rounded-full bg-secondary p-2 text-primary hover:scale-105 hover:cursor-pointer" />
-          {/* Use totalQuantity for the badge count */}
+          {/* The badge counter shows the totalQuantity excluding add-on items */}
           {totalQuantity > 0 && (
             <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
               {totalQuantity}
