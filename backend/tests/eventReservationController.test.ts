@@ -14,7 +14,7 @@ import {
   // getReservations, // Removed test for getReservations
   updateReservationStatus,
   updatePaymentStatus,
-  adminRescheduleReservation,
+  adminRescheduleEventReservation,
 } from "../controllers/eventReservationController";
 import { EventReservation } from "../models/eventReservationModel";
 
@@ -78,7 +78,11 @@ describe("Event Reservation Controller", () => {
   describe("adminRescheduleReservation", () => {
     it("should return error if reservationId is missing", async () => {
       req.body = { date: "2025-01-01" };
-      await adminRescheduleReservation(req as Request, res as Response, next);
+      await adminRescheduleEventReservation(
+        req as Request,
+        res as Response,
+        next
+      );
       expect(next).toHaveBeenCalled();
     });
   });
