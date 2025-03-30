@@ -1,8 +1,8 @@
 // EventReservationsTable.tsx
 import React from "react";
 import { Reservation } from "./columns";
-import { DataTable } from "./data-table";
 import { useReactTable } from "@tanstack/react-table";
+import DataTable from "./data-table";
 
 interface EventReservationsTableProps {
   table: ReturnType<typeof useReactTable<Reservation>>;
