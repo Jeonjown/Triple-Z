@@ -27,4 +27,4 @@ const users = generateUsers(100);
 // Write to JSON file
 fs.writeFileSync('users.json', JSON.stringify(users, null, 2));
 
-console.log('Users generated and saved to users.json');
+

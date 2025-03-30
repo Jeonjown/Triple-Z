@@ -1,12 +1,11 @@
-// GroupReservationCard.tsx
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDate } from "date-fns";
 import { FaUserCircle } from "react-icons/fa";
-import { GroupReservation } from "./columns";
 import PaymentStatusCell from "./PaymentStatusCell";
 import EventStatusCell from "./EventStatusCell";
 import GroupViewCart from "./GroupViewCart";
+import { GroupReservation } from "./columns";
 
 interface GroupReservationCardProps {
   reservation: GroupReservation;
@@ -22,15 +21,15 @@ const GroupReservationCard: React.FC<GroupReservationCardProps> = ({
   return (
     <Card className="w-full shadow transition hover:shadow-lg">
       <CardContent className="flex h-full flex-col p-4">
-        {/* Header: Reservation ID and Cart */}
         <div className="flex items-center justify-between">
           <span className="text-xs">{reservation._id}</span>
           <span className="ml-auto text-right">
             <GroupViewCart reservation={reservation} />
           </span>
         </div>
+
         <FaUserCircle size={96} className="mx-auto mt-2 text-primary" />
-        {/* Main details */}
+
         <div className="mx-auto text-center text-2xl font-semibold">
           {reservation.fullName}
         </div>
@@ -38,39 +37,32 @@ const GroupReservationCard: React.FC<GroupReservationCardProps> = ({
           {reservation.contactNumber}
         </div>
         <div className="mx-auto text-center">
-          {reservation.userId.email || "N/A"}
+          {reservation.userId?.email || "N/A"}
         </div>
-        {/* New grid row: User ID */}
-        <div className="mt-2 grid grid-cols-2 gap-x-2">
-          <span className="font-medium">User ID:</span>
-          <span className="text-right">{reservation.userId._id}</span>
+
+        <div className="mt-4 grid grid-cols-2 gap-x-2">
+          <span className="font-medium">Party Size:</span>
+          <span className="text-right">{reservation.partySize}</span>
         </div>
-        {/* Additional details */}
-        <div className="mb-10 mt-8 space-y-4">
-          <div className="grid grid-cols-2 gap-x-2">
-            <span className="font-medium">Party Size:</span>
-            <span className="text-right">{reservation.partySize}</span>
-          </div>
-          <div className="grid grid-cols-2 gap-x-2">
-            <span className="font-medium">Date:</span>
-            <span className="text-right">
-              {eventDate}
-              <br />
-              <span className="text-xs text-gray-500">
-                {reservation.startTime} - {reservation.endTime}
-              </span>
+        <div className="grid grid-cols-2 gap-x-2">
+          <span className="font-medium">Date & Time:</span>
+          <span className="text-right">
+            {eventDate}
+            <br />
+            <span className="text-right text-xs text-gray-500">
+              {reservation.startTime} - {reservation.endTime}
             </span>
-          </div>
-          <div className="grid grid-cols-2 gap-x-2">
-            <span className="font-medium">Created At:</span>
-            <span className="text-right">
-              {createdDate}
-              <br />
-              <span className="text-xs text-gray-500">{createdTime}</span>
-            </span>
-          </div>
+          </span>
         </div>
-        {/* Footer: Status and Payment cells */}
+        <div className="mb-10 grid grid-cols-2 gap-x-2">
+          <span className="font-medium">Created At:</span>
+          <span className="text-right">
+            {createdDate}
+            <br />
+            <span className="text-xs text-gray-500">{createdTime}</span>
+          </span>
+        </div>
+
         <div className="mt-auto flex justify-between">
           <div className="text-center">
             <p className="text-xs text-gray-500">Status:</p>

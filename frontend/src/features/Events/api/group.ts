@@ -157,3 +157,31 @@ export const deleteGroupReservation = async (
     throw new Error("An unexpected error occurred");
   }
 };
+
+export interface RescheduleGroupReservationData {
+  reservationId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+
+// Mutation function for rescheduling a group reservation.
+export const adminRescheduleGroupReservation = async (
+  updateData: RescheduleGroupReservationData,
+): Promise<GroupReservation> => {
+  try {
+    // Call the PATCH endpoint for group reservation reschedule.
+    const response: AxiosResponse<GroupReservation> = await api.patch(
+      `/api/events/group-reservations/group-reschedule`,
+      updateData,
+      { withCredentials: true }, // Include credentials if needed.
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<ReservationError>;
+      throw new Error(axiosError.response?.data?.error || "An error occurred");
+    }
+    throw new Error("An unexpected error occurred");
+  }
+};

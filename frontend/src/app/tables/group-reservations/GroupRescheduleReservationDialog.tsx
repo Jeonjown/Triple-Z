@@ -1,103 +1,141 @@
-// // GroupRescheduleReservationDialog.tsx
-// import React, { useState } from "react";
-// import { format, parseISO } from "date-fns";
-// import {
-//   Dialog,
-//   DialogClose,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-// } from "@/components/ui/dialog";
-// import { Button } from "@/components/ui/button";
-// import HourlyTimePicker from "@/features/Events/components/events-form/HourlyTimePicker";
-// import { GroupReservation } from "./columns";
+// GroupRescheduleReservationDialog.tsx
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { parse, format } from "date-fns";
+import { GroupReservation } from "./columns";
+import { useRescheduleGroupReservation } from "@/features/Events/hooks/useRescheduleGroupReservation";
 
-// interface GroupRescheduleReservationDialogProps {
-//   open: boolean;
-//   onOpenChange: (open: boolean) => void;
-//   reservation: GroupReservation;
-// }
+const GroupRescheduleReservationDialog: React.FC<{
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  reservation: GroupReservation;
+}> = ({ open, onOpenChange, reservation }) => {
+  // Convert stored time to 24-hour format for the time inputs.
+  const initialStartTime =
+    reservation.startTime.toLowerCase().includes("am") ||
+    reservation.startTime.toLowerCase().includes("pm")
+      ? format(parse(reservation.startTime, "h:mm a", new Date()), "HH:mm")
+      : reservation.startTime;
+  const initialEndTime =
+    reservation.endTime.toLowerCase().includes("am") ||
+    reservation.endTime.toLowerCase().includes("pm")
+      ? format(parse(reservation.endTime, "h:mm a", new Date()), "HH:mm")
+      : reservation.endTime;
 
-// const GroupRescheduleReservationDialog: React.FC<
-//   GroupRescheduleReservationDialogProps
-// > = ({ open, onOpenChange, reservation }) => {
-//   const formattedDate = format(parseISO(reservation.date), "yyyy-MM-dd");
-//   const [formData, setFormData] = useState({
-//     date: formattedDate,
-//     startTime: reservation.startTime,
-//     endTime: reservation.endTime,
-//   });
-//   const { mutate, isPending } = useRescheduleGroupReservation();
+  // Pre-fill form state with the reservation's current scheduling values.
+  const [formData, setFormData] = useState({
+    date: reservation.date.slice(0, 10), // "YYYY-MM-DD"
+    startTime: initialStartTime,
+    endTime: initialEndTime,
+  });
 
-//   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-//     setFormData({ ...formData, date: e.target.value });
-//   };
+  const { mutate, isPending } = useRescheduleGroupReservation();
 
-//   const handleStartTimeChange = (time: string): void => {
-//     setFormData({ ...formData, startTime: time });
-//   };
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, date: e.target.value });
+  };
 
-//   const handleEndTimeChange = (time: string): void => {
-//     setFormData({ ...formData, endTime: time });
-//   };
+  const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, startTime: e.target.value });
+  };
 
-//   const handleSubmit = (e: React.FormEvent): void => {
-//     e.preventDefault();
-//     mutate({
-//       userId: reservation.userId._id,
-//       updateData: {
-//         reservationId: reservation._id,
-//         date: formData.date,
-//         startTime: formData.startTime,
-//         endTime: formData.endTime,
-//       },
-//     });
-//     onOpenChange(false);
-//   };
+  const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, endTime: e.target.value });
+  };
 
-//   return (
-//     <Dialog open={open} onOpenChange={onOpenChange}>
-//       <DialogContent>
-//         <DialogHeader>
-//           <DialogTitle>Reschedule Reservation</DialogTitle>
-//         </DialogHeader>
-//         <form onSubmit={handleSubmit} className="space-y-4">
-//           <div>
-//             <label className="block text-sm font-medium">Date</label>
-//             <input
-//               type="date"
-//               name="date"
-//               value={formData.date}
-//               onChange={handleDateChange}
-//               className="mt-1 block w-full rounded border p-2"
-//             />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium">Start Time</label>
-//             <HourlyTimePicker
-//               id="start-time"
-//               value={formData.startTime}
-//               onChange={handleStartTimeChange}
-//             />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium">End Time</label>
-//             <HourlyTimePicker
-//               id="end-time"
-//               value={formData.endTime}
-//               onChange={handleEndTimeChange}
-//             />
-//           </div>
-//           <div className="flex justify-end">
-//             <Button type="submit" disabled={isPending}>
-//               {isPending ? "Rescheduling..." : "Reschedule Reservation"}
-//             </Button>
-//           </div>
-//         </form>
-//         <DialogClose className="absolute right-4 top-4" />
-//       </DialogContent>
-//     </Dialog>
-//   );
-// };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Convert 24-hour times back to 12-hour (with AM/PM) before sending.
+    const convertedStartTime = format(
+      parse(formData.startTime, "HH:mm", new Date()),
+      "h:mm a",
+    );
+    const convertedEndTime = format(
+      parse(formData.endTime, "HH:mm", new Date()),
+      "h:mm a",
+    );
 
-// export default GroupRescheduleReservationDialog;
+    mutate({
+      userId: reservation.userId._id,
+      updateData: {
+        reservationId: reservation._id,
+        date: formData.date,
+        startTime: convertedStartTime,
+        endTime: convertedEndTime,
+      },
+    });
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Reschedule Group Reservation</DialogTitle>
+          <DialogDescription>
+            Update the date and time for this group reservation.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium">Date</label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleDateChange}
+              className="mt-1 block w-full rounded border p-2"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Start Time</label>
+            <input
+              type="time"
+              name="startTime"
+              value={formData.startTime}
+              onChange={handleStartTimeChange}
+              className="mt-1 block w-full rounded border p-2"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">End Time</label>
+            <input
+              type="time"
+              name="endTime"
+              value={formData.endTime}
+              onChange={handleEndTimeChange}
+              className="mt-1 block w-full rounded border p-2"
+              required
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Rescheduling..." : "Reschedule Reservation"}
+            </Button>
+          </DialogFooter>
+        </form>
+        <DialogClose className="absolute right-4 top-4" />
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default GroupRescheduleReservationDialog;

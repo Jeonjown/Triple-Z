@@ -17,14 +17,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { GroupReservation } from "./columns";
-import { useUpdateEventReservationStatus } from "@/features/Events/hooks/useUpdateEventReservationsStatus";
+import { useUpdateGroupReservationStatus } from "@/features/Events/hooks/useUpdateGroupReservationStatus ";
 
 const EventStatusCell = ({
   reservation,
 }: {
   reservation: GroupReservation;
 }): JSX.Element => {
-  const { mutate } = useUpdateEventReservationStatus();
+  const { mutate } = useUpdateGroupReservationStatus();
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 

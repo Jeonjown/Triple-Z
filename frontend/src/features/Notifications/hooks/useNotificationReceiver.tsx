@@ -39,13 +39,11 @@ export const useNotificationReceiver = (
 
     // Listener for receiving the full list of notifications.
     const handleNotifications = (notifs: MyNotification[]) => {
-      console.log("Received notifications from server:", notifs);
       setNotifications(notifs);
     };
 
     // Listener for receiving a new realtime notification.
     const handleRealtimeNotification = (notification: MyNotification) => {
-      console.log("Received realtime notification from server:", notification);
       // playPingSound();
       setNotifications((prev) => [notification, ...prev]);
     };

@@ -1,4 +1,3 @@
-// GroupReservationsControlPanel.tsx
 import React, { useState } from "react";
 import {
   useReactTable,
@@ -44,7 +43,7 @@ const GroupReservationsControlPanel: React.FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [view, setView] = useState<"table" | "card">("table");
 
-  // Create one table instance using the reservations and columns
+  // Create table instance using the fetched reservations
   const table = useReactTable({
     data: reservations,
     columns,
@@ -68,10 +67,11 @@ const GroupReservationsControlPanel: React.FC = () => {
   if (isPending) return <LoadingPage />;
 
   return (
+    // Outer container with same width and padding as EventReservationsControlPanel
     <div className="mx-auto p-4 md:w-5/6">
       {/* Top Panel: Search, Filters & View Options */}
       <div className="top-[105px] z-10 mx-auto mb-5 flex w-full flex-col gap-4 rounded border bg-white px-6 py-2 pt-6 shadow-md md:sticky">
-        {/* Search Input */}
+        {/* Layer 1: Search Input */}
         <div className="w-full">
           <div className="relative">
             <Input
@@ -86,10 +86,11 @@ const GroupReservationsControlPanel: React.FC = () => {
             />
           </div>
         </div>
-        {/* Filters */}
+
+        {/* Layer 2: Filters & Toggle Columns */}
         <div className="flex justify-between gap-3">
           <div className="flex space-x-3">
-            {/* Event Status Filter */}
+            {/* Example Filter (adapt as needed) */}
             <Select
               value={
                 (table.getColumn("eventStatus")?.getFilterValue() as string) ||
@@ -102,18 +103,18 @@ const GroupReservationsControlPanel: React.FC = () => {
               }
               aria-label="Filter by event status"
             >
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-30 md:w-40">
                 <SelectValue placeholder="Filter by event status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="All">All</SelectItem>
+                <SelectItem value="All"> All Groups</SelectItem>
                 <SelectItem value="Pending">Pending</SelectItem>
                 <SelectItem value="Confirmed">Confirmed</SelectItem>
                 <SelectItem value="Cancelled">Cancelled</SelectItem>
                 <SelectItem value="Completed">Completed</SelectItem>
               </SelectContent>
             </Select>
-            {/* Payment Status Filter */}
+
             <Select
               value={
                 (table
@@ -127,23 +128,26 @@ const GroupReservationsControlPanel: React.FC = () => {
               }
               aria-label="Filter by payment status"
             >
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-30 md:w-40">
                 <SelectValue placeholder="Filter by payment status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="All">All</SelectItem>
+                <SelectItem value="All"> All Payments</SelectItem>
                 <SelectItem value="Not Paid">Not Paid</SelectItem>
                 <SelectItem value="Paid">Paid</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          {/* View Options */}
+
+          {/* Toggle Column Options */}
           <div className="h-10">
             <DataTableViewOptions table={table} />
           </div>
         </div>
-        {/* View Toggle & Pagination Controls */}
+
+        {/* Layer 3: View Toggle & Pagination Controls */}
         <div className="flex flex-wrap items-center justify-evenly gap-4 p-2 text-sm">
+          {/* View Toggle */}
           <div className="flex items-center space-x-2">
             <div className="flex rounded-lg border">
               <div
@@ -176,6 +180,8 @@ const GroupReservationsControlPanel: React.FC = () => {
               ))}
             </select>
           </div>
+
+          {/* Pagination Controls */}
           <div className="flex items-center space-x-2">
             <Button
               size="icon"
@@ -222,21 +228,27 @@ const GroupReservationsControlPanel: React.FC = () => {
           </div>
         </div>
       </div>
-      {/* Render Table or Card View */}
+
+      {/* Render the selected view */}
       <div className="mx-auto w-full">
         {view === "table" ? (
           <GroupReservationsTable table={table} />
         ) : (
-          <>
-            {table
-              .getRowModel()
-              .rows.map((row) => (
-                <GroupReservationCard
-                  key={row.original._id}
-                  reservation={row.original}
-                />
-              )) || <p>No reservations found.</p>}
-          </>
+          // Wrap the cards in a grid to display three per row on large screens
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {table.getRowModel().rows.length > 0 ? (
+              table
+                .getRowModel()
+                .rows.map((row) => (
+                  <GroupReservationCard
+                    key={row.original._id}
+                    reservation={row.original}
+                  />
+                ))
+            ) : (
+              <p>No reservations found.</p>
+            )}
+          </div>
         )}
       </div>
     </div>

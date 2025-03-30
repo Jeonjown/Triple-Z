@@ -17,17 +17,18 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { GroupReservation } from "./columns";
-import { useUpdateEventReservationPaymentStatusWithNotification } from "@/features/Events/hooks/useUpdateEventReservationsPaymentStatus";
+import { useUpdateGroupReservationPaymentStatus } from "@/features/Events/hooks/useUpdateGroupReservationPaymentStatus";
 
 const PaymentStatusCell = ({
   reservation,
 }: {
   reservation: GroupReservation;
 }): JSX.Element => {
-  const { mutate } = useUpdateEventReservationPaymentStatusWithNotification();
+  const { mutate } = useUpdateGroupReservationPaymentStatus();
   const [selectedPaymentStatus, setSelectedPaymentStatus] =
     useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  console.log(reservation);
 
   // Define color mapping for payment statuses (sync with event style)
   const statusColors: Record<string, { border: string; bg: string }> = {

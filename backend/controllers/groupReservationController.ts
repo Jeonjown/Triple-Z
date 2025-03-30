@@ -219,3 +219,71 @@ export const deleteGroupReservation = async (
     next(createError("Failed to delete group reservation.", 500));
   }
 };
+
+export const adminRescheduleGroupReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { reservationId, ...updateData } = req.body;
+    if (!reservationId) {
+      return next(
+        createError("ReservationId is required in the request body.", 400)
+      );
+    }
+
+    // Step 1: Fetch the current group reservation.
+    const currentReservation = await GroupReservation.findById(reservationId);
+    if (!currentReservation) {
+      return next(createError("Group reservation not found.", 404));
+    }
+
+    // Step 2: Filter only scheduling-related fields.
+    const allowedUpdates = ["date", "startTime", "endTime"];
+    const filteredUpdates = Object.keys(updateData).reduce((acc, key) => {
+      if (allowedUpdates.includes(key)) {
+        acc[key] = updateData[key];
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Step 3: Update the reservation.
+    const updatedReservation = await GroupReservation.findByIdAndUpdate(
+      reservationId,
+      { $set: filteredUpdates },
+      { new: true }
+    );
+    if (!updatedReservation) {
+      return next(createError("Group reservation not found.", 404));
+    }
+
+    // Step 4: Log which fields have changed.
+    let changes: string[] = [];
+    Object.keys(filteredUpdates).forEach((key) => {
+      const oldValue = String((currentReservation as any)[key]);
+      const newValue = String(filteredUpdates[key]);
+      if (oldValue !== newValue) {
+        changes.push(`${key} changed from "${oldValue}" to "${newValue}"`);
+      }
+    });
+    console.log(
+      changes.length
+        ? `Changes made: ${changes.join(", ")}.`
+        : "No scheduling changes were detected."
+    );
+
+    // Step 5: Populate user details before returning.
+    const populatedReservation = await GroupReservation.findById(
+      updatedReservation._id
+    ).populate("userId", "username email", User);
+
+    res.status(200).json({
+      message: "Group reservation rescheduled successfully!",
+      reservation: populatedReservation,
+    });
+  } catch (error) {
+    console.error(error);
+    next(createError("Failed to reschedule group reservation.", 500));
+  }
+};

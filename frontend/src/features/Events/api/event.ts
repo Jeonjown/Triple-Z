@@ -250,7 +250,7 @@ export const adminRescheduleEventReservation = async (updateData: {
   try {
     // Use a leading slash so the URL is absolute relative to the baseURL.
     const response: AxiosResponse<Reservation> = await api.patch(
-      `/api/events/event-reservations/reschedule`,
+      `/api/events/event-reservations/event-reschedule`,
       updateData,
       { withCredentials: true }, // if needed
     );

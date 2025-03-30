@@ -330,7 +330,7 @@ export const deleteReservation = async (
 };
 
 // Admin controller to update a user reservation (notification removed)
-export const adminRescheduleReservation = async (
+export const adminRescheduleEventReservation = async (
   req: Request,
   res: Response,
   next: NextFunction

@@ -12,14 +12,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import GroupDeleteReservationDialog from "./GroupDeleteReservationDialog";
 import GroupCartDetailsDialog from "./GroupCartDetailsDialog";
+import GroupRescheduleReservationDialog from "./GroupRescheduleReservationDialog"; // New dialog component
 import { GroupReservation } from "./columns";
 
 const GroupReservationActions: React.FC<{ reservation: GroupReservation }> = ({
   reservation,
 }) => {
   const [openCartDialog, setOpenCartDialog] = useState(false);
-  //   const [openRescheduleDialog, setOpenRescheduleDialog] = useState(false);
-
+  const [openRescheduleDialog, setOpenRescheduleDialog] = useState(false);
+  console.log(reservation);
   const handleCopyId = (): void => {
     navigator.clipboard.writeText(reservation._id);
   };
@@ -41,9 +42,10 @@ const GroupReservationActions: React.FC<{ reservation: GroupReservation }> = ({
           <DropdownMenuItem onClick={() => setOpenCartDialog(true)}>
             View Cart
           </DropdownMenuItem>
-          {/* <DropdownMenuItem onClick={() => setOpenRescheduleDialog(true)}>
+
+          <DropdownMenuItem onClick={() => setOpenRescheduleDialog(true)}>
             Reschedule
-          </DropdownMenuItem> */}
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <GroupDeleteReservationDialog reservationId={reservation._id} />
         </DropdownMenuContent>
@@ -53,11 +55,11 @@ const GroupReservationActions: React.FC<{ reservation: GroupReservation }> = ({
         onOpenChange={setOpenCartDialog}
         reservation={reservation}
       />
-      {/* <GroupRescheduleReservationDialog
+      <GroupRescheduleReservationDialog
         open={openRescheduleDialog}
         onOpenChange={setOpenRescheduleDialog}
         reservation={reservation}
-      /> */}
+      />
     </>
   );
 };

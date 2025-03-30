@@ -5,9 +5,9 @@ import {
   getReservations,
   updateReservationStatus,
   updatePaymentStatus,
-  adminRescheduleReservation,
   getAllReservations,
   cancelReservation,
+  adminRescheduleEventReservation,
 } from "../controllers/eventReservationController";
 import { validateEventReservation } from "../middleware/validateEventReservation";
 import { verifyAdminToken } from "../middleware/verifyAdminToken";
@@ -24,7 +24,11 @@ router.post(
   createReservation
 );
 router.delete("/", verifyAdminToken, deleteReservation);
-router.patch("/reschedule", verifyAdminToken, adminRescheduleReservation);
+router.patch(
+  "/event-reschedule",
+  verifyAdminToken,
+  adminRescheduleEventReservation
+);
 router.patch("/event-status", verifyAdminToken, updateReservationStatus);
 router.patch("/payment-status", verifyAdminToken, updatePaymentStatus);
 router.patch("/cancel-reservation", verifyToken, cancelReservation);

@@ -44,23 +44,22 @@ export function useFCMToken(
   // Delete the token from backend, Firebase, and clear it from state and localStorage
   const deleteCurrentToken = async (): Promise<void> => {
     if (!token) {
-      console.log("No FCM token available to delete");
+      console.error("No FCM token available to delete");
       return;
     }
-    console.log("Attempting to delete FCM token:", token);
+
     try {
       const url = `${import.meta.env.VITE_API_URL}/api/subscriptions/remove`;
-      console.log("Sending POST request to:", url);
+
       const response = await axios.post(url, { token });
-      console.log("Axios response:", response);
+
       if (response.status !== 200) {
         console.error("Backend token removal failed", response.data);
       }
       await deleteToken(getMessaging(app));
-      console.log("FCM token deleted from Firebase");
+
       setToken(null);
       localStorage.removeItem("fcmToken");
-      console.log("Token state cleared (set to null)");
     } catch (error) {
       console.error("Error deleting FCM token:", error);
     }

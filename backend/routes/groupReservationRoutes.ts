@@ -6,6 +6,7 @@ import {
   getGroupReservations,
   updateGroupReservationStatus,
   updateGroupPaymentStatus,
+  adminRescheduleGroupReservation,
 } from "../controllers/groupReservationController";
 import { verifyAdminToken } from "../middleware/verifyAdminToken";
 import { verifyToken } from "../middleware/verifyToken";
@@ -26,11 +27,13 @@ router.post(
 
 // Delete a group reservation (admin only)
 router.delete("/", verifyAdminToken, deleteGroupReservation);
-
 // Update group reservation status (admin only)
 router.patch("/event-status", verifyAdminToken, updateGroupReservationStatus);
-
 // Update group reservation payment status (admin only)
 router.patch("/payment-status", verifyAdminToken, updateGroupPaymentStatus);
-
+router.patch(
+  "/group-reschedule",
+  verifyAdminToken,
+  adminRescheduleGroupReservation
+);
 export default router;

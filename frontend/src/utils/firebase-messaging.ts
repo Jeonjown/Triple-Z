@@ -40,8 +40,6 @@ export async function requestFCMToken(): Promise<string | null> {
 }
 // Handle foreground messages
 onMessage(messaging, (payload) => {
-  console.log("Foreground message:", payload);
-
   let notificationTitle = "";
   let notificationOptions = {};
   let redirectUrl = "/";
