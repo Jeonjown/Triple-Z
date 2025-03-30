@@ -1,36 +1,10 @@
-// GroupColumns.ts
-import { Column, ColumnDef, ColumnMeta } from "@tanstack/react-table";
+// columns.ts
+import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/ui/DataTableColumnHeader";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
 import { formatDate } from "date-fns";
-import { Checkbox } from "@/components/ui/checkbox";
 import EventStatusCell from "./EventStatusCell";
 import PaymentStatusCell from "./PaymentStatusCell";
-
-// Module augmentation for custom meta type
-declare module "@tanstack/react-table" {
-  export interface ColumnMeta<TData = unknown, TValue = unknown> {
-    title: string;
-    _dummyData?: TData;
-    _dummyValue?: TValue;
-  }
-}
-
-// Interfaces for group reservations (similar to events)
-export interface User {
-  _id: string;
-  username: string;
-  email: string;
-}
+import GroupReservationActions from "./GroupReservationActions";
 
 export interface CartItem {
   _id: string;
@@ -41,75 +15,83 @@ export interface CartItem {
 }
 
 export interface GroupReservation {
+  message: string;
   _id: string;
-  userId: User;
+  userId: {
+    _id: string;
+    username: string;
+    email: string;
+  };
   fullName: string;
   contactNumber: string;
-  partySize: number;
   date: string;
   startTime: string;
   endTime: string;
-  eventType: string;
-  cart: CartItem[];
+  partySize: number;
+  cart: Array<{
+    _id: string;
+    title: string;
+    quantity: number;
+    totalPrice: number;
+    image: string;
+  }>;
   eventStatus: string;
   paymentStatus: string;
-  specialRequest: string;
+  subtotal: number;
+  totalPayment: number;
   createdAt: string;
   updatedAt: string;
   __v: number;
 }
 
-// Extend ColumnDef with our custom meta type
 export type MyColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
-  meta?: ColumnMeta<TData, TValue>;
+  meta?: { title: string };
 };
 
-// --- Group Columns Definition ---
 export const columns: MyColumnDef<GroupReservation>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
+    id: "userId",
+    accessorFn: (row: GroupReservation) => row.userId._id,
+    header: ({ column }: { column: Column<GroupReservation, unknown> }) => (
+      <DataTableColumnHeader column={column} title="User Id" />
     ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
+    meta: { title: "User Id" },
   },
-
   {
     accessorKey: "_id",
     header: "Transaction Id",
+    meta: { title: "Transaction Id" },
+  },
+  {
+    accessorKey: "eventStatus",
+    header: "Status",
+    cell: ({ row }) => <EventStatusCell reservation={row.original} />,
+    meta: { title: "Status" },
+  },
+  {
+    accessorKey: "paymentStatus",
+    header: "Payment",
+    filterFn: "equals",
+    cell: ({ row }) => <PaymentStatusCell reservation={row.original} />,
+    meta: { title: "Payment" },
   },
   {
     accessorKey: "createdAt",
     header: "Created At",
     cell: ({ row }) => {
       const rawCreatedAt: string = row.getValue<string>("createdAt");
-      return formatDate(new Date(rawCreatedAt), "MM-dd-yyyy h:mm a");
+      const formattedDate = formatDate(new Date(rawCreatedAt), "MM-dd-yyyy");
+      const formattedTime = formatDate(new Date(rawCreatedAt), "h:mm a");
+      return (
+        <>
+          <div className="text-center">{formattedDate}</div>
+          <div className="text-center text-xs text-gray-500">
+            {formattedTime}
+          </div>
+        </>
+      );
     },
-  },
-  {
-    accessorKey: "eventStatus",
-    header: "Status",
-    cell: ({ row }) => <EventStatusCell reservation={row.original} />,
-  },
-  {
-    accessorKey: "paymentStatus",
-    header: "Payment",
-    cell: ({ row }) => <PaymentStatusCell reservation={row.original} />,
+    meta: { title: "Created At" },
   },
   {
     accessorKey: "totalPayment",
@@ -120,16 +102,18 @@ export const columns: MyColumnDef<GroupReservation>[] = [
       const value = getValue<number>();
       return `₱${value.toLocaleString()}`;
     },
+    meta: { title: "Total Payment" },
   },
   {
     accessorKey: "fullName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Full Name" />
     ),
+    meta: { title: "Full Name" },
   },
   {
     id: "email",
-    accessorFn: (row: GroupReservation) => row.userId.email,
+    accessorFn: (row: GroupReservation) => row.userId?.email || "No Email",
     header: ({ column }: { column: Column<GroupReservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
@@ -147,51 +131,35 @@ export const columns: MyColumnDef<GroupReservation>[] = [
     header: ({ column }: { column: Column<GroupReservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="Party Size" />
     ),
+    meta: { title: "Party Size" },
   },
   {
-    accessorKey: "date",
+    id: "dateTime",
+    // Combine date, startTime, and endTime into a single string for accessor
+    accessorFn: (row: GroupReservation) =>
+      `${row.date} ${row.startTime} ${row.endTime}`, // Added accessorFn
     header: ({ column }: { column: Column<GroupReservation, unknown> }) => (
-      <DataTableColumnHeader column={column} title="Date" />
+      <DataTableColumnHeader column={column} title="Date & Time" />
     ),
-    cell: ({ row }) => {
-      const rawDate = row.getValue<string>("date");
-      return formatDate(new Date(rawDate), "MM-dd-yyyy");
+    cell: ({ row }: { row: Row<GroupReservation> }) => {
+      const { date, startTime, endTime } = row.original;
+      const formattedDate = formatDate(new Date(date), "MM-dd-yyyy");
+      return (
+        <>
+          <div className="text-center">{formattedDate}</div>
+          <div className="text-xs text-gray-500">
+            {startTime} - {endTime}
+          </div>
+        </>
+      );
     },
-  },
-  {
-    id: "timeRange",
-    header: "Time Range",
-    accessorFn: (row: GroupReservation) => `${row.startTime} - ${row.endTime}`,
+    meta: { title: "Date & Time" },
   },
 
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
-      const reservation = row.original;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(reservation._id)}
-            >
-              Copy reservation ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            {/* <DeleteReservationAction reservationId={reservation._id} /> */}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <GroupReservationActions reservation={row.original} />,
+    meta: { title: "Actions" },
   },
 ];

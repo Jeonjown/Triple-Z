@@ -1,14 +1,12 @@
+// DataTable.tsx
 import {
-  ColumnDef,
   flexRender,
-  getCoreRowModel,
   useReactTable,
-  getFilteredRowModel,
-  getSortedRowModel,
-  SortingState,
-  getPaginationRowModel,
+  HeaderGroup,
+  Header,
+  Row,
+  Cell,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -17,96 +15,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { DataTablePagination } from "@/components/ui/DataTablePagination";
-import { DataTableViewOptions } from "@/components/ui/DataTableViewOptions ";
-import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+// DataTableProps now explicitly types its parameter using the table instance from useReactTable
+interface DataTableProps<TData> {
+  table: ReturnType<typeof useReactTable<TData>>;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
-  const [globalFilter, setGlobalFilter] = React.useState<string>("");
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-
-  const table = useReactTable({
-    data,
-    columns,
-    initialState: {
-      columnVisibility: {},
-    },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      globalFilter,
-      sorting,
-    },
-  });
+export function DataTable<TData>({ table }: DataTableProps<TData>) {
   return (
     <div className="rounded-md md:mt-10 md:border">
-      <div className="flex w-full justify-between px-4 py-5">
-        {/* Left side: search input and select */}
-        <div className="flex space-x-3">
-          <Input
-            placeholder="Search..."
-            value={globalFilter}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className="max-w-sm"
-          />
-          <Select
-            value={
-              (table.getColumn("eventStatus")?.getFilterValue() as string) ||
-              "All"
-            }
-            onValueChange={(value) =>
-              table
-                .getColumn("eventStatus")
-                ?.setFilterValue(value === "All" ? undefined : value)
-            }
-            aria-label="Filter by status"
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All</SelectItem>
-              <SelectItem value="Pending">Pending</SelectItem>
-              <SelectItem value="Confirmed">Confirmed</SelectItem>
-              <SelectItem value="Cancelled">Cancelled</SelectItem>
-              <SelectItem value="Completed">Completed</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Right side: view options */}
-        <div>
-          <DataTableViewOptions table={table} />
-        </div>
-      </div>
-      {/* Scrollable container for the table */}
-      <div className="max-h-screen overflow-y-auto">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+      <div className="overflow-x-auto">
+        <Table className="min-w-full">
+          <TableHeader className="bg-primary">
+            {table.getHeaderGroups().map((headerGroup: HeaderGroup<TData>) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                {headerGroup.headers.map((header: Header<TData, unknown>) => (
+                  <TableHead
+                    key={header.id}
+                    className="whitespace-nowrap text-white"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -120,13 +48,13 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row: Row<TData>) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() ? "selected" : ""}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                  {row.getVisibleCells().map((cell: Cell<TData, unknown>) => (
+                    <TableCell key={cell.id} className="whitespace-nowrap">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -138,7 +66,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={table.getHeaderGroups()[0].headers.length}
                   className="h-24 text-center"
                 >
                   No results.
@@ -148,10 +76,8 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-
-      {/* Pagination stays outside the scrollable container */}
-      <div>
-        <DataTablePagination table={table} />
+      <div className="px-4 py-3">
+        <DataTablePagination />
       </div>
     </div>
   );

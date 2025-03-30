@@ -1,4 +1,4 @@
-// src/components/PaymentStatusCell.tsx
+// PaymentStatusCell.tsx
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,31 +16,38 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { GroupReservation } from "@/features/Events/api/group";
-import { useUpdateGroupReservationPaymentStatus } from "@/features/Events/hooks/useUpdateGroupReservationPaymentStatus";
+import { GroupReservation } from "./columns";
+import { useUpdateEventReservationPaymentStatusWithNotification } from "@/features/Events/hooks/useUpdateEventReservationsPaymentStatus";
 
 const PaymentStatusCell = ({
   reservation,
 }: {
   reservation: GroupReservation;
 }): JSX.Element => {
-  const { mutate } = useUpdateGroupReservationPaymentStatus();
-
-  // State to store the selected payment status and control the dialog.
+  const { mutate } = useUpdateEventReservationPaymentStatusWithNotification();
   const [selectedPaymentStatus, setSelectedPaymentStatus] =
     useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  // Handle dropdown item click: store the payment status and open the confirmation dialog.
-  const handlePaymentStatusSelection = (status: string) => {
-    setSelectedPaymentStatus(status);
-    // Delay to ensure dropdown has closed.
-    setTimeout(() => {
-      setIsDialogOpen(true);
-    }, 100);
+  // Define color mapping for payment statuses (sync with event style)
+  const statusColors: Record<string, { border: string; bg: string }> = {
+    "Not Paid": { border: "#EE4549", bg: "#EE454926" },
+    "Partially Paid": { border: "#FABC2C", bg: "#FABC2C26" },
+    Paid: { border: "#3BB537", bg: "#E2F4E1" },
   };
 
-  // Confirm the payment status change.
+  // Use current payment status to compute styles.
+  const currentStyle = statusColors[reservation.paymentStatus] || {
+    border: "#ccc",
+    bg: "#ccc",
+  };
+
+  const handlePaymentStatusSelection = (status: string) => {
+    setSelectedPaymentStatus(status);
+    // Short delay to allow the dropdown to close before opening the dialog.
+    setTimeout(() => setIsDialogOpen(true), 100);
+  };
+
   const confirmPaymentStatusChange = () => {
     mutate({
       reservationId: reservation._id,
@@ -54,22 +61,25 @@ const PaymentStatusCell = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="h-8 w-20 px-12">
+          <Button
+            variant="outline"
+            className="h-8 w-28 px-12"
+            style={{
+              borderColor: currentStyle.border,
+              backgroundColor: currentStyle.bg,
+            }}
+          >
             {reservation.paymentStatus}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuLabel>Status</DropdownMenuLabel>
+          <DropdownMenuLabel>Payment</DropdownMenuLabel>
           <DropdownMenuItem
             onClick={() => handlePaymentStatusSelection("Not Paid")}
           >
             Not Paid
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handlePaymentStatusSelection("Partially Paid")}
-          >
-            Partially Paid
-          </DropdownMenuItem>
+
           <DropdownMenuItem
             onClick={() => handlePaymentStatusSelection("Paid")}
           >
@@ -78,7 +88,6 @@ const PaymentStatusCell = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Confirmation Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>

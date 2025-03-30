@@ -38,7 +38,6 @@ export interface GroupReservation {
   }>;
   eventStatus: string;
   paymentStatus: string;
-  eventFee: number;
   subtotal: number;
   totalPayment: number;
   createdAt: string;
@@ -85,11 +84,10 @@ export const createGroupReservation = async (
 // Get all group reservations
 export const getGroupReservations = async (): Promise<GroupReservation[]> => {
   try {
-    const response: AxiosResponse<{
-      message: string;
-      reservations: GroupReservation[];
-    }> = await api.get("/api/events/group-reservations/");
-    return response.data.reservations;
+    const response: AxiosResponse = await api.get(
+      "/api/events/group-reservations/",
+    );
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<ReservationError>;

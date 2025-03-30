@@ -5,15 +5,13 @@ import { columns } from "./columns";
 
 const GroupReservationsTable = () => {
   // Use optional chaining and fallback to an empty array
-  const { data = { message: "", reservations: [] }, isPending } =
-    useGetGroupReservations();
-  const groupReservations = data ?? [];
+  const { data: reservations = [], isPending } = useGetGroupReservations();
 
   if (isPending) {
     return <LoadingPage />;
   }
 
-  return <DataTable columns={columns} data={data} />;
+  return <DataTable columns={columns} data={reservations} />;
 };
 
 export default GroupReservationsTable;

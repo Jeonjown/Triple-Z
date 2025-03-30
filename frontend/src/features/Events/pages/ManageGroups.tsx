@@ -1,10 +1,10 @@
-import GroupReservationsTable from "@/app/tables/group-reservations/page";
+import GroupReservationsControlPanel from "@/app/tables/group-reservations/GroupReservationsControlPanel";
 
 const ManageGroups = () => {
   return (
     <div className="flex justify-center">
-      <div className="w-auto min-w-96">
-        <GroupReservationsTable />
+      <div className="w-full">
+        <GroupReservationsControlPanel />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-// src/components/EventStatusCell.tsx
+// EventStatusCell.tsx
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,33 +16,37 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-
 import { GroupReservation } from "./columns";
-import { useUpdateGroupReservationStatus } from "@/features/Events/hooks/useUpdateGroupReservationStatus ";
-
-interface EventStatusCellProps {
-  reservation: GroupReservation;
-}
+import { useUpdateEventReservationStatus } from "@/features/Events/hooks/useUpdateEventReservationsStatus";
 
 const EventStatusCell = ({
   reservation,
-}: EventStatusCellProps): JSX.Element => {
-  const { mutate } = useUpdateGroupReservationStatus();
-
-  // State to store the selected status and control the dialog.
+}: {
+  reservation: GroupReservation;
+}): JSX.Element => {
+  const { mutate } = useUpdateEventReservationStatus();
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  // Handle dropdown item click: store the status and open the confirmation dialog.
-  const handleStatusSelection = (status: string) => {
-    setSelectedStatus(status);
-    // Optionally, add a delay if the dropdown needs to close first.
-    setTimeout(() => {
-      setIsDialogOpen(true);
-    }, 100);
+  // Define color mapping for event statuses
+  const statusColors: Record<string, { border: string; bg: string }> = {
+    Pending: { border: "#FABC2C", bg: "#FABC2C26" },
+    Confirmed: { border: "#3BB537", bg: "#E2F4E1" },
+    Cancelled: { border: "#EE4549", bg: "#EE454926" },
+    Completed: { border: "#043A7B", bg: "#043A7B26" },
   };
 
-  // Confirm the change and trigger the mutation.
+  // Get the current style based on the current event status
+  const currentStyle = statusColors[reservation.eventStatus] || {
+    border: "#ccc",
+    bg: "#ccc",
+  };
+
+  const handleStatusSelection = (status: string) => {
+    setSelectedStatus(status);
+    setTimeout(() => setIsDialogOpen(true), 100);
+  };
+
   const confirmStatusChange = () => {
     mutate({
       reservationId: reservation._id,
@@ -56,7 +60,14 @@ const EventStatusCell = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="h-8 w-20 px-12">
+          <Button
+            variant="outline"
+            className="h-8 w-24 px-12"
+            style={{
+              borderColor: currentStyle.border,
+              backgroundColor: currentStyle.bg,
+            }}
+          >
             {reservation.eventStatus}
           </Button>
         </DropdownMenuTrigger>
@@ -77,7 +88,6 @@ const EventStatusCell = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Confirmation Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
