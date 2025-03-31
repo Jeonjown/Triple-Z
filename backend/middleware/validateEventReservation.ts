@@ -139,7 +139,7 @@ export const validateEventReservation = async (
     ) {
       return next(
         createError(
-          `Minimum package order of ${settings.eventMinPackageOrder} is required.`,
+          `Minimum Event Meals order of ${settings.eventMinPackageOrder} is required.`,
           400
         )
       );

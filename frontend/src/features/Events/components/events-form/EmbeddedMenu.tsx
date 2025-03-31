@@ -28,6 +28,7 @@ export interface SizeOption {
   sizePrice: number;
 }
 
+// Added optional subcategoryName for flagging add-ons.
 export interface MenuItem {
   _id: string;
   title: string;
@@ -37,6 +38,7 @@ export interface MenuItem {
   requiresSizeSelection: boolean;
   description?: string;
   availability?: boolean;
+  subcategoryName?: string;
 }
 
 export interface SelectedItem {
@@ -69,7 +71,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // Filter to use the "Packages" category (case-insensitive)
+  // Use the "Packages" category (case‑insensitive)
   const packagesCategory = menuData?.categories.find(
     (cat) => cat.category.toLowerCase() === "packages",
   );
@@ -139,7 +141,6 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
   if (!packagesCategory) return <></>;
 
   return (
-    // Main container: full viewport height on mobile, flex layout for desktop.
     <div className="mt-5 flex min-h-screen w-full flex-col rounded-md md:flex-row md:border md:p-5">
       {/* Mobile Sidebar */}
       <div className="block md:hidden">
@@ -218,7 +219,6 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
         {filteredItems.length === 0 && (
           <p className="text-gray-500">No items available.</p>
         )}
-        {/* Grid of Items */}
         <div className="flex-1 overflow-hidden">
           <div
             className="grid grid-cols-1 gap-4 overflow-y-auto sm:grid-cols-2 md:grid-cols-3"

@@ -1,4 +1,3 @@
-// EventsCart.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +37,7 @@ const QuantityInput: React.FC<{
       onChange={(e) => setInputValue(e.target.value)}
       onBlur={() => {
         const parsed = parseInt(inputValue, 10);
-        if (!isNaN(parsed) && parsed >= 1 && parsed <= 999) {
+        if (!isNaN(parsed) && parsed >= 1 && parsed <= 99) {
           onChange(parsed);
         } else {
           setInputValue(value.toString());
@@ -57,14 +56,18 @@ const EventsCart: React.FC<EventsCartProps> = ({
   removeFromCart,
   tooltipTrigger,
 }) => {
-  // Calculate overall cart total and overall quantity
+  // Calculate overall total price
   const totalCartPrice = cart.reduce(
     (total, item) => total + item.totalPrice,
     0,
   );
-  const overallQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Manage tooltip state for "Item added!"
+  // Only count non‑add‑on items in the badge counter.
+  const overallQuantity = cart.reduce((sum, item) => {
+    if (item.isAddOn) return sum;
+    return sum + item.quantity;
+  }, 0);
+
   const [showTooltip, setShowTooltip] = useState(false);
   const didMount = useRef(false);
 

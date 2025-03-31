@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,6 +13,7 @@ import { EventFormValues } from "../../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useCreateEventReservations } from "../../hooks/useCreateEventReservations";
 import { useGetEventReservationSettings } from "../../hooks/useGetEventReservationSettings";
+import { Check } from "lucide-react";
 
 interface CartItem {
   _id: string;
@@ -37,11 +38,17 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
   const formValues = watch();
   const isCorkageSelected = formValues.isCorkage === "true";
 
+  // State for notification and TOS dialogs.
   const [notifDialogOpen, setNotifDialogOpen] = useState(false);
   const [tosDialogOpen, setTosDialogOpen] = useState(false);
+  // Flag to mark TOS acceptance.
   const [acceptedTOS, setAcceptedTOS] = useState(false);
+  // New state to check if the user has scrolled to the bottom.
+  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
+  // Ref for the TOS content container.
+  const tosContentRef = useRef<HTMLDivElement>(null);
 
-  // Format date as MM-DD-YYYY for display
+  // Format a date as MM-DD-YYYY for display.
   const formatDate = (date: Date) => {
     const d = new Date(date);
     const month = d.getMonth() + 1;
@@ -50,16 +57,15 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     return `${month}-${day}-${year}`;
   };
 
-  // Calculate total price including event fee and corkage fee if selected.
+  // Calculate the total price including event fee and corkage fee (if selected).
   const calculateTotalPrice = () => {
     const cartTotal = cart.reduce((total, item) => total + item.totalPrice, 0);
     const eventFee = settings?.eventFee ?? 0;
-    // Use our fixed boolean value for corkage fee
     const corkageFee = isCorkageSelected ? (settings?.eventCorkageFee ?? 0) : 0;
     return cartTotal + eventFee + corkageFee;
   };
 
-  // Submit form and process mutation.
+  // Submit form and process the mutation.
   const onSubmit = (data: EventFormValues) => {
     mutate(data, {
       onSuccess: () => {
@@ -77,7 +83,7 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     handleSubmit(onSubmit)();
   };
 
-  // Render items in the cart.
+  // Render each cart item.
   const renderCartItems = () => {
     if (cart.length === 0) return <div>No items in your cart.</div>;
     return cart.map((item) => (
@@ -101,6 +107,16 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         </div>
       </div>
     ));
+  };
+
+  // Handler to check if user scrolled to the bottom of the TOS content.
+  const handleTosScroll = () => {
+    if (tosContentRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = tosContentRef.current;
+      if (scrollTop + clientHeight >= scrollHeight - 10) {
+        setHasScrolledToBottom(true);
+      }
+    }
   };
 
   return (
@@ -143,7 +159,7 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         <div className="mb-4">
           <span className="font-semibold">Special Request:</span>
           <div className="mt-2 border p-2">
-            {formValues.specialRequest ?? "None"}
+            {formValues.specialRequest || "None"}
           </div>
         </div>
         <div className="mb-4">
@@ -154,7 +170,6 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
           <span className="text-gray-600">Event Fee:</span>
           <p className="font-semibold">₱{settings?.eventFee}</p>
         </div>
-        {/* Render Corkage Fee element only if "Yes" is selected */}
         {isCorkageSelected && (
           <div className="mb-4">
             <span className="text-gray-600">Corkage Fee:</span>
@@ -164,24 +179,24 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         <div className="text-right text-xl font-semibold">
           Total Price: ₱{calculateTotalPrice().toFixed(2)}
         </div>
-        {/* TOS acceptance checkbox */}
+        {/* Instead of a simple checkbox, force the user to read the TOS */}
         <div className="mx-auto mt-4 flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={acceptedTOS}
-            onChange={(e) => setAcceptedTOS(e.target.checked)}
-            className="h-4 w-4 bg-primary"
-          />
-          <span className="text-sm">
-            I agree to Triple Z's{" "}
-            <button
-              type="button"
-              className="text-blue-500 underline"
-              onClick={() => setTosDialogOpen(true)}
-            >
-              Terms of Service
-            </button>
-          </span>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setTosDialogOpen(true);
+              setHasScrolledToBottom(false); // reset scroll flag
+            }}
+          >
+            Read Terms of Service
+          </Button>
+          {acceptedTOS && (
+            <div className="flex space-x-2 text-green-500">
+              <span className="font-semibold">TOS Accepted</span>
+              <Check />
+            </div>
+          )}
         </div>
       </div>
 
@@ -198,7 +213,7 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
           type="button"
           onClick={() => setNotifDialogOpen(true)}
           className="flex-1"
-          disabled={!acceptedTOS}
+          disabled={!acceptedTOS} // Disable checkout until TOS is accepted
         >
           Checkout
         </Button>
@@ -238,7 +253,11 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
 
       {/* Terms of Service Dialog */}
       <Dialog open={tosDialogOpen} onOpenChange={setTosDialogOpen}>
-        <DialogContent className="max-h-[80vh] w-full max-w-md overflow-y-auto">
+        <DialogContent
+          className="max-h-[80vh] w-full max-w-md overflow-y-auto"
+          ref={tosContentRef}
+          onScroll={handleTosScroll}
+        >
           <DialogHeader>
             <DialogTitle className="text-center">Terms of Service</DialogTitle>
             <DialogDescription className="whitespace-pre-wrap">
@@ -248,9 +267,13 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
           <DialogFooter>
             <Button
               onClick={() => {
-                setAcceptedTOS(true);
-                setTosDialogOpen(false);
+                // Allow acceptance only if the user has scrolled to the bottom.
+                if (hasScrolledToBottom) {
+                  setAcceptedTOS(true);
+                  setTosDialogOpen(false);
+                }
               }}
+              disabled={!hasScrolledToBottom}
             >
               I Accept
             </Button>

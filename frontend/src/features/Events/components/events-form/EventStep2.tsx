@@ -8,7 +8,7 @@ import { CartItem, EventFormValues } from "../../pages/EventForm";
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { Info, AlertCircle } from "lucide-react";
 
-// 1. Import TooltipProvider along with other tooltip components
+// Tooltip components
 import {
   Tooltip,
   TooltipContent,
@@ -44,18 +44,22 @@ const EventStep2: React.FC<Step2Props> = ({
     trigger,
   } = useFormContext<EventFormValues>();
 
-  // Track how many times we trigger a tooltip (e.g., after adding items)
+  // Track tooltip trigger count for "Item added!" notifications
   const [tooltipTrigger, setTooltipTrigger] = useState<number>(0);
 
   useEffect(() => {
-    // Reset tooltip trigger on mount
     setTooltipTrigger(0);
   }, []);
 
-  // Function to add an item to the cart
+  // Add-to-cart function with isAddOn logic:
+  // Items whose subcategoryName equals "event additionals" (case-insensitive) are flagged as add-ons.
   const addToCart = (item: MenuItem, sizeId?: string) => {
     const key = sizeId ? `${item._id}_${sizeId}` : item._id;
     const exists = selectedPackageIds.find((s) => s.key === key);
+
+    const isAddOn =
+      item.subcategoryName &&
+      item.subcategoryName.toLowerCase() === "event additionals";
 
     if (exists) {
       const newQuantity = (quantityMap[key] || 1) + 1;
@@ -96,33 +100,32 @@ const EventStep2: React.FC<Step2Props> = ({
         totalPrice: price,
         image: item.image,
         size: sizeText || undefined,
+        isAddOn: isAddOn, // Mark as add-on if applicable
       };
       setCart((prev) => [...prev, newCartItem]);
     }
-    // Trigger the tooltip each time an item is added
     setTooltipTrigger((prev) => prev + 1);
   };
 
-  // Update form state whenever the cart changes
+  // Update the form state whenever the cart changes
   useEffect(() => {
     setValue("cart", cart);
   }, [cart, setValue]);
 
-  // Get event reservation settings
   const { data: settings } = useGetEventReservationSettings();
-  const totalPackagesOrdered = cart.reduce(
-    (sum, item) => sum + item.quantity,
-    0,
-  );
 
-  // Validate "isCorkage" before moving to the next step
+  // Only count non‑add‑on items toward the package order total.
+  const totalPackagesOrdered = cart.reduce((sum, item) => {
+    if (item.isAddOn) return sum;
+    return sum + item.quantity;
+  }, 0);
+
   const handleNext = async () => {
     const valid = await trigger("isCorkage");
     if (!valid) return;
     nextStep();
   };
 
-  // 2. Wrap all Tooltip usages in <TooltipProvider>
   return (
     <TooltipProvider>
       <ScrollToTop />
@@ -193,7 +196,6 @@ const EventStep2: React.FC<Step2Props> = ({
           </Tooltip>
         </div>
         <div className="mt-2 flex space-x-4 text-sm">
-          {/* Radio: "true" */}
           <label className="flex items-center space-x-2">
             <input
               type="radio"
@@ -207,7 +209,6 @@ const EventStep2: React.FC<Step2Props> = ({
               Yes (A ₱{settings?.eventCorkageFee ?? 500} corkage fee applies)
             </span>
           </label>
-          {/* Radio: "false" */}
           <label className="flex items-center space-x-2">
             <input
               type="radio"
@@ -228,7 +229,7 @@ const EventStep2: React.FC<Step2Props> = ({
         )}
       </div>
 
-      {/* Step Navigation */}
+      {/* Navigation Buttons */}
       <div className="mt-4 flex flex-col gap-4 md:flex-row">
         <Button
           type="button"
@@ -254,7 +255,8 @@ const EventStep2: React.FC<Step2Props> = ({
 
       {settings && totalPackagesOrdered < settings.eventMinPackageOrder && (
         <p className="mt-2 text-center text-sm text-red-500">
-          Minimum package order of {settings.eventMinPackageOrder} is required.
+          Minimum Event Meals order of {settings.eventMinPackageOrder} is
+          required.
         </p>
       )}
       {errors.cart && (

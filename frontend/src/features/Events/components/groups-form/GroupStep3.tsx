@@ -46,7 +46,7 @@ const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
         reset();
       },
       onError: (error) => {
-        console.error("Error creating reservation:", error);
+        console.error("Reservation Creation Unsuccessful:", error);
       },
     });
   };
