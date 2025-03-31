@@ -1,4 +1,3 @@
-// GroupStep1.tsx
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,10 +78,15 @@ const GroupStep1 = ({
           d.getMonth(),
           d.getDate() + 1,
         );
+        // Filter out cancelled reservations
         const reservationsForDay = reservations.filter(
-          (r: { date: string; partySize: number }) => {
+          (r: { date: string; partySize: number; eventStatus?: string }) => {
             const resDate = new Date(r.date);
-            return resDate >= startOfDay && resDate < endOfDay;
+            return (
+              resDate >= startOfDay &&
+              resDate < endOfDay &&
+              r.eventStatus !== "Cancelled"
+            );
           },
         );
         const totalBookedTables = reservationsForDay.reduce((sum, r) => {

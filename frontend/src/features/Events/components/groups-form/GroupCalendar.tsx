@@ -34,6 +34,7 @@ const GroupCalendar: React.FC = () => {
       day.getMonth(),
       day.getDate(),
     );
+    // Adjust to local time string format
     const localDate = new Date(
       normalizedDay.getTime() - normalizedDay.getTimezoneOffset() * 60000,
     );
@@ -41,7 +42,7 @@ const GroupCalendar: React.FC = () => {
     setValue("date", formatted);
     trigger("date");
 
-    // Calculate available tables for the selected day
+    // Calculate available tables for the selected day, ignoring cancelled reservations
     const startOfDay = normalizedDay;
     const endOfDay = new Date(
       day.getFullYear(),
@@ -49,9 +50,17 @@ const GroupCalendar: React.FC = () => {
       day.getDate() + 1,
     );
     const reservationsForDay = data.filter(
-      (reservation: { date: string; partySize: number }) => {
+      (reservation: {
+        date: string;
+        partySize: number;
+        eventStatus?: string;
+      }) => {
         const resDate = new Date(reservation.date);
-        return resDate >= startOfDay && resDate < endOfDay;
+        return (
+          resDate >= startOfDay &&
+          resDate < endOfDay &&
+          reservation.eventStatus !== "Cancelled"
+        );
       },
     );
     const totalBookedTables = reservationsForDay.reduce(
@@ -64,30 +73,44 @@ const GroupCalendar: React.FC = () => {
     setAvailableTables(available);
   };
 
-  // Map reservations to reservedDates (date-only)
+  // Map reservations to reservedDates (date-only), ignoring cancelled reservations
   useEffect(() => {
     if (data) {
-      const dates = data.map((reservation: { date: string }) => {
-        const d = new Date(reservation.date);
-        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      });
+      const dates = data
+        .filter(
+          (reservation: { date: string; eventStatus?: string }) =>
+            reservation.eventStatus !== "Cancelled",
+        )
+        .map((reservation: { date: string }) => {
+          const d = new Date(reservation.date);
+          return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        });
       setReservedDates(dates);
     }
   }, [data]);
 
-  // Compute fullDates based on reservations and settings
+  // Compute fullDates based on reservations and settings, excluding cancelled reservations
   useEffect(() => {
     if (data && settings) {
       const dateCountMap = new Map<string, number>();
-      data.forEach((reservation: { date: string; partySize: number }) => {
-        const d = new Date(reservation.date);
-        const norm = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-        const key = norm.toISOString();
-        const tables = Math.ceil(
-          reservation.partySize / settings.groupMaxGuestsPerTable,
-        );
-        dateCountMap.set(key, (dateCountMap.get(key) || 0) + tables);
-      });
+      data.forEach(
+        (reservation: {
+          date: string;
+          partySize: number;
+          eventStatus?: string;
+        }) => {
+          // Only count non-cancelled reservations
+          if (reservation.eventStatus !== "Cancelled") {
+            const d = new Date(reservation.date);
+            const norm = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            const key = norm.toISOString();
+            const tables = Math.ceil(
+              reservation.partySize / settings.groupMaxGuestsPerTable,
+            );
+            dateCountMap.set(key, (dateCountMap.get(key) || 0) + tables);
+          }
+        },
+      );
       const full: Date[] = [];
       for (const [key, totalTables] of dateCountMap.entries()) {
         if (totalTables >= settings.groupMaxTablesPerDay) {

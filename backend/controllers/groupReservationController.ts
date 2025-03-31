@@ -17,7 +17,7 @@ export const createGroupReservation = async (
       return next(createError("UserId is required in URL params", 400));
     }
 
-    // Destructure the required fields from the request body.
+    // Destructure required fields from the request body.
     const {
       date,
       fullName,
@@ -50,7 +50,22 @@ export const createGroupReservation = async (
       );
     }
 
-    // Calculate the total cart value using each cart item's totalPrice.
+    // NEW STEP: Check if the user has an upcoming unfinished reservation.
+    const existingReservation = await GroupReservation.findOne({
+      userId,
+      date: { $gte: new Date() },
+      eventStatus: { $in: ["Pending", "Confirmed"] },
+    });
+    if (existingReservation) {
+      return next(
+        createError(
+          "You already have an upcoming reservation. Please complete or cancel it before creating a new one.",
+          400
+        )
+      );
+    }
+
+    // Calculate the total cart value.
     const cartTotal = cart.reduce(
       (sum: number, item: { totalPrice: number }) => sum + item.totalPrice,
       0
@@ -59,7 +74,7 @@ export const createGroupReservation = async (
     // Removed event fee: totalPayment is now just the cart total.
     const totalPayment = cartTotal;
 
-    // Create a new group reservation with the updated structure.
+    // Create a new group reservation with the provided details.
     const newReservation = new GroupReservation({
       userId,
       fullName,

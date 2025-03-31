@@ -83,7 +83,7 @@ export const validateGroupReservation = async (
       );
     }
 
-    // NEW STEP: Validate that the reservation date is not marked as unavailable
+    // 7. Validate that the reservation date is not marked as unavailable
     // Create local start and end boundaries for the day
     const startOfLocalDay = new Date(
       reservationDate.getFullYear(),
@@ -102,7 +102,7 @@ export const validateGroupReservation = async (
       return next(createError("The selected date is unavailable", 400));
     }
 
-    // 7. Validate that the reservation date is at least groupMinDaysPrior in advance
+    // 8. Validate that the reservation date is at least groupMinDaysPrior in advance
     const now = new Date();
     const minValidDate = new Date(now);
     minValidDate.setDate(now.getDate() + settings.groupMinDaysPrior);
@@ -127,21 +127,11 @@ export const validateGroupReservation = async (
       );
     }
 
-    // 8. Validate Group Minimum Reservation
+    // 9. Validate Group Minimum Reservation
     if (partySize < settings.groupMinReservation) {
       return next(
         createError(
           `Party size must be at least ${settings.groupMinReservation}.`,
-          400
-        )
-      );
-    }
-
-    // 9. Validate Group Maximum Reservation
-    if (partySize > settings.groupMaxReservation) {
-      return next(
-        createError(
-          `Party size must not exceed ${settings.groupMaxReservation}.`,
           400
         )
       );
@@ -160,9 +150,10 @@ export const validateGroupReservation = async (
       reservationDate.getDate() + 1
     );
 
-    // Fetch all reservations for that day
+    // Fetch all reservations for that day, excluding those that are cancelled.
     const reservations = await GroupReservation.find({
       date: { $gte: startOfDay, $lt: endOfDay },
+      eventStatus: { $ne: "Cancelled" },
     });
 
     // Calculate total tables already booked on that day
