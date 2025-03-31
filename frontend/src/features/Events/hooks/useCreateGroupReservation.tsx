@@ -26,9 +26,9 @@ export const useCreateGroupReservation = () => {
       return createGroupReservation(values, userId);
     },
     onError: (err: Error) => {
-      console.error("Error creating group reservation:", err);
+      console.error("Reservation Creation Unsuccesssful:", err);
       toast({
-        title: "Error creating reservation",
+        title: "Reservation Creation Unsuccesssful",
         description: err.message,
         variant: "destructive",
       });

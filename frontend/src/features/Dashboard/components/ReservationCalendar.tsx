@@ -29,6 +29,7 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
+import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 
 // --- Types ---
 interface CartItem {
@@ -70,6 +71,8 @@ interface ExtendedCalendarEvent extends CalendarEvent {
 const ReservationCalendar = () => {
   const { data: reservations } = useGetAllReservations();
   const { data: unavailableDates = [] } = useGetUnavailableDates();
+  const { data: settings } = useGetEventReservationSettings();
+  console.log(settings?.eventCorkageFee);
   console.log("Reservations:", reservations);
   console.log("Unavailable Dates:", unavailableDates);
   const [selectedReservation, setSelectedReservation] =
@@ -102,7 +105,7 @@ const ReservationCalendar = () => {
 
   // --- Custom Month View that reflects Unavailable Dates ---
   const CalendarMonthViewWithUnavailableDates = () => {
-    // Use the date from Calendar context
+    console.log(selectedReservation);
     const { date, onEventClick } = useCalendar();
     const startOfMonthDate = startOfMonth(date);
     const startOfWeekForMonth = startOfWeek(startOfMonthDate, {
@@ -166,7 +169,6 @@ const ReservationCalendar = () => {
                   </span>
                 </div>
                 {matchingUnavailable && (
-                  // Center the unavailable reason in the cell overlay
                   <div className="absolute inset-0 flex items-center justify-center bg-red-100 bg-opacity-80">
                     <span className="text-center font-semibold text-red-600">
                       {matchingUnavailable.reason}
@@ -234,106 +236,146 @@ const ReservationCalendar = () => {
           <div className="p-2">
             <CalendarDayView />
             <CalendarWeekView />
-            {/* Use custom Month view with unavailable dates */}
             <CalendarMonthViewWithUnavailableDates />
           </div>
         </div>
       </Calendar>
 
-      {/* Reservation Receipt Dialog */}
+      {/* Reservation Receipt Dialog with MySchedule Style */}
       <Dialog
         open={!!selectedReservation}
         onOpenChange={(open) => {
           if (!open) setSelectedReservation(null);
         }}
       >
-        <DialogContent className="max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-h-[80vh] w-full max-w-md overflow-y-auto p-4">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold">
               {selectedReservation?.fullName}
             </DialogTitle>
-            <div className="mb-2 border-b pb-2">
-              <div>
-                <strong>Date:</strong>{" "}
-                {selectedReservation &&
-                  format(new Date(selectedReservation.date), "PPpp")}
+            <div className="mb-4 border-b pb-2">
+              <div className="flex justify-between">
+                <strong>Date:</strong>
+                <span className="ml-auto">
+                  {selectedReservation &&
+                    format(new Date(selectedReservation.date), "PPpp")}
+                </span>
               </div>
-              <div>
-                <strong>Time:</strong>{" "}
-                {selectedReservation &&
-                  `${selectedReservation.startTime} - ${selectedReservation.endTime}`}
+              <div className="flex justify-between">
+                <strong>Time:</strong>
+                <span className="ml-auto">
+                  {selectedReservation &&
+                    `${selectedReservation.startTime} - ${selectedReservation.endTime}`}
+                </span>
               </div>
             </div>
           </DialogHeader>
-          <div className="space-y-2">
-            <div>
-              <strong>Party Size:</strong> {selectedReservation?.partySize}
+
+          {/* Reservation Details */}
+          <div className="mb-4 space-y-2">
+            <div className="flex justify-between">
+              <strong>Reservation Type:</strong>
+              <span className="ml-auto">
+                {selectedReservation?.reservationType}
+              </span>
             </div>
-            <div>
-              <strong>Contact:</strong> {selectedReservation?.contactNumber}
+            <div className="flex justify-between">
+              <strong>Party Size:</strong>
+              <span className="ml-auto">{selectedReservation?.partySize}</span>
             </div>
-            <div>
-              <strong>Status:</strong> {selectedReservation?.eventStatus}
+            <div className="flex justify-between">
+              <strong>Contact:</strong>
+              <span className="ml-auto">
+                {selectedReservation?.contactNumber}
+              </span>
             </div>
-            <div>
-              <strong>Payment Status:</strong>{" "}
-              {selectedReservation?.paymentStatus}
+            <div className="flex justify-between">
+              <strong>Status:</strong>
+              <span className="ml-auto">
+                {selectedReservation?.eventStatus}
+              </span>
             </div>
-            {selectedReservation?.subtotal !== undefined && (
-              <div>
-                <strong>Subtotal:</strong> {selectedReservation.subtotal}
-              </div>
-            )}
-            {selectedReservation?.eventFee !== undefined && (
-              <div>
-                <strong>Event Fee:</strong> {selectedReservation.eventFee}
-              </div>
-            )}
-            {selectedReservation?.totalPayment !== undefined && (
-              <div>
-                <strong>Total Payment:</strong>{" "}
-                {selectedReservation.totalPayment}
-              </div>
-            )}
-            {selectedReservation?.reservationType && (
-              <div>
-                <strong>Reservation Type:</strong>{" "}
-                {selectedReservation.reservationType}
-              </div>
-            )}
+            <div className="flex justify-between">
+              <strong>Payment Status:</strong>
+              <span className="ml-auto">
+                {selectedReservation?.paymentStatus}
+              </span>
+            </div>
             {selectedReservation?.specialRequest && (
-              <div>
-                <strong>Special Request:</strong>{" "}
-                {selectedReservation.specialRequest}
+              <div className="flex justify-between">
+                <strong>Special Request:</strong>
+                <span className="ml-auto">
+                  {selectedReservation.specialRequest}
+                </span>
               </div>
             )}
-            {selectedReservation?.cart &&
-              selectedReservation.cart.length > 0 && (
-                <div>
-                  <strong>Cart Items:</strong>
-                  <ul className="mt-2 space-y-2">
-                    {selectedReservation.cart.map((item) => (
-                      <li
-                        key={item._id}
-                        className="flex items-center gap-2 rounded border p-2"
-                      >
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="h-16 w-16 rounded object-cover"
-                        />
-                        <div>
-                          <div className="font-bold">{item.title}</div>
-                          <div>
-                            Qty: {item.quantity} | Total: {item.totalPrice}
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+          </div>
+
+          {/* Cart Items Section */}
+          {selectedReservation?.cart && selectedReservation.cart.length > 0 && (
+            <div className="mb-4">
+              <strong>Cart Items:</strong>
+              <ul className="mt-2 space-y-2">
+                {selectedReservation.cart.map((item) => (
+                  <li
+                    key={item._id}
+                    className="flex items-center gap-2 rounded border p-2"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="h-16 w-16 rounded object-cover"
+                    />
+                    <div className="flex flex-col">
+                      <div className="font-bold">{item.title}</div>
+                      <div>
+                        Qty: {item.quantity} | Total: ₱{item.totalPrice}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Order Summary Section */}
+          <div className="mb-4">
+            <strong>Order Summary:</strong>
+            <div className="mt-2 space-y-1 text-sm">
+              <div className="flex justify-between">
+                <span>Order Subtotal:</span>
+                <span className="ml-auto">
+                  ₱{selectedReservation?.subtotal}
+                </span>
+              </div>
+              {selectedReservation?.eventFee !== undefined && (
+                <div className="flex justify-between">
+                  <span>Event Fee:</span>
+                  <span className="ml-auto">
+                    ₱{selectedReservation.eventFee}
+                  </span>
                 </div>
               )}
+              {/* ✅ Only show Corkage Fee if `isCorkage` is true */}
+              {selectedReservation?.isCorkage && (
+                <div className="flex justify-between">
+                  <span>Corkage Fee:</span>
+                  <span className="ml-auto">
+                    ₱{settings?.eventCorkageFee || 0}
+                  </span>
+                </div>
+              )}
+            </div>
+            {/* Horizontal line to separate details from total */}
+            <hr className="my-3 border-gray-400" />
+            <div className="flex justify-between text-base font-bold">
+              <span>Total Payment:</span>
+              <span className="ml-auto">
+                ₱{selectedReservation?.totalPayment}
+              </span>
+            </div>
           </div>
+
           <DialogClose className="mt-4 rounded bg-primary px-4 py-2 text-white">
             Close
           </DialogClose>

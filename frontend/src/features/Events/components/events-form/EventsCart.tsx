@@ -37,7 +37,7 @@ const QuantityInput: React.FC<{
       onChange={(e) => setInputValue(e.target.value)}
       onBlur={() => {
         const parsed = parseInt(inputValue, 10);
-        if (!isNaN(parsed) && parsed >= 1 && parsed <= 99) {
+        if (!isNaN(parsed) && parsed >= 1 && parsed <= 999) {
           onChange(parsed);
         } else {
           setInputValue(value.toString());

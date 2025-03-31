@@ -25,7 +25,7 @@ export const useCreateEventReservations = () => {
     onError: (err: Error) => {
       console.error("Error creating reservation:", err);
       toast({
-        title: "Error creating reservation",
+        title: "Reservation Creation Unsuccesssful",
         description: err.message,
         variant: "destructive",
       });
