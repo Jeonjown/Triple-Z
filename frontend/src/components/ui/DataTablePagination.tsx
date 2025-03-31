@@ -29,7 +29,7 @@ export function DataTablePagination() {
           <div className="flex space-x-4">
             <div className="flex items-center space-x-1">
               <p className="text-xs text-gray-600">Canceled:</p>
-              <div className="h-4 w-4 rounded bg-[#3BB537]"></div>
+              <div className="h-4 w-4 rounded bg-[#EE4549]"></div>
             </div>
             <div className="flex items-center space-x-1">
               <p className="text-xs text-gray-600">Partially Paid:</p>
@@ -37,7 +37,7 @@ export function DataTablePagination() {
             </div>
             <div className="flex items-center space-x-1">
               <p className="text-xs text-gray-600">Paid:</p>
-              <div className="h-4 w-4 rounded bg-[#EE4549]"></div>
+              <div className="h-4 w-4 rounded bg-[#3BB537]"></div>
             </div>
           </div>
         </div>
