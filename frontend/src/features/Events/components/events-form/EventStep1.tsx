@@ -1,4 +1,3 @@
-// EventStep1.tsx
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,6 +10,7 @@ import EventCalendar from "./EventCalendar";
 import useCheckEventReservationConflict from "../../hooks/useCheckEventReservationConflict";
 import useRemainingReservations from "../../hooks/useRemainingReservations";
 import { TriangleAlert } from "lucide-react";
+import { useGetUnavailableDates } from "../../hooks/useGetUnavailableDates"; // Import unavailable dates hook
 
 type Step1Props = {
   nextStep: () => void;
@@ -29,11 +29,14 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
   // Watch the date field from the form
   const dateStr = watch("date");
 
+  // Fetch unavailable dates for additional validation
+  const { data: unavailableDatesData } = useGetUnavailableDates();
+
   // Get start and end times from form
   const startTime = watch("startTime");
   const endTime = watch("endTime");
 
-  // Parse the selected date or fallback to current date
+  // Parse the selected date (or fallback to today)
   const selectedDate = dateStr ? new Date(dateStr) : new Date();
   const displayedMonth = new Date(
     selectedDate.getFullYear(),
@@ -41,7 +44,7 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
     1,
   );
 
-  // Check if the selected date has a conflict using a custom hook
+  // Check for conflicts using a custom hook (e.g. reserved dates)
   const { conflict, isPending: conflictPending } =
     useCheckEventReservationConflict(selectedDate);
   const remainingReservations = useRemainingReservations(displayedMonth);
@@ -49,12 +52,39 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
   // Local state for error message
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Clear error only when conflict becomes false
+  // Clear error when conflict is resolved
   useEffect(() => {
     if (!conflict) {
       setErrorMsg("");
     }
   }, [conflict]);
+
+  // New: Check if the selected date is unavailable
+  useEffect(() => {
+    if (dateStr && unavailableDatesData) {
+      const selected = new Date(dateStr);
+      const isUnavailable = unavailableDatesData.some(
+        (item: { date: string }) => {
+          const d = new Date(item.date);
+          return (
+            new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() ===
+            new Date(
+              selected.getFullYear(),
+              selected.getMonth(),
+              selected.getDate(),
+            ).getTime()
+          );
+        },
+      );
+      if (isUnavailable) {
+        setErrorMsg(
+          "The selected date is unavailable. Please choose another date.",
+        );
+      } else {
+        setErrorMsg("");
+      }
+    }
+  }, [dateStr, unavailableDatesData]);
 
   // Helper function to render an input field with realtime validation
   const renderInputField = (
@@ -94,7 +124,7 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
     );
   };
 
-  // Handle moving to the next step, ensuring validations and no conflicts
+  // Handle moving to the next step, ensuring validations and no conflicts/unavailable date
   const handleNextStep = async () => {
     const valid = await trigger([
       "fullName",
@@ -108,21 +138,21 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
     if (!valid) return;
     if (conflictPending) return;
 
-    // If conflict exists, show error and do not proceed
+    // Show error if there's a conflict or unavailable date
     if (conflict) {
       setErrorMsg(
         "The selected date conflicts with an existing reservation. Please choose another date.",
       );
       return;
     }
+    if (errorMsg) return; // errorMsg is set if the date is unavailable
 
-    // If no slots remain, show error and do not proceed
     if (remainingReservations === 0) {
       setErrorMsg("There are no slots left for the selected month.");
       return;
     }
 
-    // Clear any error and move to the next step
+    // Clear any error and move to next step
     setErrorMsg("");
     nextStep();
   };

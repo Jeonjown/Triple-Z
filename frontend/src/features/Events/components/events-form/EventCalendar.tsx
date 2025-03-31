@@ -1,33 +1,62 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
-import useRemainingReservations from "../../hooks/useRemainingReservations";
-
 import useGetEventReservations from "../../hooks/useGetEventReservations";
+import { useGetEventReservationSettings } from "../../hooks/useGetEventReservationSettings";
+import { useGetUnavailableDates } from "../../hooks/useGetUnavailableDates"; // Hook for unavailable dates
+import useRemainingReservations from "../../hooks/useRemainingReservations"; // Hook to compute remaining slots
 import LoadingPage from "@/pages/LoadingPage";
 import { useFormContext } from "react-hook-form";
 import { EventFormValues } from "../../pages/EventForm";
-import { useGetEventReservationSettings } from "../../hooks/useGetEventReservationSettings";
 
 // Helper: normalize a date string to a Date at midnight
-const normalizeDate = (dateStr: string) => new Date(dateStr.split("T")[0]);
+const normalizeDate = (dateStr: string): Date =>
+  new Date(dateStr.split("T")[0]);
 
-const EventCalendar = () => {
+const EventCalendar: React.FC = () => {
+  // Fetch data via custom hooks
   const { data, isPending, isError } = useGetEventReservations();
   const { data: settings } = useGetEventReservationSettings();
+  const { data: unavailableDatesData } = useGetUnavailableDates();
   const { setValue, trigger } = useFormContext<EventFormValues>();
 
-  // Use undefined for selected date to satisfy DayPicker's type
+  // Local state for selected date and displayed month
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-
-  // Track displayed month (normalized to the first day)
   const [displayedMonth, setDisplayedMonth] = useState<Date>(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
 
-  const currentMonthName = displayedMonth.toLocaleString("default", {
-    month: "long",
-  });
+  // State for reserved and unavailable dates
+  const [reservedDates, setReservedDates] = useState<Date[]>([]);
+  const [unavailable, setUnavailable] = useState<Date[]>([]);
+
+  // Update reserved dates—ignore reservations with eventStatus "Cancelled"
+  useEffect(() => {
+    if (data && data.reservations) {
+      const dates: Date[] = data.reservations
+        .filter(
+          (reservation: { date: string; eventStatus: string }) =>
+            reservation.eventStatus !== "Cancelled",
+        )
+        .map((reservation: { date: string }) =>
+          normalizeDate(reservation.date),
+        );
+      setReservedDates(dates);
+    }
+  }, [data]);
+
+  // Update unavailable dates from fetched data
+  useEffect(() => {
+    if (unavailableDatesData) {
+      const dates: Date[] = unavailableDatesData.map(
+        (item: { date: string }) => {
+          const d = new Date(item.date);
+          return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        },
+      );
+      setUnavailable(dates);
+    }
+  }, [unavailableDatesData]);
 
   // Calculate earliest available booking date based on settings
   const earliestAvailableDate =
@@ -39,36 +68,30 @@ const EventCalendar = () => {
         })()
       : null;
 
-  // Reserved dates from the API (booked reservations), normalized to midnight
-  const [reservedDates, setReservedDates] = useState<Date[]>([]);
-  useEffect(() => {
-    if (data && data.reservations) {
-      const dates = data.reservations.map((reservation: { date: string }) =>
-        normalizeDate(reservation.date),
-      );
-      setReservedDates(dates);
-    }
-  }, [data]);
+  const currentMonthName = displayedMonth.toLocaleString("default", {
+    month: "long",
+  });
 
-  // When a date is clicked, update state and form field.
-  // If the date is already booked, do nothing.
-  const handleSelect = (newDate?: Date) => {
+  // Compute remaining reservations
+  const remainingReservations = useRemainingReservations(displayedMonth);
+
+  // Handle date selection—ignore if the date is booked or unavailable
+  const handleSelect = (newDate?: Date): void => {
     if (!newDate) return;
-    // Normalize newDate for comparison (set to midnight)
     const normalizedNew = new Date(
       newDate.getFullYear(),
       newDate.getMonth(),
       newDate.getDate(),
     );
-    const conflictExists = reservedDates.some(
+    const conflictReserved = reservedDates.some(
       (d) => d.getTime() === normalizedNew.getTime(),
     );
-    if (conflictExists) {
-      // If the date is booked, do nothing.
-      return;
-    }
+    const conflictUnavailable = unavailable.some(
+      (d) => d.getTime() === normalizedNew.getTime(),
+    );
+    if (conflictReserved || conflictUnavailable) return;
+
     setSelectedDate(newDate);
-    // Adjust for timezone offset so the formatted date is correct locally.
     const localDate = new Date(
       newDate.getTime() - newDate.getTimezoneOffset() * 60000,
     );
@@ -77,12 +100,10 @@ const EventCalendar = () => {
     trigger("date");
   };
 
-  // Update displayed month when calendar's month changes
-  const handleMonthChange = (newMonth: Date) => {
+  // Update displayed month when calendar's month changes (set to first day)
+  const handleMonthChange = (newMonth: Date): void => {
     setDisplayedMonth(new Date(newMonth.getFullYear(), newMonth.getMonth(), 1));
   };
-
-  const remainingReservations = useRemainingReservations(displayedMonth);
 
   if (isPending) return <LoadingPage />;
   if (isError)
@@ -90,35 +111,40 @@ const EventCalendar = () => {
 
   return (
     <div className="mx-auto mt-5 w-full max-w-4xl px-4">
-      <div className="rounded-lg bg-white">
+      <div className="rounded-lg bg-white p-4">
         <h2 className="mb-2 text-center text-2xl font-bold text-primary">
           Event Reservation View
         </h2>
-        <div className="mb-4 border">
+        <div className="mb-4 border p-4">
           <Calendar
-            mode="single" // Allow single date selection
+            mode="single"
             selected={selectedDate}
             onSelect={handleSelect}
             onMonthChange={handleMonthChange}
             className="mx-auto hover:cursor-pointer"
-            // Use DayPicker modifiers to mark booked dates with a primary background
-            modifiers={{ booked: reservedDates }}
-            modifiersClassNames={{ booked: "bg-primary text-white" }}
-            // Disable the booked dates so they are not clickable
-            disabled={reservedDates}
+            modifiers={{
+              booked: reservedDates,
+              unavailable: unavailable,
+            }}
+            modifiersClassNames={{
+              booked: "bg-primary text-white",
+              unavailable: "bg-gray-500 text-white",
+            }}
+            disabled={[...reservedDates, ...unavailable]}
           />
+          {/* Calendar legend */}
           <div className="mx-5 mb-5 flex justify-center space-x-4">
-            <div className="flex space-x-1">
+            <div className="flex items-center space-x-1">
               <p className="text-xs text-gray-600">Today:</p>
               <div className="h-4 w-4 rounded border bg-muted"></div>
             </div>
-            <div className="flex space-x-1">
+            <div className="flex items-center space-x-1">
               <p className="text-xs text-gray-600">Booked:</p>
-              <div className="h-4 w-4 rounded bg-primary opacity-50"></div>
+              <div className="h-4 w-4 rounded bg-primary text-white opacity-60"></div>
             </div>
-            <div className="flex space-x-1">
-              <p className="text-xs text-gray-600">Selected:</p>
-              <div className="h-4 w-4 rounded bg-primary"></div>
+            <div className="flex items-center space-x-1">
+              <p className="text-xs text-gray-600">Unavailable:</p>
+              <div className="h-4 w-4 rounded bg-gray-500 text-white opacity-60"></div>
             </div>
           </div>
         </div>

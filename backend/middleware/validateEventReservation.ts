@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { EventSettings } from "../models/eventSettingsModel";
 import { EventReservation } from "../models/eventReservationModel";
+// NEW: Import the unavailable dates model (assume it exists)
+
 import { createError } from "../utils/createError";
+import { UnavailableDate } from "../models/unavailableDate";
 
 export const validateEventReservation = async (
   req: Request,
@@ -55,7 +58,7 @@ export const validateEventReservation = async (
     if (!Array.isArray(cart) || cart.length === 0) {
       return next(createError("Cart must be a non-empty array", 400));
     }
-    // Validate each cart item
+    // Validate each cart item and check if any item is marked unavailable
     for (const item of cart) {
       if (
         !item._id ||
@@ -69,13 +72,12 @@ export const validateEventReservation = async (
       ) {
         return next(createError("Invalid cart item", 400));
       }
-      // Check if any cart item is unavailable
       if (item.availability === false) {
         return next(createError("Cart contains an unavailable item.", 400));
       }
     }
 
-    // 6. Retrieve event settings for dynamic validations
+    // 5. Retrieve event settings for dynamic validations
     const settings = await EventSettings.findOne();
     if (!settings) {
       return next(createError("Event settings not configured.", 500));
@@ -98,6 +100,7 @@ export const validateEventReservation = async (
       minValidDate.getDate()
     );
 
+    // 6. Validate reservation is made at least eventMinDaysPrior days in advance
     if (reservationDateOnly < minValidDateOnly) {
       return next(
         createError(
@@ -107,7 +110,7 @@ export const validateEventReservation = async (
       );
     }
 
-    // 7. Validate partySize meets minimum guests requirement
+    // 7. Validate partySize meets minimum and does not exceed maximum guest requirements
     if (settings.eventMinGuests && partySize < settings.eventMinGuests) {
       return next(
         createError(
@@ -116,8 +119,6 @@ export const validateEventReservation = async (
         )
       );
     }
-
-    // NEW: Validate partySize does not exceed the maximum allowed guests.
     if (settings.eventMaxGuests && partySize > settings.eventMaxGuests) {
       return next(
         createError(
@@ -144,8 +145,29 @@ export const validateEventReservation = async (
       );
     }
 
-    // 9. Validate Reservation Conflict
-    // Normalize selected date to ignore time (i.e., compare date-only)
+    // NEW 9. Validate that the reservation date is not among the unavailable dates.
+    // Assumes that the UnavailableDate model returns documents with a "date" field.
+    const unavailableDates = await UnavailableDate.find({});
+    const isUnavailable = unavailableDates.some((item) => {
+      const itemDate = new Date(item.date);
+      const normalizedItemDate = new Date(
+        itemDate.getFullYear(),
+        itemDate.getMonth(),
+        itemDate.getDate()
+      );
+      return normalizedItemDate.getTime() === reservationDateOnly.getTime();
+    });
+    if (isUnavailable) {
+      return next(
+        createError(
+          "The selected date is unavailable. Please choose another date.",
+          400
+        )
+      );
+    }
+
+    // NEW 10. Validate Reservation Conflict: ignore reservations with eventStatus "Cancelled"
+    // Normalize the selected date (date only) for the entire day
     const startOfDay = new Date(
       reservationDate.getFullYear(),
       reservationDate.getMonth(),
@@ -157,9 +179,10 @@ export const validateEventReservation = async (
       reservationDate.getDate() + 1
     );
 
-    // Check if any reservation exists on the same day
+    // Query for any existing reservations on the same day that are NOT cancelled
     const existingReservation = await EventReservation.findOne({
       date: { $gte: startOfDay, $lt: endOfDay },
+      eventStatus: { $ne: "Cancelled" },
     });
 
     if (existingReservation) {
