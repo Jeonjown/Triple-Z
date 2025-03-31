@@ -130,7 +130,7 @@ export const createReservation = async (
 };
 
 // Controller to get all reservations with auto‑update and notifications
-export const getReservations = async (
+export const getGroupReservations = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -138,91 +138,94 @@ export const getReservations = async (
   try {
     const now = new Date();
 
-    // --- Process Confirmed Reservations ---
-    const confirmedReservations = await EventReservation.find({
+    // --- Auto-Complete Process ---
+    // Conditions:
+    //   - Date is past.
+    //   - eventStatus is "Confirmed".
+    //   - paymentStatus is "Paid".
+    const completeReservations = await GroupReservation.find({
       date: { $lt: now },
       eventStatus: "Confirmed",
+      paymentStatus: "Paid",
     });
-    if (confirmedReservations.length > 0) {
-      const confirmedIds = confirmedReservations.map((r) => r._id);
-      await EventReservation.updateMany(
-        { _id: { $in: confirmedIds } },
+    if (completeReservations.length > 0) {
+      const completeIds = completeReservations.map((r) => r._id);
+      await GroupReservation.updateMany(
+        { _id: { $in: completeIds } },
         { eventStatus: "Completed" }
       );
       console.log(
-        `Auto-updated ${confirmedReservations.length} confirmed reservations to Completed.`
+        `Auto-updated ${completeReservations.length} reservations to Completed.`
       );
-
-      // For each reservation, call createNotification by simulating req/res objects.
-      for (const reservation of confirmedReservations) {
+      for (const reservation of completeReservations) {
         const fakeReq = {
           body: {
-            title: "Reservation Completed",
-            description: `Your reservation on ${format(
+            title: "Group Reservation Completed",
+            description: `Your group reservation on ${format(
               reservation.date,
               "MMMM dd, yyyy"
-            )} has been automatically marked as Completed.`,
+            )} has been marked as Completed.`,
             userId: String(reservation.userId),
             redirectUrl: "/profile",
           },
         } as Request;
-        // Create a fake response object that does nothing.
         const fakeRes = {
-          status: () => ({
-            json: () => {},
-          }),
+          status: () => ({ json: () => {} }),
         } as unknown as Response;
         await createNotification(fakeReq, fakeRes, next);
       }
     }
 
-    // --- Process Pending Reservations ---
-    const pendingReservations = await EventReservation.find({
+    // --- Auto-Cancel Process ---
+    // Conditions:
+    //   - Date is past.
+    //   - eventStatus is "Pending".
+    //   - paymentStatus is neither "Paid" nor "Partially Paid".
+    const cancelReservations = await GroupReservation.find({
       date: { $lt: now },
       eventStatus: "Pending",
+      paymentStatus: { $nin: ["Paid", "Partially Paid"] },
     });
-    if (pendingReservations.length > 0) {
-      const pendingIds = pendingReservations.map((r) => r._id);
-      await EventReservation.updateMany(
-        { _id: { $in: pendingIds } },
+    if (cancelReservations.length > 0) {
+      const cancelIds = cancelReservations.map((r) => r._id);
+      await GroupReservation.updateMany(
+        { _id: { $in: cancelIds } },
         { eventStatus: "Cancelled" }
       );
       console.log(
-        `Auto-updated ${pendingReservations.length} pending reservations to Cancelled.`
+        `Auto-updated ${cancelReservations.length} pending reservations to Cancelled.`
       );
-      for (const reservation of pendingReservations) {
+      for (const reservation of cancelReservations) {
         const fakeReq = {
           body: {
-            title: "Reservation Cancelled",
-            description: `Your reservation on ${format(
+            title: "Group Reservation Cancelled",
+            description: `Your group reservation on ${format(
               reservation.date,
               "MMMM dd, yyyy"
-            )} has been automatically cancelled as it was not confirmed.`,
+            )} has been cancelled as it was not confirmed.`,
             userId: String(reservation.userId),
-            redirectUrl: "/profile", // Adjust as needed
+            redirectUrl: "/profile",
           },
         } as Request;
         const fakeRes = {
-          status: () => ({
-            json: () => {},
-          }),
+          status: () => ({ json: () => {} }),
         } as unknown as Response;
         await createNotification(fakeReq, fakeRes, next);
       }
     }
 
-    // Fetch all reservations after auto-updates
-    const reservations = await EventReservation.find()
+    // Fetch all group reservations after auto-updates
+    const reservations = await GroupReservation.find()
       .sort({ createdAt: -1 })
       .populate("userId", "username email", User);
 
     res.status(200).json({
-      message: "Reservations fetched successfully!",
+      message: "Group reservations fetched successfully!",
       reservations,
     });
   } catch (error) {
     console.error(error);
-    next(createError("Failed to fetch reservations.", 500));
+    next(createError("Failed to fetch group reservations.", 500));
   }
 };
 // Update a reservation's status (confirming, canceling, or completing)

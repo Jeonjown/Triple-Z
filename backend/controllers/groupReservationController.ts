@@ -2,8 +2,10 @@
 import { Request, Response, NextFunction } from "express";
 import { GroupReservation } from "../models/groupReservationModel";
 import { createError } from "../utils/createError";
+import { format } from "date-fns";
 import User from "../models/userModel";
 import { EventSettings } from "../models/eventSettingsModel";
+import { createNotification } from "./notificationController";
 
 // Create a group reservation
 export const createGroupReservation = async (
@@ -112,6 +114,85 @@ export const getGroupReservations = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const now = new Date();
+
+    // --- Auto-Complete Process ---
+    // Conditions:
+    //   - Date is past.
+    //   - eventStatus is "Confirmed".
+    //   - paymentStatus is "Paid".
+    const completeReservations = await GroupReservation.find({
+      date: { $lt: now },
+      eventStatus: "Confirmed",
+      paymentStatus: "Paid",
+    });
+    if (completeReservations.length > 0) {
+      const completeIds = completeReservations.map((r) => r._id);
+      await GroupReservation.updateMany(
+        { _id: { $in: completeIds } },
+        { eventStatus: "Completed" }
+      );
+      console.log(
+        `Auto-updated ${completeReservations.length} reservations to Completed.`
+      );
+      for (const reservation of completeReservations) {
+        const fakeReq = {
+          body: {
+            title: "Group Reservation Completed",
+            description: `Your group reservation on ${format(
+              reservation.date,
+              "MMMM dd, yyyy"
+            )} has been marked as Completed.`,
+            userId: String(reservation.userId),
+            redirectUrl: "/profile",
+          },
+        } as Request;
+        const fakeRes = {
+          status: () => ({ json: () => {} }),
+        } as unknown as Response;
+        await createNotification(fakeReq, fakeRes, next);
+      }
+    }
+
+    // --- Auto-Cancel Process ---
+    // Conditions:
+    //   - Date is past.
+    //   - eventStatus is "Pending".
+    //   - paymentStatus is neither "Paid" nor "Partially Paid".
+    const cancelReservations = await GroupReservation.find({
+      date: { $lt: now },
+      eventStatus: "Pending",
+      paymentStatus: { $nin: ["Paid", "Partially Paid"] },
+    });
+    if (cancelReservations.length > 0) {
+      const cancelIds = cancelReservations.map((r) => r._id);
+      await GroupReservation.updateMany(
+        { _id: { $in: cancelIds } },
+        { eventStatus: "Cancelled" }
+      );
+      console.log(
+        `Auto-updated ${cancelReservations.length} pending reservations to Cancelled.`
+      );
+      for (const reservation of cancelReservations) {
+        const fakeReq = {
+          body: {
+            title: "Group Reservation Cancelled",
+            description: `Your group reservation on ${format(
+              reservation.date,
+              "MMMM dd, yyyy"
+            )} has been cancelled as it was not confirmed.`,
+            userId: String(reservation.userId),
+            redirectUrl: "/profile",
+          },
+        } as Request;
+        const fakeRes = {
+          status: () => ({ json: () => {} }),
+        } as unknown as Response;
+        await createNotification(fakeReq, fakeRes, next);
+      }
+    }
+
+    // Fetch all group reservations after auto-updates
     const reservations = await GroupReservation.find()
       .sort({ createdAt: -1 })
       .populate("userId", "username email", User);
