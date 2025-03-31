@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { createError } from "../utils/createError";
 import { GroupReservation } from "../models/groupReservationModel";
 import { EventSettings } from "../models/eventSettingsModel";
+import { UnavailableDate } from "../models/unavailableDate"; // Import UnavailableDate model
 
 export const validateGroupReservation = async (
   req: Request,
@@ -82,12 +83,31 @@ export const validateGroupReservation = async (
       );
     }
 
+    // NEW STEP: Validate that the reservation date is not marked as unavailable
+    // Create local start and end boundaries for the day
+    const startOfLocalDay = new Date(
+      reservationDate.getFullYear(),
+      reservationDate.getMonth(),
+      reservationDate.getDate()
+    );
+    const endOfLocalDay = new Date(
+      reservationDate.getFullYear(),
+      reservationDate.getMonth(),
+      reservationDate.getDate() + 1
+    );
+    const unavailableRecord = await UnavailableDate.findOne({
+      date: { $gte: startOfLocalDay, $lt: endOfLocalDay },
+    });
+    if (unavailableRecord) {
+      return next(createError("The selected date is unavailable", 400));
+    }
+
     // 7. Validate that the reservation date is at least groupMinDaysPrior in advance
     const now = new Date();
     const minValidDate = new Date(now);
     minValidDate.setDate(now.getDate() + settings.groupMinDaysPrior);
 
-    // Normalize dates (date-only)
+    // Normalize both dates to local date-only
     const reservationDateOnly = new Date(
       reservationDate.getFullYear(),
       reservationDate.getMonth(),
@@ -128,7 +148,7 @@ export const validateGroupReservation = async (
     }
 
     // 10. Validate Available Tables Considering Party Size
-    // Define start and end of reservation day
+    // Define start and end of reservation day in local time
     const startOfDay = new Date(
       reservationDate.getFullYear(),
       reservationDate.getMonth(),
@@ -147,8 +167,6 @@ export const validateGroupReservation = async (
 
     // Calculate total tables already booked on that day
     const existingTables = reservations.reduce((total, reservation) => {
-      // For each reservation, compute the tables required:
-      // (partySize may be greater than the max per table)
       const tablesRequired = Math.ceil(
         reservation.partySize / settings.groupMaxGuestsPerTable
       );
@@ -169,6 +187,7 @@ export const validateGroupReservation = async (
         )
       );
     }
+
     next();
   } catch (error: any) {
     next(createError(error.message || "Internal Server Error", 500));

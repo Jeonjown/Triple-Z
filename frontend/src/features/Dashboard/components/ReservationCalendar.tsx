@@ -3,17 +3,25 @@ import {
   Calendar,
   CalendarCurrentDate,
   CalendarDayView,
-  CalendarMonthView,
+  CalendarWeekView,
   CalendarNextTrigger,
   CalendarPrevTrigger,
   CalendarTodayTrigger,
   CalendarViewTrigger,
-  CalendarWeekView,
   CalendarEvent,
+  useCalendar,
 } from "@/components/ui/full-calendar";
 import { useGetAllReservations } from "@/features/Events/hooks/useGetAllReservations";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format, parse } from "date-fns";
+import { useGetUnavailableDates } from "@/features/Events/hooks/useGetUnavailableDates";
+import { ChevronLeft, ChevronRight, User } from "lucide-react";
+import {
+  format,
+  parse,
+  isSameDay,
+  addDays,
+  startOfMonth,
+  startOfWeek,
+} from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +30,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 
-// Define a type for each cart item.
+// --- Types ---
 interface CartItem {
   _id: string;
   title: string;
@@ -33,14 +41,9 @@ interface CartItem {
   size: string;
 }
 
-// Updated Reservation type with cart and payment details.
 interface IReservation {
   _id: string;
-  userId: {
-    _id: string;
-    username: string;
-    email: string;
-  };
+  userId: { _id: string; username: string; email: string };
   fullName: string;
   contactNumber: string;
   partySize: number;
@@ -59,22 +62,22 @@ interface IReservation {
   isCorkage?: boolean;
 }
 
-// Extend the CalendarEvent type to include full reservation details.
 interface ExtendedCalendarEvent extends CalendarEvent {
   details: IReservation;
 }
 
+// --- ReservationCalendar Component ---
 const ReservationCalendar = () => {
   const { data: reservations } = useGetAllReservations();
+  const { data: unavailableDates = [] } = useGetUnavailableDates();
   console.log("Reservations:", reservations);
+  console.log("Unavailable Dates:", unavailableDates);
   const [selectedReservation, setSelectedReservation] =
     useState<IReservation | null>(null);
 
-  // Map reservations to typed calendar events.
   const calendarEvents: ExtendedCalendarEvent[] = useMemo(() => {
     if (!reservations || !reservations.reservations) return [];
-    return reservations.reservations.map((res: IReservation) => {
-      // Use format to get the base date string.
+    return (reservations.reservations as IReservation[]).map((res) => {
       const baseDate = format(new Date(res.date), "yyyy-MM-dd");
       const start = parse(
         `${baseDate} ${res.startTime}`,
@@ -86,7 +89,6 @@ const ReservationCalendar = () => {
         "yyyy-MM-dd h:mm a",
         new Date(),
       );
-      // Always display fullName on calendar.
       const title = res.fullName;
       const color: "blue" | "pink" | "default" | "green" | "purple" =
         res.reservationType === "Event" ? "blue" : "pink";
@@ -94,8 +96,101 @@ const ReservationCalendar = () => {
     });
   }, [reservations]);
 
-  const handleEventClick = (event: ExtendedCalendarEvent): void => {
-    setSelectedReservation(event.details);
+  const handleEventClick = (event: CalendarEvent): void => {
+    setSelectedReservation((event as ExtendedCalendarEvent).details);
+  };
+
+  // --- Custom Month View that reflects Unavailable Dates ---
+  const CalendarMonthViewWithUnavailableDates = () => {
+    // Use the date from Calendar context
+    const { date, onEventClick } = useCalendar();
+    const startOfMonthDate = startOfMonth(date);
+    const startOfWeekForMonth = startOfWeek(startOfMonthDate, {
+      weekStartsOn: 0,
+    });
+    const monthDates = useMemo(() => {
+      const dates: Date[] = [];
+      let currentDate = startOfWeekForMonth;
+      while (dates.length < 42) {
+        dates.push(new Date(currentDate));
+        currentDate = addDays(currentDate, 1);
+      }
+      return dates;
+    }, [startOfWeekForMonth]);
+
+    const weekDays = useMemo(() => {
+      const start = startOfWeek(date, { weekStartsOn: 0 });
+      return Array.from({ length: 7 }, (_, i) =>
+        format(addDays(start, i), "EEEEEE"),
+      );
+    }, [date]);
+
+    return (
+      <div className="flex h-full flex-col p-4">
+        {/* Weekdays Header */}
+        <div className="sticky top-0 mb-4 grid grid-cols-7 gap-2 pb-2">
+          {weekDays.map((day) => (
+            <div
+              key={day}
+              className="text-center text-sm font-medium text-gray-600"
+            >
+              {day}
+            </div>
+          ))}
+        </div>
+        {/* Calendar Grid */}
+        <div className="grid flex-1 grid-cols-7 border">
+          {monthDates.map((cellDate) => {
+            const currentEvents = calendarEvents.filter((event) =>
+              isSameDay(event.start, cellDate),
+            );
+            const matchingUnavailable = unavailableDates.find((u) =>
+              isSameDay(new Date(u.date), cellDate),
+            );
+            return (
+              <div
+                key={cellDate.toString()}
+                className={`relative flex h-24 flex-col border p-2 shadow-sm ${
+                  matchingUnavailable ? "bg-red-50" : "bg-white"
+                }`}
+              >
+                <div className="flex justify-end">
+                  <span
+                    className={`text-xs font-bold ${
+                      isSameDay(new Date(), cellDate)
+                        ? "rounded-full bg-primary p-1 text-white"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    {format(cellDate, "d")}
+                  </span>
+                </div>
+                {matchingUnavailable && (
+                  // Center the unavailable reason in the cell overlay
+                  <div className="absolute inset-0 flex items-center justify-center bg-red-100 bg-opacity-80">
+                    <span className="text-center font-semibold text-red-600">
+                      {matchingUnavailable.reason}
+                    </span>
+                  </div>
+                )}
+                <div className="mt-1 flex-1 overflow-auto">
+                  {currentEvents.map((event) => (
+                    <div
+                      key={event.id}
+                      className="flex cursor-pointer items-center gap-1 rounded bg-gray-100 px-1 text-xs"
+                      onClick={() => onEventClick && onEventClick(event)}
+                    >
+                      <User className="h-4 w-4" />
+                      <span className="truncate">{event.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -107,7 +202,7 @@ const ReservationCalendar = () => {
       >
         <div className="space-y-4">
           {/* Navigation Controls */}
-          <div className="mx-5 flex items-center justify-between">
+          <div className="mx-5 flex flex-col items-center justify-between gap-2 sm:flex-row">
             <div className="flex items-center space-x-2">
               <CalendarPrevTrigger>
                 <ChevronLeft />
@@ -117,10 +212,9 @@ const ReservationCalendar = () => {
               </CalendarNextTrigger>
               <CalendarTodayTrigger>Today</CalendarTodayTrigger>
             </div>
-            <div className="ml-2 text-2xl font-semibold text-primary">
+            <div className="text-2xl font-semibold text-primary">
               <CalendarCurrentDate />
             </div>
-            {/* View Switcher */}
             <div className="flex items-center justify-center space-x-2">
               <CalendarViewTrigger
                 view="week"
@@ -140,7 +234,8 @@ const ReservationCalendar = () => {
           <div className="p-2">
             <CalendarDayView />
             <CalendarWeekView />
-            <CalendarMonthView />
+            {/* Use custom Month view with unavailable dates */}
+            <CalendarMonthViewWithUnavailableDates />
           </div>
         </div>
       </Calendar>
@@ -154,7 +249,6 @@ const ReservationCalendar = () => {
       >
         <DialogContent className="max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            {/* Receipt Header */}
             <DialogTitle className="text-lg font-bold">
               {selectedReservation?.fullName}
             </DialogTitle>
@@ -171,7 +265,6 @@ const ReservationCalendar = () => {
               </div>
             </div>
           </DialogHeader>
-          {/* Receipt Body */}
           <div className="space-y-2">
             <div>
               <strong>Party Size:</strong> {selectedReservation?.partySize}

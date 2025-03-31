@@ -5,25 +5,30 @@ import { useGetEventReservationSettings } from "../../hooks/useGetEventReservati
 import LoadingPage from "@/pages/LoadingPage";
 import { useFormContext } from "react-hook-form";
 import { GroupFormValues } from "../../pages/GroupForm";
+import { useGetUnavailableDates } from "../../hooks/useGetUnavailableDates";
 
 const GroupCalendar: React.FC = () => {
+  // Fetch reservations, settings, and unavailable dates using custom hooks
   const { data, isPending, isError } = useGetGroupReservations();
-
   const { data: settings } = useGetEventReservationSettings();
-  // Import setValue and trigger from form context
+  const { data: unavailableDates } = useGetUnavailableDates();
+
+  // Get setValue and trigger from react-hook-form
   const { setValue, trigger } = useFormContext<GroupFormValues>();
 
+  // States for reserved, fully booked, and unavailable dates
   const [reservedDates, setReservedDates] = useState<Date[]>([]);
   const [fullDates, setFullDates] = useState<Date[]>([]);
+  const [unavailable, setUnavailable] = useState<Date[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [availableTables, setAvailableTables] = useState<number | null>(null);
 
-  // Updated handleSelect: update both local state and form date
+  // Handle date selection: update local state, form, and compute available tables
   const handleSelect = (day: Date | undefined): void => {
     setSelectedDate(day);
     if (!day || !data || !settings) return;
 
-    // Update form date input similar to EventCalendar logic
+    // Normalize date (date-only)
     const normalizedDay = new Date(
       day.getFullYear(),
       day.getMonth(),
@@ -33,43 +38,33 @@ const GroupCalendar: React.FC = () => {
       normalizedDay.getTime() - normalizedDay.getTimezoneOffset() * 60000,
     );
     const formatted = localDate.toISOString().split("T")[0];
-    setValue("date", formatted); // update the form's date field
-    trigger("date"); // trigger validation if needed
+    setValue("date", formatted);
+    trigger("date");
 
-    // Compute available tables as before
-    const startOfDay = new Date(
-      day.getFullYear(),
-      day.getMonth(),
-      day.getDate(),
-    );
+    // Calculate available tables for the selected day
+    const startOfDay = normalizedDay;
     const endOfDay = new Date(
       day.getFullYear(),
       day.getMonth(),
       day.getDate() + 1,
     );
-
     const reservationsForDay = data.filter(
       (reservation: { date: string; partySize: number }) => {
         const resDate = new Date(reservation.date);
         return resDate >= startOfDay && resDate < endOfDay;
       },
     );
-
     const totalBookedTables = reservationsForDay.reduce(
-      (sum: number, reservation: { date: string; partySize: number }) => {
-        return (
-          sum +
-          Math.ceil(reservation.partySize / settings.groupMaxGuestsPerTable)
-        );
-      },
+      (sum: number, reservation: { date: string; partySize: number }) =>
+        sum +
+        Math.ceil(reservation.partySize / settings.groupMaxGuestsPerTable),
       0,
     );
-
     const available = settings.groupMaxTablesPerDay - totalBookedTables;
     setAvailableTables(available);
   };
 
-  // The rest of your code remains unchanged
+  // Map reservations to reservedDates (date-only)
   useEffect(() => {
     if (data) {
       const dates = data.map((reservation: { date: string }) => {
@@ -80,6 +75,7 @@ const GroupCalendar: React.FC = () => {
     }
   }, [data]);
 
+  // Compute fullDates based on reservations and settings
   useEffect(() => {
     if (data && settings) {
       const dateCountMap = new Map<string, number>();
@@ -102,6 +98,17 @@ const GroupCalendar: React.FC = () => {
     }
   }, [data, settings]);
 
+  // Map fetched unavailableDates to Date objects
+  useEffect(() => {
+    if (unavailableDates) {
+      const dates: Date[] = unavailableDates.map((item: { date: string }) => {
+        const d = new Date(item.date);
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      });
+      setUnavailable(dates);
+    }
+  }, [unavailableDates]);
+
   if (isPending || !settings) return <LoadingPage />;
   if (isError)
     return <p className="text-center text-red-500">Error occurred!</p>;
@@ -117,16 +124,27 @@ const GroupCalendar: React.FC = () => {
             mode="single"
             selected={selectedDate}
             onSelect={handleSelect}
-            modifiers={{ reserved: reservedDates, full: fullDates }}
+            // Include reserved, full, and unavailable dates as modifiers
+            modifiers={{
+              reserved: reservedDates,
+              full: fullDates,
+              unavailable: unavailable,
+            }}
             modifiersStyles={{
               reserved: { backgroundColor: "#7b4d35", color: "white" },
               full: { backgroundColor: "#e11d48", color: "white" },
+              unavailable: { backgroundColor: "#6b7280", color: "white" },
             }}
-            modifiersClassNames={{ reserved: "reserved-day", full: "full-day" }}
+            modifiersClassNames={{
+              reserved: "reserved-day",
+              full: "full-day",
+              unavailable: "unavailable-day",
+            }}
+            // Disable selection on unavailable dates
+            disabled={unavailable}
             className="mx-auto hover:cursor-pointer"
-            disabled={false}
           />
-          {/* Legend */}
+          {/* Legend for Calendar Colors */}
           <div className="mx-5 mb-5 flex justify-center space-x-4">
             <div className="flex items-center space-x-1">
               <p className="text-xs text-gray-600">Today:</p>
@@ -143,6 +161,13 @@ const GroupCalendar: React.FC = () => {
                 style={{ backgroundColor: "#e11d48" }}
               ></div>
             </div>
+            <div className="flex items-center space-x-1">
+              <p className="text-xs text-gray-600">Unavailable:</p>
+              <div
+                className="h-4 w-4 rounded"
+                style={{ backgroundColor: "#6b7280" }}
+              ></div>
+            </div>
           </div>
           {selectedDate && availableTables !== null && (
             <div className="text-center">
@@ -154,9 +179,11 @@ const GroupCalendar: React.FC = () => {
           )}
         </div>
       </div>
+      {/* Simple hover effect for calendar modifiers */}
       <style>{`
         .reserved-day:hover,
-        .full-day:hover {
+        .full-day:hover,
+        .unavailable-day:hover {
           opacity: 0.75;
         }
       `}</style>

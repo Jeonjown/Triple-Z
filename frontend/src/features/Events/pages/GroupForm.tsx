@@ -9,6 +9,7 @@ import GroupStep4 from "../components/groups-form/GroupStep4";
 import { SelectedItem } from "../components/groups-form/EmbeddedMenu";
 import { useGetEventReservationSettings } from "../hooks/useGetEventReservationSettings";
 import { ProgressBar } from "@/components/ProgressBar";
+import { useGetUnavailableDates } from "../hooks/useGetUnavailableDates";
 
 // Unified CartItem type
 export type CartItem = {
@@ -21,11 +22,13 @@ export type CartItem = {
   size?: string;
 };
 
-// Updated Zod schema using normalized date validation
+// Updated Zod schema using normalized date validation and unavailable date check.
+// We pass unavailableDates as a parameter so the refine function can use it.
 const getReservationSchema = (
   minReservation: number,
   maxReservation: number,
   minDaysPrior: number,
+  unavailableDates: Date[],
 ) =>
   z.object({
     fullName: z.string().nonempty("Full Name is required."),
@@ -40,17 +43,16 @@ const getReservationSchema = (
     date: z
       .string()
       .nonempty("Date is required")
+      // Validate the minimum days prior condition
       .refine(
         (val) => {
           const selectedDate = new Date(val);
-          // Normalize selected date (ignore hours/minutes)
           const normSelected = new Date(
             selectedDate.getFullYear(),
             selectedDate.getMonth(),
             selectedDate.getDate(),
           );
           const now = new Date();
-          // Create a normalized minimum date: today + minDaysPrior (date-only)
           const normMin = new Date(
             now.getFullYear(),
             now.getMonth(),
@@ -60,6 +62,27 @@ const getReservationSchema = (
           return normSelected >= normMin;
         },
         { message: `Date must be at least ${minDaysPrior} day(s) in advance` },
+      )
+      // Validate that the selected date is not in the unavailableDates array
+      .refine(
+        (val) => {
+          // If there are no unavailable dates loaded, pass validation.
+          if (!unavailableDates || unavailableDates.length === 0) return true;
+          const selectedDate = new Date(val);
+          const normSelected = new Date(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth(),
+            selectedDate.getDate(),
+          );
+          // Return false if the selected date matches any unavailable date
+          return !unavailableDates.some(
+            (date) =>
+              date.getFullYear() === normSelected.getFullYear() &&
+              date.getMonth() === normSelected.getMonth() &&
+              date.getDate() === normSelected.getDate(),
+          );
+        },
+        { message: "The selected date is unavailable" },
       ),
     startTime: z.string().nonempty("Start Time is required"),
     endTime: z.string().nonempty("End Time is required"),
@@ -80,14 +103,33 @@ export type GroupFormValues = z.infer<ReturnType<typeof getReservationSchema>>;
 
 const GroupForm = () => {
   const { data: settings } = useGetEventReservationSettings();
+  const { data: unavailableDatesData } = useGetUnavailableDates();
 
   const minReservation = settings ? settings.groupMinReservation : 1;
   const maxReservation = settings ? settings.groupMaxReservation : 12;
   const minDaysPrior = settings ? settings.groupMinDaysPrior : 0;
 
+  // Convert fetched unavailable dates to Date objects (normalized to date-only)
+  const unavailableDates = useMemo(() => {
+    if (unavailableDatesData) {
+      return unavailableDatesData.map((item: { date: string }) => {
+        const d = new Date(item.date);
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      });
+    }
+    return [];
+  }, [unavailableDatesData]);
+
+  // Update reservation schema to include the unavailableDates array
   const reservationSchema = useMemo(
-    () => getReservationSchema(minReservation, maxReservation, minDaysPrior),
-    [minReservation, maxReservation, minDaysPrior],
+    () =>
+      getReservationSchema(
+        minReservation,
+        maxReservation,
+        minDaysPrior,
+        unavailableDates,
+      ),
+    [minReservation, maxReservation, minDaysPrior, unavailableDates],
   );
 
   // Multi-step form state
@@ -98,7 +140,7 @@ const GroupForm = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Define the steps array for the progress bar.
+  // Steps for progress bar
   const steps = [
     { step: 1, label: "Details" },
     { step: 2, label: "Packages" },
