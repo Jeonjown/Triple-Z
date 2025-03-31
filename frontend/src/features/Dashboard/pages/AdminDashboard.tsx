@@ -4,7 +4,7 @@ import UserAnalytics from "../components/UserAnalytics";
 
 const AdminDashboard = () => {
   return (
-    <div className="min-h-screen bg-white p-5">
+    <div className="min-h-screen bg-white">
       {/* Dashboard Header */}
       <div className="mb-10 mt-5">
         <h2 className="text-3xl font-extrabold">Dashboard</h2>

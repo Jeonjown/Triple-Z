@@ -44,7 +44,7 @@ const UserAnalytics = () => {
           <p className="mt-2 text-3xl">{totalReservations}</p>
         </div>
         <div className="rounded-lg border bg-muted p-5 shadow">
-          <h3 className="text-xl font-bold">Monthly Revenue</h3>
+          <h3 className="text-xl font-bold">Guest This month: </h3>
           <p className="mt-2 text-3xl">${monthlyRevenue}</p>
         </div>
       </div>
