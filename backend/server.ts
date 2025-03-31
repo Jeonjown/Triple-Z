@@ -25,6 +25,7 @@ import emailRoutes from "./routes/emailRoutes";
 import blogRoutes from "./routes/blogRoutes";
 import pushNotificationRoutes from "./routes/pushNotificationRoutes";
 import subscriptionRoutes from "./routes/subscriptionRoutes";
+import unavailableDateRoutes from "./routes/unavailableDateRoutes";
 
 import http from "http";
 import { initSocket } from "./socket/socket";
@@ -123,6 +124,7 @@ server.use("/api/messages", messageRoutes);
 server.use("/api/mail", emailRoutes);
 server.use("/api/blogs", blogRoutes);
 server.use("/api/subscriptions", subscriptionRoutes);
+server.use("/api/unavailable-dates", unavailableDateRoutes);
 
 // --- Error Handling Middleware ---
 server.use(

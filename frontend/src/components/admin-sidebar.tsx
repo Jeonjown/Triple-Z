@@ -76,7 +76,7 @@ export function AppAdminSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
-                    to="#"
+                    to="/admin/admin-dashboard"
                     className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
                   >
                     <LayoutDashboard />
@@ -89,7 +89,7 @@ export function AppAdminSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="[&>svg]:size-5">
                   <Link
-                    to="admin/manage-users"
+                    to="/admin/manage-users"
                     className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
                   >
                     <UsersRound />
@@ -104,7 +104,7 @@ export function AppAdminSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="[&>svg]:size-6">
                   <Link
-                    to="admin/manage-menu"
+                    to="/admin/manage-menu"
                     className="flex w-full items-center gap-2 rounded p-2 hover:bg-muted"
                   >
                     <Coffee />

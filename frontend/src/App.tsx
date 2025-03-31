@@ -26,7 +26,7 @@ import Menu from "./features/Menu/pages/Menu";
 import Home from "./pages/Home";
 import Settings from "./features/Admin/pages/Settings";
 import Footer from "./components/Footer";
-import AdminDashboard from "./features/Admin/pages/AdminDashboard";
+import AdminDashboard from "./features/Dashboard/pages/AdminDashboard";
 import ManageEvents from "./features/Events/pages/ManageEvents";
 import AdminChat from "./features/Chat/components/AdminChat";
 import ManageGroups from "./features/Events/pages/ManageGroups";
