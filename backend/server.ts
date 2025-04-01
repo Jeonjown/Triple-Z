@@ -29,6 +29,7 @@ import unavailableDateRoutes from "./routes/unavailableDateRoutes";
 
 import http from "http";
 import { initSocket } from "./socket/socket";
+import analyticsRoutes from "./routes/analyticsRoutes";
 
 const server = express();
 
@@ -125,6 +126,7 @@ server.use("/api/mail", emailRoutes);
 server.use("/api/blogs", blogRoutes);
 server.use("/api/subscriptions", subscriptionRoutes);
 server.use("/api/unavailable-dates", unavailableDateRoutes);
+server.use("/api/analytics", analyticsRoutes);
 
 // --- Error Handling Middleware ---
 server.use(

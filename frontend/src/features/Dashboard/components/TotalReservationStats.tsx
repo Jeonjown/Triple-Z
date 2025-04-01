@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -23,50 +22,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-// Dummy chart data using event and group reservation counts
-const chartData = [
-  { date: "2024-04-01", events: 50, groups: 20 },
-  { date: "2024-04-02", events: 55, groups: 25 },
-  { date: "2024-04-03", events: 48, groups: 22 },
-  { date: "2024-04-04", events: 60, groups: 30 },
-  { date: "2024-04-05", events: 65, groups: 35 },
-  { date: "2024-04-06", events: 70, groups: 40 },
-  { date: "2024-04-07", events: 68, groups: 38 },
-  { date: "2024-04-08", events: 75, groups: 42 },
-  { date: "2024-04-09", events: 80, groups: 45 },
-  { date: "2024-04-10", events: 78, groups: 43 },
-  // Additional data points as needed...
-];
+import { useFetchReservationTimeSeries } from "../hooks/useFetchReservationTimeSeries";
 
 const chartConfig = {
-  events: {
-    label: "Event Reservations",
-    color: "hsl(var(--primary))", // Uses your bg-primary color
-  },
-  groups: {
-    label: "Group Reservations",
-    color: "hsl(var(--muted))", // Uses your muted color
-  },
+  events: { label: "Event Reservations", color: "hsl(var(--primary))" },
+  groups: { label: "Group Reservations", color: "hsl(var(--muted))" },
 } satisfies ChartConfig;
 
 export default function ReservationAnalytics() {
   const [timeRange, setTimeRange] = React.useState("90d");
-
-  // Dummy filtering based on time range
-  const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date);
-    const referenceDate = new Date("2024-04-10"); // Adjust as needed
-    let daysToSubtract = 90;
-    if (timeRange === "30d") {
-      daysToSubtract = 30;
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7;
-    }
-    const startDate = new Date(referenceDate);
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return date >= startDate;
-  });
+  const { data: chartData = [] } = useFetchReservationTimeSeries(timeRange);
 
   return (
     <Card>
@@ -102,7 +67,7 @@ export default function ReservationAnalytics() {
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"
         >
-          <AreaChart data={filteredData}>
+          <AreaChart data={chartData || []}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="date"
@@ -110,13 +75,12 @@ export default function ReservationAnalytics() {
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
+              tickFormatter={(value) =>
+                new Date(value).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
-                });
-              }}
+                })
+              }
             />
             <ChartTooltip
               cursor={false}
@@ -135,14 +99,14 @@ export default function ReservationAnalytics() {
             <Area
               dataKey="groups"
               type="natural"
-              fill="hsl(var(--primary))" // Solid fill without gradient
+              fill="hsl(var(--primary))"
               stroke="hsl(var(--muted))"
               stackId="a"
             />
             <Area
               dataKey="events"
               type="natural"
-              fill="hsl(var(--muted))" // Solid fill without gradient
+              fill="hsl(var(--muted))"
               stroke="hsl(var(--primary))"
               stackId="a"
             />

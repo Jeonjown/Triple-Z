@@ -1,3 +1,6 @@
+// src/components/ReservationStatusSummary.tsx
+
+import React from "react";
 import {
   Card,
   CardContent,
@@ -7,24 +10,34 @@ import {
 } from "@/components/ui/card";
 import { ClockAlert, HandCoins, PiggyBank } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useFetchReservationStats } from "../hooks/useFetchReservationStats"; // Import the custom hook
 
-const ReservationStatusSummary = () => {
-  // Dummy data; replace these values with actual API data.
-  const eventStats = {
-    pending: 12,
-    notPaid: 5,
-    partiallyPaid: 3,
-  };
+const ReservationStatusSummary: React.FC = () => {
+  // Use the custom hook to fetch dynamic reservation stats
+  const { data, isLoading, isError, error } = useFetchReservationStats();
 
-  const groupStats = {
-    pending: 7,
-    notPaid: 2,
+  // Handle loading state
+  if (isLoading) {
+    return <div>Loading reservation stats...</div>;
+  }
+
+  // Handle error state
+  if (isError) {
+    return <div>Error fetching stats: {error?.message}</div>;
+  }
+
+  // Ensure data exists before destructuring it
+  const eventStats = data?.eventStats || {
+    pending: 0,
+    notPaid: 0,
+    partiallyPaid: 0,
   };
+  const groupStats = data?.groupStats || { pending: 0, notPaid: 0 };
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       {/* Event Reservations Stats Card */}
-      <Link to={"/admin/manage-events"} className="h-full">
+      <Link to="/admin/manage-events" className="h-full">
         <Card className="flex h-full flex-col rounded-lg bg-muted hover:scale-105">
           <CardHeader className="rounded-t-lg bg-primary p-4 text-white">
             <CardTitle className="text-2xl font-bold">
@@ -57,7 +70,7 @@ const ReservationStatusSummary = () => {
       </Link>
 
       {/* Group Reservations Stats Card */}
-      <Link to={"/admin/manage-groups"} className="h-full">
+      <Link to="/admin/manage-groups" className="h-full">
         <Card className="flex h-full flex-col rounded-lg bg-muted hover:scale-105">
           <CardHeader className="rounded-t-lg bg-primary p-4 text-white">
             <CardTitle className="text-2xl font-bold">
