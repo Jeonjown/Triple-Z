@@ -1,6 +1,6 @@
 import { Table } from "@tanstack/react-table";
 import { useState } from "react";
-import { MenuItem } from "../pages/ManageMenu";
+
 import MenuTableView from "./MenuTableView";
 import MenuCardView from "./MenuCardView";
 import CreateMenuItemModal from "./CreateMenuItemModal";
@@ -16,6 +16,7 @@ import {
   Search,
   Table2,
 } from "lucide-react";
+import { MenuItem } from "@/app/tables/menu/columns";
 
 interface CardViewProps {
   table: Table<MenuItem>;

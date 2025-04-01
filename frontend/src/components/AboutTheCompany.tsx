@@ -1,9 +1,20 @@
-// AboutTheCompany.tsx
+// Importing React types and aliasing the motion component to 'm'
 import { FC } from "react";
+// Use the correct package name for Motion One for React
+import { motion } from "motion/react";
 
 const AboutTheCompany: FC = () => {
   return (
-    <section className="mx-auto max-w-7xl rounded p-10 px-4 sm:px-6 lg:my-20 lg:px-8">
+    // m.section acts like a normal section element with added animation properties
+    <motion.section
+      className="mx-auto max-w-7xl rounded p-10 px-4 sm:px-6 lg:my-20 lg:px-8"
+      // Initial state: transparent and moved 50px down
+      initial={{ opacity: 0, y: 50 }}
+      // Animate to: fully visible and in the original position
+      animate={{ opacity: 1, y: 0 }}
+      // Transition duration of 0.5 seconds
+      transition={{ duration: 0.5 }}
+    >
       {/* Grid: 1 column on mobile, 2 columns on larger screens */}
       <div className="grid grid-cols-1 gap-8 p-5 lg:grid-cols-2">
         {/* Left Column: Text */}
@@ -39,7 +50,7 @@ const AboutTheCompany: FC = () => {
           />
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 
