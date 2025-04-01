@@ -14,10 +14,10 @@ import { useFetchReservationStats } from "../hooks/useFetchReservationStats"; //
 
 const ReservationStatusSummary: React.FC = () => {
   // Use the custom hook to fetch dynamic reservation stats
-  const { data, isLoading, isError, error } = useFetchReservationStats();
+  const { data, isPending, isError, error } = useFetchReservationStats();
 
   // Handle loading state
-  if (isLoading) {
+  if (isPending) {
     return <div>Loading reservation stats...</div>;
   }
 

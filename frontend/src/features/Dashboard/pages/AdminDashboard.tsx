@@ -10,6 +10,7 @@ import ReservationCalendar from "../components/ReservationCalendar";
 import UserAnalytics from "../components/UserAnalytics";
 import { generateReport } from "@/utils/generateReport";
 import { Button } from "@/components/ui/button";
+import ReservationStatusSummary from "../components/ReservationStatusSummary";
 
 const AdminDashboard = () => {
   const {
@@ -83,6 +84,7 @@ const AdminDashboard = () => {
 
       {/* Analytics content */}
       <div className="grid grid-cols-1 gap-8">
+        <ReservationStatusSummary />
         <ReservationAnalytics />
         <ReservationCalendar />
         <UserAnalytics />
