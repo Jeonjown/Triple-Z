@@ -1,26 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "../stores/useCartStore";
-import useAuthStore from "@/features/Auth/stores/useAuthStore";
-import Login from "../../Auth/pages/Login";
+// import useAuthStore from "@/features/Auth/stores/useAuthStore";
+// import Login from "../../Auth/pages/Login";
+import { Link } from "react-router-dom";
 
 const OrderCheckout = () => {
-  const { user } = useAuthStore();
+  // const { user } = useAuthStore();
   const { cart } = useCartStore();
 
-  console.log(cart);
-
-  const handlePlaceOrder = () => {
-    alert(cart.toString());
-  };
-
-  if (!user) {
-    return (
-      <Login
-        text="Welcome! Please log in to proceed with your order."
-        destination="/menu/order-checkout"
-      />
-    );
-  }
+  // if (!user) {
+  //   return (
+  //     <Login
+  //       text="Welcome! Please log in to proceed with your order."
+  //       destination="/menu/order-checkout"
+  //     />
+  //   );
+  // }
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center">
@@ -70,8 +65,10 @@ const OrderCheckout = () => {
           </span>
         </div>
 
-        <Button onClick={handlePlaceOrder} className="mt-6 w-full">
-          Place Order
+        <Button className="mt-6 w-full">
+          <Button asChild>
+            <Link to="/menu/generate-receipt">Place Order</Link>
+          </Button>
         </Button>
       </div>
     </div>

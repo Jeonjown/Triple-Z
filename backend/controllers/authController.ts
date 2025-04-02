@@ -72,7 +72,7 @@ export const jwtSignup = async (
 
     res.cookie("auth_token", token, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 259200000,
     });
@@ -130,7 +130,7 @@ export const jwtLogin = async (
     // Set the token as a cookie
     res.cookie("auth_token", token, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 259200000,
     });

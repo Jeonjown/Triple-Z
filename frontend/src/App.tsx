@@ -34,6 +34,8 @@ import ManageBlogs from "./features/Blogs/pages/ManageBlogs";
 import BlogPosts from "./features/Blogs/pages/BlogPosts";
 import AdminBlog from "./features/Blogs/pages/AdminBlog";
 import { useFCMToken } from "./features/Notifications/push-notification/useFCMToken";
+import GenerateReceipt from "./features/Menu/pages/GenerateReceipt";
+import ReceiptPage from "./features/Menu/pages/ReceiptPage";
 
 function App(): JSX.Element {
   // Retrieve authenticated user info from your store.
@@ -81,6 +83,8 @@ function App(): JSX.Element {
       />
       <Route path="/menu/:menuItemId" element={<MenuItem />} />
       <Route path="/menu/order-checkout" element={<OrderCheckout />} />
+      <Route path="/menu/generate-receipt" element={<GenerateReceipt />} />
+      <Route path="/menu/receipt-page" element={<ReceiptPage />} />
       <Route path="/contacts" element={<Contacts />} />
       <Route path="/blogs" element={<Blogs />} />
       <Route path="/blogs/:id" element={<BlogPosts />} />
