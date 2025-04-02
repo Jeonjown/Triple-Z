@@ -12,7 +12,7 @@ const GenerateReceipt = () => {
   return (
     <div style={{ textAlign: "center", marginTop: "20px" }}>
       <h2>Scan QR Code to View Receipt</h2>
-      <QRCodeCanvas value={qrUrl} size={200} />
+      <QRCodeCanvas value={qrUrl} size={250} className="mx-auto" />
       <p>{qrUrl}</p> {/* Optional: Show URL for debugging */}
     </div>
   );
