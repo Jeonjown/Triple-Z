@@ -7,6 +7,12 @@ const OrderCheckout = () => {
   const { user } = useAuthStore();
   const { cart } = useCartStore();
 
+  console.log(cart);
+
+  const handlePlaceOrder = () => {
+    alert(cart.toString());
+  };
+
   if (!user) {
     return (
       <Login
@@ -64,7 +70,9 @@ const OrderCheckout = () => {
           </span>
         </div>
 
-        <Button className="mt-6 w-full">Place Order</Button>
+        <Button onClick={handlePlaceOrder} className="mt-6 w-full">
+          Place Order
+        </Button>
       </div>
     </div>
   );
