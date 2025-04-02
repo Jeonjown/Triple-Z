@@ -122,7 +122,8 @@ const UserChat: React.FC = () => {
                 <p className="text-sm font-bold">
                   {msg.sender === "user" ? "You" : "Admin"}
                 </p>
-                <p>{msg.text}</p>
+                <p className="break-words">{msg.text}</p>{" "}
+                {/* Added break-words here */}
               </div>
             ))}
           </div>

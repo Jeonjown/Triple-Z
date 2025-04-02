@@ -18,58 +18,67 @@ const OrderCheckout = () => {
   // }
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center">
-      <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-center text-2xl font-semibold">
-          Order Checkout
-        </h2>
-
-        {Array.isArray(cart) && cart.length > 0 ? (
-          <div className="space-y-4">
-            {cart.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between rounded-lg border p-4 shadow-sm"
-              >
-                <div className="flex items-center gap-4">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="h-16 w-16 rounded-md object-cover"
-                  />
-                  <div className="flex flex-col">
-                    <p className="font-medium">{item.title}</p>
-                    <p className="text-sm text-gray-500">
-                      {item.quantity} × ₱{item.price}
+    <div className="flex min-h-screen items-center justify-center py-8">
+      <div className="w-full max-w-md overflow-hidden rounded-md border bg-white shadow-md">
+        <div className="border-b px-6 py-4">
+          <h2 className="text-center text-lg font-semibold text-gray-800">
+            Order Checkout
+          </h2>
+        </div>
+        <div className="p-6">
+          {Array.isArray(cart) && cart.length > 0 ? (
+            <div className="mb-4 max-h-[400px] overflow-y-auto">
+              {cart.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between border-b py-2 last:border-b-0"
+                >
+                  <div className="flex items-center">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="mr-4 h-12 w-12 rounded-md object-cover"
+                    />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">
+                        {item.title}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {item.quantity} × ₱{item.price}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-700">
+                      ₱{item.quantity * item.price}
                     </p>
                   </div>
                 </div>
-                <div>
-                  <p className="font-semibold">₱{item.quantity * item.price}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          ) : (
+            <p className="py-4 text-center text-gray-500">
+              Your cart is empty.
+            </p>
+          )}
+
+          <div className="border-t py-4">
+            <div className="flex justify-between font-semibold text-gray-800">
+              <span>Total:</span>
+              <span>
+                ₱
+                {cart.reduce(
+                  (total, item) => total + item.quantity * item.price,
+                  0,
+                )}
+              </span>
+            </div>
           </div>
-        ) : (
-          <p className="text-center text-gray-500">Your cart is empty.</p>
-        )}
 
-        <div className="mt-6 flex justify-between text-lg font-semibold">
-          <span>Total:</span>
-          <span>
-            ₱
-            {cart.reduce(
-              (total, item) => total + item.quantity * item.price,
-              0,
-            )}
-          </span>
-        </div>
-
-        <Button className="mt-6 w-full">
-          <Button asChild>
+          <Button asChild className="mt-4 w-full">
             <Link to="/menu/generate-receipt">Place Order</Link>
           </Button>
-        </Button>
+        </div>
       </div>
     </div>
   );

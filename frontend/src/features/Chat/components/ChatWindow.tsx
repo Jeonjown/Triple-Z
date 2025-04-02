@@ -72,8 +72,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                   : "mr-auto rounded-bl-none border bg-blue-500 text-white"
               }`}
             >
-              <p>
-                <strong>{msg.sender === "admin" ? "Admin" : "User"}:</strong>{" "}
+              <p className="break-words">
+                {" "}
+                {/* Added the break-words class here */}
+                <strong>
+                  {msg.sender === "admin" ? "Admin" : "User"}:
+                </strong>{" "}
                 {msg.text}
               </p>
               {msg.createdAt && (
