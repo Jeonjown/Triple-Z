@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { FaMeta, FaXTwitter } from "react-icons/fa6";
-import { SiGmail } from "react-icons/si";
-import { AiFillInstagram } from "react-icons/ai";
+// import { FaMeta, FaXTwitter } from "react-icons/fa6";
+// import { SiGmail } from "react-icons/si";
+// import { AiFillInstagram } from "react-icons/ai";
 
 const Footer = () => {
   const location = useLocation();
@@ -36,13 +36,15 @@ const Footer = () => {
           an alternative hang out place with a new taste of variety of foods
           that are not common to the culture of the city
         </p>
-        <div className="h-13 mr-4 flex justify-center space-x-4 py-5">
+        {/* <div className="h-13 mr-4 flex justify-center space-x-4 py-5">
           <FaMeta size={24} />
           <FaXTwitter size={24} />
           <SiGmail size={24} />
           <AiFillInstagram size={24} />
-        </div>
-        <p className="text-sm">&copy; 2024 Triple Z. All rights reserved.</p>
+        </div> */}
+        <p className="mt-5 text-sm">
+          &copy;2025 Triple Z. All rights reserved.
+        </p>
       </div>
     </footer>
   );

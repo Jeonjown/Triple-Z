@@ -25,7 +25,7 @@ const Cart = () => {
   return (
     <Drawer>
       <DrawerTrigger>
-        <div className="fixed bottom-10 right-10">
+        <div className="fixed bottom-10 right-10 z-30">
           <RiShoppingBag3Fill className="size-12 rounded-full bg-secondary p-2 text-primary hover:scale-105 hover:cursor-pointer" />
           {cart.length > 0 && (
             <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">

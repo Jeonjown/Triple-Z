@@ -74,15 +74,22 @@ const Contacts: React.FC = () => {
           </div>
           <div className="flex items-center space-x-3">
             <Mail className="h-6 w-6" />
-            <p className="text-primary">triplez@gmail.com</p>
+            <p className="text-primary">triplez.main@gmail.com</p>
           </div>
           <div className="flex items-center space-x-3">
             <Phone className="h-6 w-6" />
-            <p className="text-primary">090952953232</p>
+            <p className="text-primary">0942-427-1054</p>
           </div>
           <div className="flex items-center space-x-3">
             <FaFacebook className="h-6 w-6" />
-            <p className="text-primary">Triple Z Coffee Shop</p>
+            <a
+              href="https://www.facebook.com/profile.php?id=100090846759015"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600"
+            >
+              Triple Z Coffee Shop
+            </a>
           </div>
         </div>
 
