@@ -1,4 +1,3 @@
-// RoomList.tsx
 import React from "react";
 import { X } from "lucide-react";
 
@@ -29,14 +28,11 @@ const RoomList: React.FC<RoomListProps> = ({
 }) => {
   const handleRoomClick = (room: Room) => {
     const userId = room.latestMessage?.userId;
-    console.log("Room clicked. Room:", room.roomId, "User:", userId);
     onJoinRoom(room.roomId, userId);
   };
 
   return (
-    // Fixed height with overflow-y-auto for scrolling through room list
-    <div className="h-full max-h-screen w-full overflow-y-auto p-4">
-      {/* Header with title and close button */}
+    <div className="max-h-screen w-full overflow-y-auto p-4">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Chats</h1>
         {onClose && (
