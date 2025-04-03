@@ -1,9 +1,9 @@
-// pages/ResetPassword.tsx
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button"; // Assuming your Shadcn button is here, adjust the path
+import { Eye, EyeOff } from "lucide-react";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -12,6 +12,8 @@ const ResetPassword = () => {
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for confirm password visibility
 
   useEffect(() => {
     const tokenParam = searchParams.get("token");
@@ -107,7 +109,7 @@ const ResetPassword = () => {
         >
           {({ touched, errors }) => (
             <Form className="space-y-4">
-              <div>
+              <div className="relative">
                 <label
                   htmlFor="password"
                   className="mb-2 block text-sm font-bold text-gray-700"
@@ -116,13 +118,20 @@ const ResetPassword = () => {
                 </label>
                 <Field
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"} // Toggle password visibility
                   placeholder="Enter new password"
                   className={`focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none ${
                     touched.password && errors.password ? "border-red-500" : ""
                   }`}
                   id="password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 cursor-pointer text-gray-500 focus:outline-none"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
                 <ErrorMessage
                   component="p"
                   name="password"
@@ -130,7 +139,7 @@ const ResetPassword = () => {
                 />
               </div>
 
-              <div>
+              <div className="relative">
                 <label
                   htmlFor="confirmPassword"
                   className="mb-2 block text-sm font-bold text-gray-700"
@@ -139,7 +148,7 @@ const ResetPassword = () => {
                 </label>
                 <Field
                   name="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"} // Toggle confirm password visibility
                   placeholder="Confirm new password"
                   className={`focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none ${
                     touched.confirmPassword && errors.confirmPassword
@@ -148,6 +157,17 @@ const ResetPassword = () => {
                   }`}
                   id="confirmPassword"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3 cursor-pointer text-gray-500 focus:outline-none"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
                 <ErrorMessage
                   component="p"
                   name="confirmPassword"

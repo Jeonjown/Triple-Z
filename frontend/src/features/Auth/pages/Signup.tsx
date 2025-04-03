@@ -4,10 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { signupUser } from "../api/auth";
 import { useMutation } from "@tanstack/react-query";
 import useAuthStore from "../stores/useAuthStore";
+import { useState } from "react"; // Import useState
+import { Eye, EyeOff } from "lucide-react"; // Import icons
 
 const Signup = () => {
   const { login } = useAuthStore();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for confirm password visibility
 
   const mutation = useMutation({
     mutationFn: signupUser,
@@ -74,7 +78,9 @@ const Signup = () => {
                 type="text"
                 autoComplete="username"
                 placeholder="Username"
-                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.username && errors.username ? "border-red-500" : ""}`}
+                className={`mb-4 rounded border p-3 focus:outline-secondary ${
+                  touched.username && errors.username ? "border-red-500" : ""
+                }`}
               />
               <ErrorMessage
                 component={"div"}
@@ -87,7 +93,9 @@ const Signup = () => {
                 type="email"
                 autoComplete="email"
                 placeholder="Email"
-                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.email && errors.email ? "border-red-500" : ""}`}
+                className={`mb-4 rounded border p-3 focus:outline-secondary ${
+                  touched.email && errors.email ? "border-red-500" : ""
+                }`}
               />
               <ErrorMessage
                 component={"div"}
@@ -95,25 +103,53 @@ const Signup = () => {
                 className="-mt-3 ml-2 text-xs text-red-700"
               />
 
-              <Field
-                name="password"
-                type="password"
-                placeholder="Password"
-                autoComplete="new-password"
-                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.password && errors.password ? "border-red-500" : ""}`}
-              />
+              <div className="relative mb-4">
+                <Field
+                  name="password"
+                  type={showPassword ? "text" : "password"} // Toggle password visibility
+                  placeholder="Password"
+                  autoComplete="new-password"
+                  className={`w-full rounded border p-3 focus:outline-secondary ${
+                    touched.password && errors.password ? "border-red-500" : ""
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-4 cursor-pointer text-gray-500 focus:outline-none"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
               <ErrorMessage
                 component={"div"}
                 name="password"
                 className="-mt-3 ml-2 text-xs text-red-700"
               />
-              <Field
-                name="confirmPassword"
-                type="password"
-                placeholder="Confirm Password"
-                autoComplete="password"
-                className={`mb-4 rounded border p-3 focus:outline-secondary ${touched.password && errors.username ? "border-red-500" : ""}`}
-              />
+              <div className="relative mb-4">
+                <Field
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"} // Toggle confirm password visibility
+                  placeholder="Confirm Password"
+                  autoComplete="password"
+                  className={`w-full rounded border p-3 focus:outline-secondary ${
+                    touched.confirmPassword && errors.confirmPassword
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-4 cursor-pointer text-gray-500 focus:outline-none"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+              </div>
               <ErrorMessage
                 component={"div"}
                 name="confirmPassword"

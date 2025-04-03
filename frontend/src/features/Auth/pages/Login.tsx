@@ -4,7 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../api/auth";
 import { useMutation } from "@tanstack/react-query";
 import useAuthStore from "../stores/useAuthStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react"; // Import icons
 
 interface LoginProps {
   text?: string;
@@ -14,6 +15,7 @@ interface LoginProps {
 const Login = ({ text = "Welcome Back!", destination = "/" }: LoginProps) => {
   const { login } = useAuthStore();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
 
   const mutation = useMutation({
     mutationFn: (credentials: { email: string; password: string }) =>
@@ -28,7 +30,6 @@ const Login = ({ text = "Welcome Back!", destination = "/" }: LoginProps) => {
     },
   });
 
-  // ✅ Move useEffect inside the component
   useEffect(() => {
     if (mutation.isSuccess) {
       navigate(destination, { replace: true });
@@ -92,15 +93,24 @@ const Login = ({ text = "Welcome Back!", destination = "/" }: LoginProps) => {
               className="-mt-3 ml-2 text-xs text-red-700"
             />
 
-            <Field
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="Password"
-              className={`mb-4 rounded border p-3 focus:outline-secondary ${
-                touched.password && errors.password ? "border-red-500" : ""
-              }`}
-            />
+            <div className="relative mb-4">
+              <Field
+                name="password"
+                type={showPassword ? "text" : "password"} // Toggle password visibility
+                autoComplete="current-password"
+                placeholder="Password"
+                className={`w-full rounded border p-3 focus:outline-secondary ${
+                  touched.password && errors.password ? "border-red-500" : ""
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-4 cursor-pointer text-gray-500 focus:outline-none"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
             <ErrorMessage
               component="div"
               name="password"
@@ -109,7 +119,7 @@ const Login = ({ text = "Welcome Back!", destination = "/" }: LoginProps) => {
 
             {mutation.isError && mutation.error instanceof Error && (
               <div className="-mt-3 ml-2 text-xs text-red-700">
-                {mutation.error.message}
+                {mutation.error.message.error}
               </div>
             )}
 
