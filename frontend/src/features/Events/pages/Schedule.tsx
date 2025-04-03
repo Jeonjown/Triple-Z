@@ -1,3 +1,4 @@
+import React from "react";
 import Login from "../../Auth/pages/Login";
 import useAuthStore from "../../Auth/stores/useAuthStore";
 
@@ -11,6 +12,18 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import {
+  UsersIcon,
+  CalendarIcon,
+  UserRoundIcon,
+  ClockIcon,
+  EyeIcon,
+  UserPlusIcon,
+  BuildingIcon,
+  UtensilsIcon,
+  GiftIcon,
+  WrenchIcon,
+} from "lucide-react"; // Import all necessary icons
 
 const Schedule = () => {
   const { user } = useAuthStore();
@@ -20,101 +33,143 @@ const Schedule = () => {
   }
 
   return (
-    <>
-      <div className="relative mx-auto mt-10 flex min-h-screen flex-col items-center text-center">
-        <h2 className="mb-2 font-heading text-2xl">Choose Event Type</h2>
-        <p className="mb-6">
-          Select the event type that best suits your needs and book your spot
-          hassle-free!
-        </p>
+    <div className="min-h-screen bg-white py-10">
+      <div className="container relative mx-auto px-4">
+        {/* Hero Section with a more modern feel */}
+        <div className="mb-16 text-center">
+          <h2 className="mb-6 font-heading text-5xl font-bold text-primary">
+            Plan Your Perfect Event
+          </h2>
+          <p className="mb-10 text-xl text-gray-700 sm:text-2xl">
+            Effortlessly schedule and book the ideal event experience for your
+            needs.
+          </p>
+        </div>
 
-        {/* Responsive Card Container */}
-        <div className="z-10 mx-5 mb-10 flex flex-col gap-6 md:flex-row md:justify-center md:gap-10">
+        {/* Improved Responsive Card Container with better spacing and animations */}
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
           {/* Groups Card */}
-          <Card className="flex w-full flex-col p-10 md:w-[45%] md:shadow-md lg:w-[40%]">
-            <CardHeader>
-              <CardTitle>
+          <Card className="group relative flex flex-col overflow-hidden rounded-xl border-2 bg-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg">
+            <CardHeader className="flex flex-col items-center justify-center p-8">
+              <div className="relative mb-4 flex h-48 w-48 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <img
                   src="groups.png"
                   alt="groups event pic"
-                  className="mx-auto"
+                  className="max-w-48"
                 />
+              </div>
+
+              <CardTitle className="mt-2 text-center text-3xl font-semibold text-primary">
+                Groups
               </CardTitle>
-              <CardDescription className="text-lg font-semibold">
-                GROUPS
+              <CardDescription className="mt-2 text-center text-gray-600">
+                Small Gatherings
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow">
-              <ul className="max-w-prose list-disc pl-4 text-left text-sm sm:text-base">
-                <li>For: 6 - 12 persons</li>
-                <li>
+            <CardContent className="p-8">
+              <ul className="max-w-prose space-y-4 text-lg text-gray-700">
+                <li className="flex items-center">
+                  <UsersIcon className="mr-2 !size-5 text-primary" />
+                  For: 6 - 12 persons
+                </li>
+                <li className="flex items-center">
+                  <UserRoundIcon className="mr-2 !size-8 text-primary" />
                   Best for: Small gatherings, casual meetups, or family dinners
                 </li>
-                <li>
+                <li className="flex items-center">
+                  <CalendarIcon className="mr-2 !size-8 text-primary" />
                   Booking requirement: Must be reserved at least 24 hours in
                   advance
                 </li>
-                <li>
+                <li className="flex items-center">
+                  <ClockIcon className="mr-2 !size-8 text-primary" />
                   Availability: Based on open table slots; no exclusive use of
                   the venue
                 </li>
-                <li>Other guests may be present</li>
+                <li className="flex items-center">
+                  <EyeIcon className="mr-2 !size-5 text-primary" />
+                  Other guests may be present
+                </li>
               </ul>
             </CardContent>
-            <CardFooter className="mt-auto flex justify-center">
-              <Link to={`/schedule/group-form/${user._id}`} className="w-full">
-                <Button variant={"outline"} className="w-full">
-                  Select
+            <CardFooter className="mt-auto flex flex-col justify-end p-8">
+              <Link
+                to={`/schedule/group-form/${user._id}`}
+                className="block w-full"
+              >
+                <Button className="mt-auto w-full bg-primary text-lg font-medium text-white transition-colors duration-300 hover:bg-primary/80 focus:ring-primary">
+                  Book Now
                 </Button>
               </Link>
             </CardFooter>
           </Card>
 
           {/* Events Card */}
-          <Card className="flex w-full flex-col p-10 md:w-[45%] md:shadow-md lg:w-[40%]">
-            <CardHeader>
-              <CardTitle>
+          <Card className="group relative flex flex-col overflow-hidden rounded-xl border bg-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg">
+            <CardHeader className="flex flex-col items-center justify-center p-8">
+              <div className="relative mb-4 flex h-48 w-48 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <img
                   src="events.png"
                   alt="events event pic"
-                  className="mx-auto"
+                  className="max-w-48"
                 />
+              </div>
+
+              <CardTitle className="mt-2 text-center text-3xl font-semibold text-primary">
+                Events
               </CardTitle>
-              <CardDescription className="text-lg font-semibold">
-                EVENTS
+              <CardDescription className="mt-2 text-center text-gray-600">
+                Large Group Gatherings
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow">
-              <ul className="max-w-prose list-disc pl-4 text-left text-sm sm:text-base">
-                <li>For: 24 - 60 persons</li>
-                <li>
+            <CardContent className="p-8">
+              <ul className="max-w-prose space-y-4 text-lg text-gray-700">
+                <li className="flex items-center">
+                  <UserPlusIcon className="mr-2 !size-5 text-primary" />
+                  For: 24 - 60 persons
+                </li>
+                <li className="flex items-center">
+                  <BuildingIcon className="m:w-6 mr-2 !size-8 text-primary" />
                   Best for: Large group gatherings, corporate events, or
                   celebrations
                 </li>
-                <li>
+                <li className="flex items-center">
+                  <CalendarIcon className="mr-2 !size-8 text-primary" />
                   Booking requirement: Must be scheduled at least 2 weeks in
                   advance
                 </li>
-                <li>
-                  Includes: Catering, decorations, exclusive/private venue use
+                <li className="flex items-center">
+                  <UtensilsIcon className="mr-2 !size-5 text-primary" />
+                  Includes: Catering
                 </li>
-                <li>Requires: Custom event planning & coordination</li>
+                <li className="flex items-center">
+                  <GiftIcon className="mr-2 !size-5 text-primary" />
+                  Includes: Decorations
+                </li>
+                <li className="flex items-center">
+                  <UsersIcon className="mr-2 !size-5 text-primary" />
+                  Includes: Exclusive/private venue use
+                </li>
+                <li className="flex items-center">
+                  <WrenchIcon className="mr-2 !size-5 text-primary" />
+                  Requires: Custom event planning & coordination
+                </li>
               </ul>
             </CardContent>
-            <CardFooter className="mt-auto flex justify-center">
-              <Link to={`/schedule/event-form/${user._id}`} className="w-full">
-                <Button variant={"outline"} className="w-full">
-                  Select
+            <CardFooter className="mt-auto flex flex-col justify-end p-8">
+              <Link
+                to={`/schedule/event-form/${user._id}`}
+                className="block w-full"
+              >
+                <Button className="mt-auto w-full bg-primary text-lg font-medium text-white transition-colors duration-300 hover:bg-primary/80 focus:ring-primary">
+                  Book Now
                 </Button>
               </Link>
             </CardFooter>
           </Card>
         </div>
-
-        {/* Background Overlay */}
-        <div className="absolute inset-x-0 bottom-0 h-1/3 w-full bg-primary sm:h-[40%] md:h-[50%]"></div>
       </div>
-    </>
+    </div>
   );
 };
 
