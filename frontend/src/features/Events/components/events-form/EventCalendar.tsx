@@ -110,8 +110,8 @@ const EventCalendar: React.FC = () => {
     return <p className="text-center text-red-500">Error occurred!</p>;
 
   return (
-    <div className="mx-auto mt-5 w-full max-w-4xl px-4">
-      <div className="rounded-lg bg-white p-4">
+    <div className="mx-auto mt-5 w-full max-w-4xl">
+      <div className="rounded-lg bg-white">
         <h2 className="mb-2 text-center text-2xl font-bold text-primary">
           Event Reservation View
         </h2>

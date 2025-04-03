@@ -168,23 +168,23 @@ const GroupCalendar: React.FC = () => {
             className="mx-auto hover:cursor-pointer"
           />
           {/* Legend for Calendar Colors */}
-          <div className="mx-5 mb-5 flex justify-center space-x-4">
-            <div className="flex items-center space-x-1">
+          <div className="mx-5 mb-5 flex flex-wrap justify-center space-x-4 md:flex-nowrap md:space-x-2 lg:space-x-4">
+            <div className="mb-1 flex items-center space-x-1 md:mb-0">
               <p className="text-xs text-gray-600">Today:</p>
               <div className="h-4 w-4 rounded bg-muted"></div>
             </div>
-            <div className="flex items-center space-x-1">
+            <div className="mb-1 flex items-center space-x-1 md:mb-0">
               <p className="text-xs text-gray-600">Partially Booked:</p>
               <div className="h-4 w-4 rounded bg-primary"></div>
             </div>
-            <div className="flex items-center space-x-1">
+            <div className="mb-1 flex items-center space-x-1 md:mb-0">
               <p className="text-xs text-gray-600">Fully Booked:</p>
               <div
                 className="h-4 w-4 rounded"
                 style={{ backgroundColor: "#e11d48" }}
               ></div>
             </div>
-            <div className="flex items-center space-x-1">
+            <div className="mb-1 flex items-center space-x-1 md:mb-0">
               <p className="text-xs text-gray-600">Unavailable:</p>
               <div
                 className="h-4 w-4 rounded"
