@@ -198,7 +198,7 @@ const AdminChat: React.FC = () => {
   };
 
   return (
-    <div className="flex h-[100dvh] flex-col md:grid md:grid-cols-12">
+    <div className="flex h-screen flex-col md:grid md:grid-cols-12">
       {/* Mobile Header with room toggle */}
       <div className="flex items-center justify-between border-b bg-white p-2 md:hidden">
         <div className="flex items-center space-x-2">
