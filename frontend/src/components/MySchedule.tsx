@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { Button } from "@/components/ui/button";
-import { useGetAllReservations } from "@/features/Events/hooks/useGetAllReservations";
+import { useGetAllReservationsByUser } from "@/features/Events/hooks/useGetAllReservationsByUser"; // Import the new hook
 import { useCancelReservation } from "@/features/Events/hooks/useCancelReservation";
 
 export interface CartItem {
@@ -53,32 +53,9 @@ export interface Reservation {
   __v: number;
 }
 
-interface ReservationRaw {
-  _id: string;
-  userId: { _id: string } | string | null;
-  fullName: string;
-  contactNumber: string;
-  partySize: number;
-  date: string;
-  startTime: string;
-  endTime: string;
-  eventType?: string;
-  cart: CartItem[];
-  eventStatus: string;
-  createdAt: string;
-  specialRequest: string;
-  totalPayment: number;
-  eventFee?: number;
-  subtotal: number;
-  paymentStatus: string;
-  isCorkage: boolean;
-  reservationType?: string;
-  __v: number;
-}
-
 const MySchedule: React.FC = () => {
   const { user } = useAuthStore();
-  const { data, isLoading, error } = useGetAllReservations();
+  const { data, isLoading, error } = useGetAllReservationsByUser(user?._id);
   const { data: settings } = useGetEventReservationSettings();
   const { mutate: cancelReservationMutate, isPending: isCanceling } =
     useCancelReservation();
@@ -86,37 +63,23 @@ const MySchedule: React.FC = () => {
   if (isLoading) return <p>Loading reservations...</p>;
   if (error) return <p>Error loading reservations: {error.message}</p>;
 
-  // Filter out reservations with null/undefined userId
-  const validReservations = (data?.reservations || []).filter(
-    (r: ReservationRaw | null) =>
-      r && r.userId !== null && r.userId !== undefined,
-  ) as ReservationRaw[];
-
-  // Normalize raw reservations.
-  const allReservations: Reservation[] = validReservations.map((r) => {
-    const normalizedUserId: string =
-      typeof r.userId === "object" && r.userId !== null
-        ? r.userId._id.toString()
-        : (r.userId as string);
-    return { ...r, userId: normalizedUserId };
-  });
-
   // Normalize today's date.
   const today = startOfDay(new Date());
 
-  // Filter upcoming reservations for the current user.
-  const userReservations = allReservations.filter((reservation) => {
-    const reservationDate = startOfDay(new Date(reservation.date));
-    return (
-      reservation.userId === user?._id &&
-      !isBefore(reservationDate, today) &&
-      (reservation.eventStatus.toLowerCase() === "pending" ||
-        reservation.eventStatus.toLowerCase() === "confirmed")
-    );
-  });
+  // Filter upcoming reservations.
+  const upcomingReservations = (data?.reservations || []).filter(
+    (reservation: Reservation) => {
+      const reservationDate = startOfDay(new Date(reservation.date));
+      return (
+        !isBefore(reservationDate, today) &&
+        (reservation.eventStatus.toLowerCase() === "pending" ||
+          reservation.eventStatus.toLowerCase() === "confirmed")
+      );
+    },
+  );
 
   // Sort by createdAt descending (most recent first).
-  const sortedReservations = userReservations.sort((a, b) =>
+  const sortedReservations = upcomingReservations.sort((a, b) =>
     compareDesc(new Date(a.createdAt), new Date(b.createdAt)),
   );
 

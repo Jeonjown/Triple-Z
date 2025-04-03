@@ -1,7 +1,6 @@
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
-import useGetReservations from "@/features/Events/hooks/useGetEventReservations";
-import useGetGroupReservations from "@/features/Events/hooks/useGetGroupReservations";
-import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings"; // Import settings hook
+import { useGetAllReservationsByUser } from "@/features/Events/hooks/useGetAllReservationsByUser"; // Import the new hook
+import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { format, compareDesc } from "date-fns";
 import { Copy } from "lucide-react";
 import {
@@ -27,7 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-// Define interfaces.
+// Explicit interfaces.
 interface User {
   _id: string;
   username: string;
@@ -42,7 +41,6 @@ interface CartItem {
   image: string;
 }
 
-// For event reservations.
 export interface Reservation {
   _id: string;
   userId: User | null;
@@ -57,85 +55,29 @@ export interface Reservation {
   eventStatus: string;
   createdAt: string;
   updatedAt: string;
-  specialRequest: string;
+  specialRequest?: string;
   totalPayment: number;
   eventFee: number;
   subtotal: number;
   paymentStatus: string;
   isCorkage: boolean;
+  reservationType: string;
   __v: number;
 }
 
-// Interface for event reservation data.
-interface EventReservationData {
-  reservations: Reservation[];
-}
-
-// Raw group reservation interface.
-interface GroupReservationRaw {
-  _id: string;
-  userId: User | null;
-  fullName: string;
-  contactNumber: string;
-  partySize: number;
-  date: string;
-  startTime: string;
-  endTime: string;
-  cart: CartItem[];
-  eventStatus: string;
-  paymentStatus: string;
-  subtotal: number;
-  totalPayment: number;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
-
-// Map group reservations into the unified Reservation interface.
-// Default isCorkage is set to false for group reservations.
-const mapGroupToReservation = (group: GroupReservationRaw): Reservation => ({
-  ...group,
-  eventType: "Group Reservation", // Mark as Group Reservation.
-  specialRequest: "",
-  eventFee: 0,
-  isCorkage: false,
-});
-
-const Cancelled = (): JSX.Element => {
-  // Get event and group reservations.
-  const { data } = useGetReservations() as { data?: EventReservationData };
-  const { data: groupData } = useGetGroupReservations();
+const ScheduleHistory = (): JSX.Element => {
+  // Retrieve all reservations for the user using the hook.
   const { user } = useAuthStore();
+  const { data } = useGetAllReservationsByUser(user?._id) as {
+    data?: { reservations: Reservation[] };
+  };
 
-  // Retrieve event settings to get the corkage fee.
+  // Retrieve event settings for the corkage fee.
   const { data: settings } = useGetEventReservationSettings();
 
-  // Filter cancelled event reservations for the current user.
-  const eventCancelled: Reservation[] =
-    data?.reservations.filter(
-      (reservation: Reservation) =>
-        // Only include if userId is not null and matches.
-        reservation.userId !== null &&
-        reservation.userId._id === user?._id &&
-        reservation.eventStatus === "Cancelled",
-    ) || [];
-
-  // Map, then filter cancelled group reservations.
-  const groupCancelled: Reservation[] = groupData
-    ? groupData
-        .map((group: GroupReservationRaw) => mapGroupToReservation(group))
-        .filter(
-          (reservation) =>
-            // Again, check that userId exists before accessing _id.
-            reservation.userId !== null &&
-            reservation.userId._id === user?._id &&
-            reservation.eventStatus === "Cancelled",
-        )
-    : [];
-
-  // Merge and sort descending (most recent first).
-  const mergedReservations = [...eventCancelled, ...groupCancelled].sort(
-    (a, b) => compareDesc(new Date(a.date), new Date(b.date)),
+  // Sort reservations descending by date.
+  const sortedReservations = (data?.reservations || []).sort((a, b) =>
+    compareDesc(new Date(a.date), new Date(b.date)),
   );
 
   // Define color mapping for event statuses.
@@ -156,13 +98,16 @@ const Cancelled = (): JSX.Element => {
   return (
     <div className="overflow-x-auto p-4 sm:p-5">
       <h3 className="mb-4 text-center text-xl font-semibold sm:text-2xl">
-        Cancelled Reservations
+        Schedule History
       </h3>
       <Table className="min-w-full">
         <TableHeader>
           <TableRow className="border border-gray-300 bg-gray-100">
             <TableHead className="px-3 py-2 sm:px-4">Date &amp; Time</TableHead>
-            <TableHead className="px-3 py-2 sm:px-4">Event</TableHead>
+            <TableHead className="px-3 py-2 sm:px-4">Type</TableHead>
+            <TableHead className="px-3 py-2 sm:px-4">
+              Reservation Type
+            </TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Party Size</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Special Request</TableHead>
             <TableHead className="px-3 py-2 sm:px-4">Status</TableHead>
@@ -172,15 +117,15 @@ const Cancelled = (): JSX.Element => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {mergedReservations.length > 0 ? (
-            mergedReservations.map((reservation: Reservation) => {
+          {sortedReservations.length > 0 ? (
+            sortedReservations.map((reservation: Reservation) => {
               // Compute total payment including corkage fee if applicable.
               const computedTotal =
                 (reservation.subtotal || 0) +
                 (reservation.eventFee || 0) +
                 (reservation.isCorkage ? settings?.eventCorkageFee || 0 : 0);
 
-              // Render event and payment statuses as badges.
+              // Get colors for event and payment statuses.
               const currentEventStyle = eventStatusColors[
                 reservation.eventStatus
               ] || {
@@ -212,19 +157,25 @@ const Cancelled = (): JSX.Element => {
                   {/* Event Type */}
                   <TableCell className="px-3 py-2 sm:px-4">
                     <span className="text-xs font-bold sm:text-sm">
-                      {reservation.eventType}
+                      {reservation.eventType || "N/A"}
+                    </span>
+                  </TableCell>
+                  {/* Reservation Type */}
+                  <TableCell className="px-3 py-2 sm:px-4">
+                    <span className="text-xs font-bold sm:text-sm">
+                      {reservation.reservationType || "N/A"}
                     </span>
                   </TableCell>
                   {/* Party Size */}
-                  <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
+                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
                     {reservation.partySize} pax
                   </TableCell>
                   {/* Special Request */}
-                  <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
+                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
                     {reservation.specialRequest || "N/A"}
                   </TableCell>
                   {/* Event Status */}
-                  <TableCell className="px-3 py-2 text-xs sm:px-4 sm:text-sm">
+                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
                     <span
                       style={{
                         display: "inline-block",
@@ -295,7 +246,7 @@ const Cancelled = (): JSX.Element => {
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle className="text-xs sm:text-sm">
+                          <DialogTitle className="text-sm sm:text-base">
                             Cart Details
                           </DialogTitle>
                           <DialogDescription className="text-xs sm:text-sm">
@@ -375,9 +326,9 @@ const Cancelled = (): JSX.Element => {
             <TableRow>
               <TableCell
                 className="px-3 py-2 text-center text-xs sm:text-sm"
-                colSpan={8}
+                colSpan={9}
               >
-                No cancelled reservations history.
+                No reservations found.
               </TableCell>
             </TableRow>
           )}
@@ -387,4 +338,4 @@ const Cancelled = (): JSX.Element => {
   );
 };
 
-export default Cancelled;
+export default ScheduleHistory;

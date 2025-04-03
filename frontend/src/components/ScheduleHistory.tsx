@@ -1,5 +1,5 @@
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
-import { useGetAllReservations } from "@/features/Events/hooks/useGetAllReservations";
+import { useGetAllReservationsByUser } from "@/features/Events/hooks/useGetAllReservationsByUser"; // Import the new hook
 import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings";
 import { format, compareDesc } from "date-fns";
 import { Copy } from "lucide-react";
@@ -65,31 +65,18 @@ export interface Reservation {
   __v: number;
 }
 
-interface AllReservationsResponse {
-  message: string;
-  reservations: Reservation[];
-}
-
 const ScheduleHistory = (): JSX.Element => {
-  // Retrieve all reservations using the hook.
-  const { data } = useGetAllReservations() as {
-    data?: AllReservationsResponse;
-  };
+  // Retrieve all reservations for the user using the hook.
   const { user } = useAuthStore();
+  const { data } = useGetAllReservationsByUser(user?._id) as {
+    data?: { reservations: Reservation[] };
+  };
 
   // Retrieve event settings for the corkage fee.
   const { data: settings } = useGetEventReservationSettings();
 
-  // Filter reservations for the current user,
-  // adding a check to ensure reservation.userId is not null.
-  const userReservations: Reservation[] =
-    data?.reservations.filter(
-      (reservation) =>
-        reservation.userId !== null && reservation.userId._id === user?._id,
-    ) || [];
-
   // Sort reservations descending by date.
-  const sortedReservations = userReservations.sort((a, b) =>
+  const sortedReservations = (data?.reservations || []).sort((a, b) =>
     compareDesc(new Date(a.date), new Date(b.date)),
   );
 

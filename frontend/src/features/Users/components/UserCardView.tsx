@@ -4,7 +4,7 @@ import useDeleteUserModal from "../hooks/useDeleteUserModal";
 import { User } from "../pages/ManageUsers";
 import UserEditModal from "./UserEditModal";
 import useEditUserModal from "../hooks/useEditUserModal";
-import { ArrowUpDown, SquarePen, Trash2, Eye } from "lucide-react";
+import { SquarePen, Trash2, Eye } from "lucide-react";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 
 import {
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import LoadingPage from "@/pages/LoadingPage";
 import ErrorPage from "@/pages/ErrorPage";
 import UserViewTransactionModal from "./UserViewTransactionModal";
-import React, { useState } from "react";
+import { useState } from "react";
 
 interface UserCardViewProps {
   table: Table<User>;
