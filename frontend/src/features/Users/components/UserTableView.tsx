@@ -4,7 +4,7 @@ import useDeleteUserModal from "../hooks/useDeleteUserModal";
 import useEditUserModal from "../hooks/useEditUserModal";
 import UserEditModal from "./UserEditModal";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
-import { SquarePen, Trash2, ArrowUpDown } from "lucide-react";
+import { SquarePen, Trash2, ArrowUpDown, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -21,6 +21,8 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import DeleteUserModal from "./DeleteUserModal";
+import UserViewTransactionModal from "./UserViewTransactionModal";
+import { useState } from "react";
 
 interface UserTableViewProps {
   table: TanstackTable<User>;
@@ -66,6 +68,22 @@ const UserTableView = ({ table }: UserTableViewProps) => {
 
   const { user: currentUser } = useAuthStore();
 
+  const [isViewTransactionModalOpen, setIsViewTransactionModalOpen] =
+    useState(false);
+  const [selectedUserIdForTransactions, setSelectedUserIdForTransactions] =
+    useState<string | null>(null);
+
+  const handleOpenViewTransactionModal = (user: User) => {
+    setSelectedUserIdForTransactions(user._id);
+    console.log(selectedUserIdForTransactions);
+    setIsViewTransactionModalOpen(true);
+  };
+
+  const handleCloseViewTransactionModal = () => {
+    setIsViewTransactionModalOpen(false);
+    setSelectedUserIdForTransactions(null);
+  };
+
   return (
     <>
       {isEditModalOpen && userToEdit && (
@@ -81,6 +99,13 @@ const UserTableView = ({ table }: UserTableViewProps) => {
           user={userToDelete}
           handleConfirmDelete={handleConfirmDelete}
           handleCloseModal={handleCloseModal}
+        />
+      )}
+
+      {isViewTransactionModalOpen && selectedUserIdForTransactions && (
+        <UserViewTransactionModal
+          userId={selectedUserIdForTransactions}
+          onClose={handleCloseViewTransactionModal}
         />
       )}
 
@@ -146,6 +171,15 @@ const UserTableView = ({ table }: UserTableViewProps) => {
                     </TableCell>
                   ))}
                   <TableCell className="mt-1 flex items-center gap-2 py-4">
+                    <Button
+                      onClick={() =>
+                        handleOpenViewTransactionModal(row.original)
+                      }
+                      size="icon"
+                      className="bg-blue-500 text-white hover:bg-primary"
+                    >
+                      <Eye size={20} />
+                    </Button>
                     <Button
                       onClick={() => handleEdit(row.original)}
                       size="icon"

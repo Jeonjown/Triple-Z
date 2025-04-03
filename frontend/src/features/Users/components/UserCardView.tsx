@@ -4,7 +4,7 @@ import useDeleteUserModal from "../hooks/useDeleteUserModal";
 import { User } from "../pages/ManageUsers";
 import UserEditModal from "./UserEditModal";
 import useEditUserModal from "../hooks/useEditUserModal";
-import { ArrowUpDown, SquarePen, Trash2 } from "lucide-react";
+import { ArrowUpDown, SquarePen, Trash2, Eye } from "lucide-react";
 import useAuthStore from "@/features/Auth/stores/useAuthStore";
 
 import {
@@ -16,6 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import LoadingPage from "@/pages/LoadingPage";
 import ErrorPage from "@/pages/ErrorPage";
+import UserViewTransactionModal from "./UserViewTransactionModal";
+import React, { useState } from "react";
 
 interface UserCardViewProps {
   table: Table<User>;
@@ -36,20 +38,36 @@ const UserCardView = ({ table }: UserCardViewProps) => {
     handleDelete,
     handleConfirmDelete,
     handleCloseModal,
-    isPending,
-    isError,
-    error,
+    isPending: isDeletePending,
+    isError: isDeleteError,
+    error: deleteError,
   } = useDeleteUserModal();
 
   const { user: currentUser } = useAuthStore();
 
-  if (isPending) {
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  const handleViewTransactions = (userId: string) => {
+    setSelectedUserId(userId);
+    setIsTransactionModalOpen(true);
+  };
+
+  const handleCloseTransactionModal = () => {
+    setIsTransactionModalOpen(false);
+    setSelectedUserId(null);
+  };
+
+  if (isDeletePending) {
     return <LoadingPage />;
   }
 
-  if (isError) {
+  if (isDeleteError) {
     return (
-      <ErrorPage message={error?.message} statusCode={error?.statusCode} />
+      <ErrorPage
+        message={deleteError?.message}
+        statusCode={deleteError?.statusCode}
+      />
     );
   }
 
@@ -71,34 +89,40 @@ const UserCardView = ({ table }: UserCardViewProps) => {
         />
       )}
 
+      {/* Transaction Modal */}
+      {isTransactionModalOpen && selectedUserId && (
+        <UserViewTransactionModal
+          userId={selectedUserId}
+          onClose={handleCloseTransactionModal}
+        />
+      )}
+
       {/* Main Content – Cards */}
       <div className="grid w-5/6 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {table.getRowModel().rows.map((row) => {
-          const isSelf = row.original._id === currentUser?._id;
+          const user = row.original;
+          const isSelf = user._id === currentUser?._id;
 
           return (
             <div
               key={row.id}
-              className="flex min-w-0 flex-col space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-md transition hover:scale-105 hover:border-secondary hover:shadow-xl"
+              className="relative flex min-w-0 flex-col space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-md transition hover:scale-105 hover:border-secondary hover:shadow-xl"
             >
-              {/* Render each cell as a key-value pair */}
-              {row.getVisibleCells().map((cell) => {
-                const header = table
-                  .getHeaderGroups()
-                  .flatMap((group) => group.headers)
-                  .find((h) => h.id === cell.column.id);
+              {/* User Details */}
+              <div className="space-y-2 pb-20">
+                {row.getVisibleCells().map((cell) => {
+                  const header = table
+                    .getHeaderGroups()
+                    .flatMap((group) => group.headers)
+                    .find((h) => h.id === cell.column.id);
 
-                return (
-                  <div
-                    key={cell.id}
-                    className="flex items-center justify-between text-gray-600"
-                  >
-                    {header && (
-                      <div
-                        className="flex items-center hover:scale-110 hover:cursor-pointer hover:opacity-80"
-                        onClick={header.column.getToggleSortingHandler?.()}
-                      >
-                        {header?.column.columnDef.header !== "Actions" && (
+                  return (
+                    <div
+                      key={cell.id}
+                      className="flex items-center justify-between text-gray-600"
+                    >
+                      {header &&
+                        header?.column.columnDef.header !== "Actions" && (
                           <span className="text-sm font-medium">
                             {flexRender(
                               header.column.columnDef.header,
@@ -106,34 +130,36 @@ const UserCardView = ({ table }: UserCardViewProps) => {
                             )}
                           </span>
                         )}
-                        {header.column.columnDef.header === "Actions" ? (
-                          ""
-                        ) : (
-                          <ArrowUpDown className="ml-1 mr-3 size-3" />
+                      <span className="truncate text-sm">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
                         )}
-                      </div>
-                    )}
-                    <span className="truncate text-sm">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </span>
-                  </div>
-                );
-              })}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
 
               {/* Action Buttons */}
-              <div className="ml-auto flex gap-2">
-                <Button onClick={() => handleEdit(row.original)} size="icon">
+              <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                <Button
+                  onClick={() => handleViewTransactions(user._id)}
+                  size="icon"
+                  className="bg-blue-500"
+                >
+                  <Eye size={20} />
+                </Button>
+                <Button onClick={() => handleEdit(user)} size="icon">
                   <SquarePen size={20} />
                 </Button>
+
                 <TooltipProvider delayDuration={100}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <span>
                         <Button
-                          onClick={() => handleDelete(row.original)}
+                          onClick={() => handleDelete(user)}
                           size="icon"
                           variant="destructive"
                           className="disabled:cursor-not-allowed disabled:bg-secondary"
@@ -150,6 +176,7 @@ const UserCardView = ({ table }: UserCardViewProps) => {
                     )}
                   </Tooltip>
                 </TooltipProvider>
+                {/* Eye Icon to View Transactions */}
               </div>
             </div>
           );

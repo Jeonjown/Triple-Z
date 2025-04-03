@@ -8,6 +8,7 @@ import {
   getAllReservations,
   cancelReservation,
   adminRescheduleEventReservation,
+  getAllReservationsForUser,
 } from "../controllers/eventReservationController";
 import { validateEventReservation } from "../middleware/validateEventReservation";
 import { verifyAdminToken } from "../middleware/verifyAdminToken";
@@ -17,6 +18,7 @@ const router = Router();
 
 router.get("/", getReservations);
 router.get("/all", getAllReservations);
+router.get("/all/:userId", getAllReservationsForUser);
 router.post(
   "/:userId",
   verifyToken,

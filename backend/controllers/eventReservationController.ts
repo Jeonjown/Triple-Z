@@ -509,3 +509,48 @@ export const cancelReservation = async (
     next(createError("Failed to cancel reservation.", 500));
   }
 };
+
+export const getAllReservationsForUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return next(createError("User ID is required in the URL.", 400));
+    }
+
+    // Fetch individual event reservations for the specific user.
+    const eventReservations = await EventReservation.find({ userId }).populate(
+      "userId",
+      "username email",
+      User
+    );
+
+    // Fetch group reservations for the specific user.
+    const groupReservations = await GroupReservation.find({ userId }).populate(
+      "userId",
+      "username email",
+      User
+    );
+
+    // Merge both arrays.
+    const allReservations = [...eventReservations, ...groupReservations];
+
+    // Sort by the 'createdAt' field in descending order (most recent first).
+    allReservations.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    res.status(200).json({
+      message: "User reservations fetched successfully!",
+      reservations: allReservations,
+    });
+  } catch (error) {
+    console.error(error);
+    next(createError("Failed to fetch user reservations.", 500));
+  }
+};

@@ -302,9 +302,6 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
                     ))}
                   </select>
                 )}
-                <p className="mb-4 mt-1 whitespace-normal text-sm text-gray-600">
-                  {item.description}
-                </p>
                 <div className="mx-auto mt-auto">
                   <Button
                     type="button"

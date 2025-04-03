@@ -44,7 +44,7 @@ export const initSocket = (httpServer: any) => {
         const notificationPayload = {
           title: "New Message Received",
           description: `Message from user: ${savedMessage.text}`,
-          redirectUrl: "/admin-chat",
+          redirectUrl: "admin/admin-chat",
         };
         const adminNotifications = await createAdminNotifications(
           notificationPayload
