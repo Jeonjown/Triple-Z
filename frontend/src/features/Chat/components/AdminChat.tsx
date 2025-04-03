@@ -38,10 +38,13 @@ const AdminChat: React.FC = () => {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string | undefined>();
-  const [showRooms, setShowRooms] = useState<boolean>(false);
-  const [showInput, setShowInput] = useState<boolean>(true);
-  const [showUserDetails, setShowUserDetails] = useState<boolean>(true);
 
+  // State for mobile room list visibility
+  const [showRooms, setShowRooms] = useState<boolean>(false);
+  // State for controlling the input display
+  const [showInput, setShowInput] = useState<boolean>(true);
+
+  // Set up sound preferences and lock body scroll
   useEffect(() => {
     const storedSoundPref = localStorage.getItem("soundEnabled");
     if (storedSoundPref !== null) {
@@ -61,19 +64,25 @@ const AdminChat: React.FC = () => {
   const { data: rooms = [] } = useRoomsWithLatestMessage();
   const { data: fetchedMessages, isPending: messagesLoading } =
     useMessagesForRoom(roomId);
+
+  console.log(fetchedMessages);
   const { data: userInfo } = useGetUser(selectedUserId);
 
   useEffect(() => {
     if (Notification.permission === "default") setDialogOpen(true);
   }, []);
 
+  // Join room function: clear input, hide it, and auto-close room list
   const joinRoom = useCallback(
     (selectedRoomId?: string, roomUserId?: string) => {
       const newRoomId = selectedRoomId || roomId;
       if (!newRoomId.trim() || newRoomId === roomId) return;
 
+      // Clear input and hide it while switching rooms
       setInput("");
       setShowInput(false);
+
+      // Auto-close the room list on mobile
       if (showRooms) setShowRooms(false);
 
       setSelectedUserId(roomUserId || newRoomId.replace("room_", ""));
@@ -83,6 +92,7 @@ const AdminChat: React.FC = () => {
           setRoomId(newRoomId);
           setJoined(true);
           setMessages([]);
+          // Show input after room has been joined
           setShowInput(true);
         }
       });
@@ -90,6 +100,7 @@ const AdminChat: React.FC = () => {
     [roomId, showRooms],
   );
 
+  // Auto-join the first room on mount
   useEffect(() => {
     if (!roomId && rooms?.length) {
       const topRoom = rooms[0] as Room;
@@ -97,8 +108,10 @@ const AdminChat: React.FC = () => {
     }
   }, [rooms, roomId, joinRoom]);
 
+  // Update messages when new messages are fetched
   useEffect(() => {
     if (fetchedMessages && roomId) {
+      // Remove joined dependency
       setMessages(
         fetchedMessages.map((msg) => ({
           ...msg,
@@ -108,8 +121,9 @@ const AdminChat: React.FC = () => {
         })),
       );
     }
-  }, [fetchedMessages, roomId]);
+  }, [fetchedMessages, roomId]); // Removed joined from dependencies
 
+  // Listen for real-time updates and update room list
   useEffect(() => {
     const updateRoomList = (data: Message) => {
       queryClient.setQueryData<Room[]>(
@@ -167,6 +181,7 @@ const AdminChat: React.FC = () => {
     };
   }, [roomId, soundEnabled, queryClient]);
 
+  // Send an admin message
   const sendAdminMessage = () => {
     if (!input.trim() || !joined) return;
     const adminMessage: Message = {
@@ -182,13 +197,9 @@ const AdminChat: React.FC = () => {
     setInput("");
   };
 
-  const toggleUserDetails = () => {
-    setShowUserDetails(!showUserDetails);
-  };
-
   return (
-    <div className="flex h-screen flex-col md:grid md:grid-cols-12">
-      {/* Mobile Header */}
+    <div className="flex h-[100dvh] flex-col md:grid md:grid-cols-12">
+      {/* Mobile Header with room toggle */}
       <div className="flex items-center justify-between border-b bg-white p-2 md:hidden">
         <div className="flex items-center space-x-2">
           <button
@@ -205,9 +216,9 @@ const AdminChat: React.FC = () => {
         </div>
       </div>
 
-      {/* Sidebar */}
+      {/* Sidebar: Room List */}
       <aside
-        className={`absolute left-0 top-0 z-10 mt-12 h-[calc(100%-3rem)] w-full transform border-r bg-white p-4 transition-transform md:static md:z-0 md:col-span-3 md:mt-0 md:h-auto md:translate-x-0 ${
+        className={`absolute left-0 top-0 mt-20 h-full w-full transform border-r bg-white p-4 transition-transform md:static md:col-span-2 md:mt-0 md:translate-x-0 ${
           showRooms ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -217,24 +228,13 @@ const AdminChat: React.FC = () => {
           onJoinRoom={joinRoom}
           onClose={() => setShowRooms(false)}
         />
+        <button className="mt-4 md:hidden" onClick={() => setShowRooms(false)}>
+          Close
+        </button>
       </aside>
 
-      {/* Main Chat */}
-      <main
-        className={`flex h-full flex-col transition-all duration-300 ${
-          showUserDetails && userInfo
-            ? "md:col-span-7 lg:col-span-6"
-            : "md:col-span-9"
-        }`}
-      >
-        <div className="flex items-center justify-between border-b bg-white p-2">
-          <button
-            className="hidden rounded border px-2 py-1 md:block lg:hidden"
-            onClick={toggleUserDetails}
-          >
-            {showUserDetails ? "Hide Details" : "Show Details"}
-          </button>
-        </div>
+      {/* Main Chat Window */}
+      <main className="flex flex-col md:col-span-7">
         {messagesLoading ? (
           <div className="flex h-full items-center justify-center text-gray-500">
             Loading messages...
@@ -252,26 +252,16 @@ const AdminChat: React.FC = () => {
             onSendMessage={sendAdminMessage}
             messagesLoading={messagesLoading}
             pushToken={selectedUserId}
+            // Hide input when the room list is open
             showInput={showInput && !showRooms}
           />
         )}
       </main>
 
-      {/* User Details */}
-      {showUserDetails && userInfo && (
-        <aside className="hidden border-l bg-white p-4 lg:col-span-3 lg:block">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">User Details</h2>
-            <button
-              className="rounded p-1 hover:bg-gray-100 lg:hidden"
-              onClick={toggleUserDetails}
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <UserDetails user={userInfo} />
-        </aside>
-      )}
+      {/* UserDetails: visible on large screens */}
+      <aside className="hidden border-l bg-white p-4 lg:col-span-3 lg:block">
+        <UserDetails user={userInfo} />
+      </aside>
 
       {/* Notification Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -290,6 +280,7 @@ const AdminChat: React.FC = () => {
               checked={soundEnabled}
               onChange={(e) => setSoundEnabled(e.target.checked)}
             />
+
             <label htmlFor="soundNotifications">
               Enable sound notifications
             </label>
