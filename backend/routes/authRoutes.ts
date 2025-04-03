@@ -3,9 +3,11 @@ import passport from "passport";
 
 import {
   checkAuth,
+  forgotPassword,
   jwtLogin,
   jwtSignup,
   logoutUser,
+  resetPassword,
 } from "../controllers/authController";
 import { validateUsername } from "../middleware/validateUsername";
 import { validateEmail } from "../middleware/validateEmail";
@@ -27,6 +29,9 @@ router.post(
   jwtSignup
 );
 router.post("/jwt-login", validateEmail, validatePassword, jwtLogin);
+
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 //GOOGLE AUTH
 router.get("/google", (req: Request, res: Response, next: NextFunction) => {
@@ -52,7 +57,7 @@ router.get(
       });
     } // ✅ Close the if block properly
 
-    const redirectUri = req.query.state as string; // ✅ This is now correctly outside `if (token)`
+    const redirectUri = req.query.state as string;
 
     // ✅ Redirect only  if it was the intended destination
     if (

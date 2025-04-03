@@ -36,6 +36,8 @@ import AdminBlog from "./features/Blogs/pages/AdminBlog";
 import { useFCMToken } from "./features/Notifications/push-notification/useFCMToken";
 import GenerateReceipt from "./features/Menu/pages/GenerateReceipt";
 import ReceiptPage from "./features/Menu/pages/ReceiptPage";
+import ResetPassword from "./features/Auth/components/ResetPassword ";
+import ForgotPassword from "./features/Auth/components/ForgotPassword";
 
 function App(): JSX.Element {
   // Retrieve authenticated user info from your store.
@@ -91,6 +93,8 @@ function App(): JSX.Element {
       <Route path="/profile" element={<Profile />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
     </>
   );
 

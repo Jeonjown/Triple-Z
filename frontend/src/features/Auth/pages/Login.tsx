@@ -119,8 +119,13 @@ const Login = ({ text = "Welcome Back!", destination = "/" }: LoginProps) => {
             >
               Log in
             </button>
-
-            <hr className="my-4 border-t-2" />
+            <div className="mt-4 text-center text-xs text-text">
+              Forgot your password?
+              <span className="ml-1 underline">
+                <Link to="/forgot-password">Click here </Link>
+              </span>
+            </div>
+            <hr className="my-8 border-t-2" />
             <a
               onClick={handleGoogleLogin}
               className="flex items-center justify-center rounded border-2 bg-white p-2 py-2 hover:scale-105 hover:cursor-pointer active:scale-110 active:opacity-95"

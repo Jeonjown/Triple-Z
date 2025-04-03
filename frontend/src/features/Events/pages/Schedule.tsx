@@ -1,4 +1,3 @@
-import React from "react";
 import Login from "../../Auth/pages/Login";
 import useAuthStore from "../../Auth/stores/useAuthStore";
 

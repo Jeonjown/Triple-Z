@@ -1,7 +1,7 @@
+// userModel.js
 import mongoose from "mongoose";
 import { userDB } from "../db";
 
-// Define the User schema
 const userSchema = new mongoose.Schema(
   {
     _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
@@ -14,11 +14,12 @@ const userSchema = new mongoose.Schema(
     fullName: { type: String },
     phoneNumber: { type: String },
     role: { type: String, enum: ["user", "admin"], default: "user" },
+    passwordResetToken: String, // Add this field
+    passwordResetExpires: Date, // Add this field
   },
   { timestamps: true }
 );
 
-// Register the User model with the userDB connection
 const User = userDB.model("User", userSchema);
 
 export default User;

@@ -12,8 +12,6 @@ export const sendEmail = (req: Request, res: Response): void => {
       user: process.env.BUSINESS_EMAIL,
       pass: process.env.BUSINESS_EMAIL_PASS,
     },
-    logger: true, // Enable logging
-    debug: true, // Include SMTP traffic in the logs
   });
 
   const mailOptions = {
