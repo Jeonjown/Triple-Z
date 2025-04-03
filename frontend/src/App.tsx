@@ -38,6 +38,7 @@ import GenerateReceipt from "./features/Menu/pages/GenerateReceipt";
 import ReceiptPage from "./features/Menu/pages/ReceiptPage";
 import ResetPassword from "./features/Auth/components/ResetPassword ";
 import ForgotPassword from "./features/Auth/components/ForgotPassword";
+import FAQPage from "./pages/FAQPage";
 
 function App(): JSX.Element {
   // Retrieve authenticated user info from your store.
@@ -88,6 +89,8 @@ function App(): JSX.Element {
       <Route path="/menu/generate-receipt" element={<GenerateReceipt />} />
       <Route path="/menu/receipt-page" element={<ReceiptPage />} />
       <Route path="/contacts" element={<Contacts />} />
+      <Route path="/faqs" element={<FAQPage />} />
+
       <Route path="/blogs" element={<Blogs />} />
       <Route path="/blogs/:id" element={<BlogPosts />} />
       <Route path="/profile" element={<Profile />} />

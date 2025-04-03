@@ -58,6 +58,18 @@ const NavLinks = () => {
           MENU
         </NavLink>
       </li>
+      <li>
+        <NavLink
+          to="/faqs"
+          className={({ isActive }) =>
+            isActive
+              ? "border-b-2 border-solid border-primary p-1"
+              : "p-1 hover:font-bold"
+          }
+        >
+          FAQs
+        </NavLink>
+      </li>
 
       <li>
         <NavLink

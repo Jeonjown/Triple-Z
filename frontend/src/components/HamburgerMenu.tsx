@@ -99,6 +99,19 @@ const HamburgerMenu = ({
               Menu
             </NavLink>
           </li>
+
+          <li className="py-2">
+            <NavLink
+              to="/faqs"
+              className={({ isActive }) =>
+                isActive
+                  ? "border-l-4 border-solid border-primary px-2"
+                  : "hover:font-bold"
+              }
+            >
+              FAQs
+            </NavLink>
+          </li>
           <li className="py-2 hover:font-bold">
             <NavLink
               to="/contacts"
