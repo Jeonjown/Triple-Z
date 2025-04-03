@@ -47,7 +47,7 @@ router.get(
       res.cookie("auth_token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        sameSite: "strict",
         maxAge: 259200000,
       });
     } // ✅ Close the if block properly
