@@ -128,7 +128,7 @@ const ResetPassword = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 cursor-pointer text-gray-500 focus:outline-none"
+                  className="absolute right-3 top-9 cursor-pointer text-gray-500 focus:outline-none"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -160,7 +160,7 @@ const ResetPassword = () => {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3 cursor-pointer text-gray-500 focus:outline-none"
+                  className="absolute right-3 top-9 cursor-pointer text-gray-500 focus:outline-none"
                 >
                   {showConfirmPassword ? (
                     <EyeOff size={20} />
