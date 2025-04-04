@@ -93,7 +93,7 @@ const NotificationIcon: React.FC = () => {
             </span>
           )}
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="mr-2 max-h-[80vh] w-[250px] overflow-y-auto px-2 sm:w-auto sm:px-5">
+        <DropdownMenuContent className="mr-2 max-h-[80vh] w-[50vh] overflow-y-auto px-2 sm:px-5">
           {/* Header: Notification label and ellipsis icon */}
           <DropdownMenuLabel className="flex items-center justify-between text-xs font-bold sm:text-sm">
             <span>NOTIFICATIONS</span>
