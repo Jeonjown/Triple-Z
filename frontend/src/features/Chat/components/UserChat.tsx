@@ -275,95 +275,103 @@ const UserChat: React.FC = () => {
   if (user?.role === "admin") return null;
 
   return (
-    <div className="fixed bottom-10 right-10 z-30">
-      {open ? (
-        <div className="flex h-[600px] w-[500px] flex-col rounded-lg border bg-white shadow-lg">
-          {/* Chat Header */}
-          <div className="flex items-center justify-between rounded-t-lg bg-primary px-4 py-2 text-white">
-            <span className="text-lg font-semibold">Support Chat</span>
-            <button onClick={() => setOpen(false)} className="text-xl">
-              &times;
-            </button>
-          </div>
-          {/* Messages Area */}
-          <div
-            className="flex-1 space-y-2 overflow-y-auto p-4"
-            ref={messagesEndRef}
-          >
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`rounded p-2 ${
-                  msg.sender === "user"
-                    ? "self-end bg-primary text-white"
-                    : "self-start bg-gray-200 text-black"
-                }`}
-              >
-                <p className="text-sm font-bold">
-                  {msg.sender === "user" ? "You" : "Admin"}
-                </p>
-                <p className="break-words">{msg.text}</p>
-              </div>
-            ))}
-            {/* Typing Indicator */}
-            {isAdminTyping && (
-              <div className="self-start rounded bg-gray-200 p-2 text-black">
-                <p className="text-sm font-bold">Admin</p>
-                <div className="mt-4 flex gap-2">
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:.1s]"></span>
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:.2s]"></span>
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:.3s]"></span>
-                </div>
-              </div>
-            )}
-          </div>
-          {/* Instant Reply Options */}
-          <div className="border-t px-4 py-2">
-            <div className="flex flex-wrap gap-2">
-              {instantReplyOptions.map((option, index) => (
-                <button
+    <>
+      <div
+        className="fixed right-5 z-30 sm:bottom-10 sm:right-10"
+        style={{ bottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
+      >
+        {open ? (
+          <div className="h-[calc(100vh - 100px)] relative flex max-h-[600px] w-[90vw] flex-col rounded-lg border bg-white shadow-lg sm:h-[600px] sm:w-[500px]">
+            {/* Chat Header */}
+            <div className="flex items-center justify-between rounded-t-lg bg-primary px-4 py-2 text-white">
+              <span className="text-lg font-semibold">Support Chat</span>
+              <button onClick={() => setOpen(false)} className="text-xl">
+                &times;
+              </button>
+            </div>
+            {/* Messages Area */}
+            <div
+              className="flex-1 space-y-2 overflow-y-auto p-4"
+              ref={messagesEndRef}
+              style={{
+                paddingBottom: "calc(1rem + env(safe-area-inset-bottom))",
+              }}
+            >
+              {messages.map((msg, index) => (
+                <div
                   key={index}
-                  onClick={() => handleInstantReplyClick(option)}
-                  className="rounded-md bg-gray-100 px-2 py-1 text-sm text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
+                  className={`rounded p-2 ${
+                    msg.sender === "user"
+                      ? "self-end bg-primary text-white"
+                      : "self-start bg-gray-200 text-black"
+                  }`}
                 >
-                  {option}
-                </button>
+                  <p className="text-sm font-bold">
+                    {msg.sender === "user" ? "You" : "Admin"}
+                  </p>
+                  <p className="break-words">{msg.text}</p>
+                </div>
               ))}
+              {/* Typing Indicator */}
+              {isAdminTyping && (
+                <div className="self-start rounded bg-gray-200 p-2 text-black">
+                  <p className="text-sm font-bold">Admin</p>
+                  <div className="mt-4 flex gap-2">
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:.1s]"></span>
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:.2s]"></span>
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:.3s]"></span>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Instant Reply Options */}
+            <div className="border-t px-4 py-2">
+              <div className="flex flex-wrap gap-2">
+                {instantReplyOptions.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleInstantReplyClick(option)}
+                    className="rounded-md bg-gray-100 px-2 py-1 text-sm text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Input Area */}
+            <div className="flex items-center border-t px-4 py-2">
+              <input
+                type="text"
+                className="flex-1 rounded border p-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Type your message..."
+                value={input}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setInput(e.target.value)
+                }
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                  if (e.key === "Enter") sendMessage();
+                }}
+              />
+              <button
+                onClick={() => sendMessage()}
+                disabled={notifyAdminsPending}
+                className="ml-2 rounded bg-primary px-3 py-2 text-white"
+              >
+                Send
+              </button>
             </div>
           </div>
-          {/* Input Area */}
-          <div className="flex items-center border-t px-4 py-2">
-            <input
-              type="text"
-              className="flex-1 rounded border p-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Type your message..."
-              value={input}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setInput(e.target.value)
-              }
-              onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                if (e.key === "Enter") sendMessage();
-              }}
-            />
-            <button
-              onClick={() => sendMessage()}
-              disabled={notifyAdminsPending}
-              className="ml-2 rounded bg-primary px-3 py-2 text-white"
-            >
-              Send
-            </button>
-          </div>
-        </div>
-      ) : (
-        // Chat icon button to open the chat widget.
-        <button
-          onClick={() => setOpen(true)}
-          className="rounded-full bg-primary p-3 text-white shadow-lg"
-        >
-          <MessageCircle className="h-6 w-6" />
-        </button>
-      )}
-    </div>
+        ) : (
+          // Chat icon button to open the chat widget.
+          <button
+            onClick={() => setOpen(true)}
+            className="rounded-full bg-primary p-3 text-white shadow-lg"
+          >
+            <MessageCircle className="h-6 w-6" />
+          </button>
+        )}
+      </div>
+    </>
   );
 };
 
