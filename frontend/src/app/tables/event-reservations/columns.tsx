@@ -42,7 +42,8 @@ export type MyColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
 export const columns: MyColumnDef<Reservation>[] = [
   {
     id: "userId",
-    accessorFn: (row: Reservation) => row.userId._id,
+    // Use optional chaining and provide a fallback if userId is null
+    accessorFn: (row: Reservation) => (row.userId ? row.userId._id : "No User"),
     header: ({ column }: { column: Column<Reservation, unknown> }) => (
       <DataTableColumnHeader column={column} title="User Id" />
     ),

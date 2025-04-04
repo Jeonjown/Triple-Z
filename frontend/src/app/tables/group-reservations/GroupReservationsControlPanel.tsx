@@ -1,3 +1,4 @@
+// GroupReservationsControlPanel.tsx
 import React, { useState } from "react";
 import {
   useReactTable,
@@ -29,12 +30,15 @@ import useGetGroupReservations from "@/features/Events/hooks/useGetGroupReservat
 import LoadingPage from "@/pages/LoadingPage";
 import GroupReservationCard from "./GroupReservationCard";
 import GroupReservationsTable from "./GroupReservationsTable";
-import { columns } from "./columns";
+import { columns, GroupReservation } from "./columns";
 import { DataTableViewOptions } from "@/components/ui/DataTableViewOptions";
 
 const GroupReservationsControlPanel: React.FC = () => {
   // Step 1. Fetch the reservations data and default to an empty array if undefined.
-  const { data: reservations = [], isPending } = useGetGroupReservations();
+  const { data: reservations = [], isPending } = useGetGroupReservations() as {
+    data: GroupReservation[];
+    isPending: boolean;
+  };
 
   // Step 2. Local state for filtering, sorting, and view toggle.
   const [globalFilter, setGlobalFilter] = useState<string>("");
@@ -64,10 +68,6 @@ const GroupReservationsControlPanel: React.FC = () => {
 
   // Step 4. If data is still loading, show the loading page.
   if (isPending) return <LoadingPage />;
-
-  // Step 5. Safely retrieve the row model and default to an empty array if undefined.
-  const rowModel = table.getRowModel();
-  const rows = rowModel?.rows || [];
 
   return (
     <div className="mx-auto p-4 md:w-5/6">
@@ -236,18 +236,11 @@ const GroupReservationsControlPanel: React.FC = () => {
           <GroupReservationsTable table={table} />
         ) : (
           // Render the cards in a grid
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {rows.length > 0 ? (
-              rows.map((row) => (
-                <GroupReservationCard
-                  key={row.original._id}
-                  reservation={row.original}
-                />
-              ))
-            ) : (
-              <p>No reservations found.</p>
-            )}
-          </div>
+
+          <GroupReservationCard
+            reservations={table.getRowModel().rows.map((row) => row.original)}
+            table={table}
+          />
         )}
       </div>
     </div>

@@ -69,12 +69,9 @@ const EventReservationsCard: React.FC<EventReservationsCardProps> = ({
                 </div>
               )}
               {columnVisibility["userId"] !== false && (
-                <div className="grid grid-cols-2 gap-x-2">
-                  <span className="font-medium">User ID:</span>
-                  <span className="text-right">
-                    {reservation.userId?._id || "N/A"}
-                  </span>
-                </div>
+                <span className="text-center text-xs">
+                  {reservation.userId?._id || "N/A"}
+                </span>
               )}
 
               <div className="mb-10 mt-8 space-y-4">
