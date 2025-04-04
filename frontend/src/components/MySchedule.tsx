@@ -233,26 +233,35 @@ const MySchedule: React.FC = () => {
                       Pre Ordered Menu
                     </h4>
                     {reservation.cart.length > 0 ? (
-                      reservation.cart.map((item) => (
-                        <div
-                          key={item._id}
-                          className="my-2 flex items-center rounded bg-muted p-2"
-                        >
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="h-10 w-10 rounded object-cover sm:h-12 sm:w-12"
-                          />
-                          <div className="ml-4">
-                            <p className="text-sm font-semibold sm:text-base">
-                              {item.title}
-                            </p>
-                            <p className="text-xs sm:text-sm">
-                              {item.quantity} x ₱{item.totalPrice}
-                            </p>
+                      reservation.cart.map((item) => {
+                        // Calculate the unit price
+                        const unitPrice = item.totalPrice / item.quantity;
+
+                        return (
+                          <div
+                            key={item._id}
+                            className="my-2 flex items-center rounded bg-muted p-2"
+                          >
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              className="h-10 w-10 rounded object-cover sm:h-12 sm:w-12"
+                            />
+                            <div className="ml-4">
+                              <p className="text-sm font-semibold sm:text-base">
+                                {item.title}
+                              </p>
+                              {/* Updated receipt format */}
+                              <p className="text-xs sm:text-sm">
+                                Qty: {item.quantity} x ₱{unitPrice.toFixed(2)}
+                              </p>
+                              <p className="text-xs sm:text-sm">
+                                Total: ₱{item.totalPrice.toFixed(2)}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <p className="mt-2 text-xs text-gray-500 sm:text-sm">
                         No item selected

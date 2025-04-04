@@ -65,7 +65,7 @@ export interface Reservation {
   __v: number;
 }
 
-const ScheduleHistory = (): JSX.Element => {
+const Cancelled = (): JSX.Element => {
   // Retrieve all reservations for the user using the hook.
   const { user } = useAuthStore();
   const { data } = useGetAllReservationsByUser(user?._id) as {
@@ -75,8 +75,13 @@ const ScheduleHistory = (): JSX.Element => {
   // Retrieve event settings for the corkage fee.
   const { data: settings } = useGetEventReservationSettings();
 
+  // Filter for cancelled reservations.
+  const cancelledReservations = (data?.reservations || []).filter(
+    (reservation) => reservation.eventStatus.toLowerCase() === "cancelled",
+  );
+
   // Sort reservations descending by date.
-  const sortedReservations = (data?.reservations || []).sort((a, b) =>
+  const sortedReservations = cancelledReservations.sort((a, b) =>
     compareDesc(new Date(a.date), new Date(b.date)),
   );
 
@@ -98,7 +103,7 @@ const ScheduleHistory = (): JSX.Element => {
   return (
     <div className="overflow-x-auto p-4 sm:p-5">
       <h3 className="mb-4 text-center text-xl font-semibold sm:text-2xl">
-        Schedule History
+        Cancelled Reservations
       </h3>
       <Table className="min-w-full">
         <TableHeader>
@@ -271,29 +276,33 @@ const ScheduleHistory = (): JSX.Element => {
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {reservation.cart.map((item: CartItem) => (
-                              <TableRow
-                                key={item._id}
-                                className="border-b border-gray-300"
-                              >
-                                <TableCell className="px-3 py-2">
-                                  <img
-                                    src={item.image}
-                                    alt={item.title}
-                                    className="h-8 w-8 rounded object-cover sm:h-10 sm:w-10"
-                                  />
-                                </TableCell>
-                                <TableCell className="px-3 py-2 text-xs sm:text-sm">
-                                  {item.title}
-                                </TableCell>
-                                <TableCell className="px-3 py-2 text-xs sm:text-sm">
-                                  {item.quantity}
-                                </TableCell>
-                                <TableCell className="px-3 py-2 text-right text-xs sm:text-sm">
-                                  ₱{item.totalPrice}
-                                </TableCell>
-                              </TableRow>
-                            ))}
+                            {reservation.cart.map((item: CartItem) => {
+                              // Calculate unit price.
+                              const unitPrice = item.totalPrice / item.quantity;
+                              return (
+                                <TableRow
+                                  key={item._id}
+                                  className="border-b border-gray-300"
+                                >
+                                  <TableCell className="px-3 py-2">
+                                    <img
+                                      src={item.image}
+                                      alt={item.title}
+                                      className="h-8 w-8 rounded object-cover sm:h-10 sm:w-10"
+                                    />
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
+                                    {item.title}
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
+                                    {item.quantity} x ₱{unitPrice.toFixed(2)}
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2 text-right text-xs sm:text-sm">
+                                    ₱{item.totalPrice.toFixed(2)}
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
                           </TableBody>
                         </Table>
                         <div className="mt-3 space-y-2">
@@ -338,4 +347,4 @@ const ScheduleHistory = (): JSX.Element => {
   );
 };
 
-export default ScheduleHistory;
+export default Cancelled;

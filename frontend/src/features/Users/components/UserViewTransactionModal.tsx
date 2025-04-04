@@ -14,6 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useGetAllReservationsByUser } from "@/features/Events/hooks/useGetAllReservationsByUser";
+import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEventReservationSettings"; // Import the hook
 
 export interface CartItem {
   _id: string;
@@ -47,8 +48,8 @@ export interface Reservation {
 }
 
 interface UserViewTransactionModalProps {
-  userId: string; // Expects the userId (string)
-  onClose?: () => void; // Optional onClose handler
+  userId: string;
+  onClose?: () => void;
 }
 
 const UserViewTransactionModal = ({
@@ -56,16 +57,15 @@ const UserViewTransactionModal = ({
   onClose,
 }: UserViewTransactionModalProps) => {
   const {
-    data: reservationsData, // Renamed to be more accurate
+    data: reservationsData,
     isPending,
     isError,
     error,
   } = useGetAllReservationsByUser(userId);
+  const { data: settings } = useGetEventReservationSettings(); // Fetch event settings
+
   const userReservations = reservationsData?.reservations || [];
 
-  console.log(userId, "");
-
-  // Color mappings for statuses (you can adjust these)
   const paymentStatusColors: Record<string, { border: string; bg: string }> = {
     "Not Paid": { border: "#EE4549", bg: "#EE454926" },
     "Partially Paid": { border: "#FABC2C", bg: "#FABC2C26" },
@@ -118,31 +118,39 @@ const UserViewTransactionModal = ({
           <DialogTitle>User Transactions</DialogTitle>
           <DialogDescription>All transactions for user.</DialogDescription>
         </DialogHeader>
+
         {userReservations.length > 0 ? (
           userReservations.map((reservation) => {
             const currentPaymentStyle = paymentStatusColors[
               reservation.paymentStatus
-            ] || { border: "#ccc", bg: "#ccc" };
+            ] || {
+              border: "#ccc",
+              bg: "#ccc",
+            };
             const currentEventStyle = eventStatusColors[
               reservation.eventStatus
-            ] || { border: "#ccc", bg: "#ccc" };
+            ] || {
+              border: "#ccc",
+              bg: "#ccc",
+            };
 
+            // Calculate computed total payment.
             const computedTotal =
               reservation.subtotal +
               (reservation.eventFee || 0) +
-              (reservation.isCorkage ? 0 : 0); // Assuming you don't have settings here
+              (reservation.isCorkage ? settings?.eventCorkageFee || 0 : 0);
 
             return (
               <div
                 key={reservation._id}
                 className="my-4 rounded border-b p-4 shadow-sm"
               >
-                {/* Reservation Header */}
+                {/* Header */}
                 <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
                   <div className="flex items-center space-x-2">
                     <CalendarDays className="h-5 w-5 sm:h-6 sm:w-6" />
                     <span className="text-lg font-bold sm:text-xl">
-                      {format(new Date(reservation.date), "MMMM dd, yyyy")}
+                      {format(new Date(reservation.date), "MMMM dd,")}
                     </span>
                   </div>
                   <div className="mt-2 flex space-x-2 sm:mt-0">
@@ -165,9 +173,10 @@ const UserViewTransactionModal = ({
                     )}
                   </div>
                 </div>
-                {/* Reservation Details */}
+
+                {/* Details */}
                 <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {/* Left Column */}
+                  {/* Left */}
                   <div className="space-y-2">
                     <div>
                       <p className="text-sm text-primary sm:text-base">Time:</p>
@@ -240,7 +249,8 @@ const UserViewTransactionModal = ({
                       </TooltipProvider>
                     </div>
                   </div>
-                  {/* Right Column */}
+
+                  {/* Right */}
                   <div className="flex flex-col">
                     <div>
                       <h4 className="text-sm text-primary sm:text-base">
@@ -262,7 +272,11 @@ const UserViewTransactionModal = ({
                                 {item.title}
                               </p>
                               <p className="text-xs sm:text-sm">
-                                {item.quantity} x ₱{item.totalPrice}
+                                Qty: {item.quantity} x ₱
+                                {(item.totalPrice / item.quantity).toFixed(2)}
+                              </p>
+                              <p className="text-xs sm:text-sm">
+                                Total: ₱{item.totalPrice.toFixed(2)}
                               </p>
                             </div>
                           </div>
@@ -273,6 +287,7 @@ const UserViewTransactionModal = ({
                         </p>
                       )}
                     </div>
+
                     <div className="mt-5 w-full">
                       <h4 className="text-sm font-semibold sm:text-base">
                         Total Summary:
@@ -290,8 +305,9 @@ const UserViewTransactionModal = ({
                       {reservation.isCorkage && (
                         <div className="flex w-full justify-between text-xs sm:text-sm">
                           <span className="text-primary">Corkage Fee:</span>
-                          <p className="font-medium">₱0</p>{" "}
-                          {/* Assuming no settings here */}
+                          <p className="font-medium">
+                            ₱{settings?.eventCorkageFee || 0}
+                          </p>
                         </div>
                       )}
                       <hr className="my-1 border-gray-700" />

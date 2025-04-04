@@ -244,7 +244,7 @@ const ScheduleHistory = (): JSX.Element => {
                           View Cart Details
                         </button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="min-w-fit">
                         <DialogHeader>
                           <DialogTitle className="text-sm sm:text-base">
                             Cart Details
@@ -271,29 +271,33 @@ const ScheduleHistory = (): JSX.Element => {
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {reservation.cart.map((item: CartItem) => (
-                              <TableRow
-                                key={item._id}
-                                className="border-b border-gray-300"
-                              >
-                                <TableCell className="px-3 py-2">
-                                  <img
-                                    src={item.image}
-                                    alt={item.title}
-                                    className="h-8 w-8 rounded object-cover sm:h-10 sm:w-10"
-                                  />
-                                </TableCell>
-                                <TableCell className="px-3 py-2 text-xs sm:text-sm">
-                                  {item.title}
-                                </TableCell>
-                                <TableCell className="px-3 py-2 text-xs sm:text-sm">
-                                  {item.quantity}
-                                </TableCell>
-                                <TableCell className="px-3 py-2 text-right text-xs sm:text-sm">
-                                  ₱{item.totalPrice}
-                                </TableCell>
-                              </TableRow>
-                            ))}
+                            {reservation.cart.map((item: CartItem) => {
+                              // Calculate unit price.
+                              const unitPrice = item.totalPrice / item.quantity;
+                              return (
+                                <TableRow
+                                  key={item._id}
+                                  className="border-b border-gray-300"
+                                >
+                                  <TableCell className="px-3 py-2">
+                                    <img
+                                      src={item.image}
+                                      alt={item.title}
+                                      className="h-8 w-8 rounded object-cover sm:h-10 sm:w-10"
+                                    />
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
+                                    {item.title}
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2 text-xs sm:text-sm">
+                                    {item.quantity} x ₱{unitPrice.toFixed(2)}
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2 text-right text-xs sm:text-sm">
+                                    ₱{item.totalPrice.toFixed(2)}
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
                           </TableBody>
                         </Table>
                         <div className="mt-3 space-y-2">

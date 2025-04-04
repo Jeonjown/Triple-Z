@@ -83,30 +83,34 @@ const EventStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
     handleSubmit(onSubmit)();
   };
 
-  // Render each cart item.
   const renderCartItems = () => {
     if (cart.length === 0) return <div>No items in your cart.</div>;
-    return cart.map((item) => (
-      <div
-        key={item._id}
-        className="flex items-center gap-4 border-b p-2 last:border-b-0"
-      >
-        <img
-          src={item.image}
-          alt={item.title}
-          className="h-16 w-16 rounded object-cover"
-        />
-        <div>
-          <div className="font-semibold">{item.title}</div>
-          <div className="text-sm text-gray-600">
-            {item.quantity} x ₱{item.price.toFixed(2)}
-          </div>
-          <div className="text-sm text-gray-600">
-            Total: ₱{item.totalPrice.toFixed(2)}
+    return cart.map((item) => {
+      // Calculate the single price (unit price) based on totalPrice divided by quantity.
+
+      return (
+        <div
+          key={item._id}
+          className="flex items-center gap-4 border-b p-2 last:border-b-0"
+        >
+          <img
+            src={item.image}
+            alt={item.title}
+            className="h-16 w-16 rounded object-cover"
+          />
+          <div>
+            <div className="font-semibold">{item.title}</div>
+            <div className="text-sm text-gray-600">
+              Qty: {item.quantity} x ₱{item.price.toFixed(2)}
+            </div>
+
+            <div className="text-sm text-gray-600">
+              Total: ₱{item.totalPrice.toFixed(2)}
+            </div>
           </div>
         </div>
-      </div>
-    ));
+      );
+    });
   };
 
   // Handler to check if user scrolled to the bottom of the TOS content.

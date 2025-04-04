@@ -74,7 +74,7 @@ const GroupStep3 = ({ prevStep, nextStep, methods, cart }: Step3Props) => {
           <div>
             <div className="font-semibold">{item.title}</div>
             <div className="text-sm text-gray-600">
-              Quantity: {item.quantity} x ₱{item.price.toFixed(2)}
+              Qty: {item.quantity} x ₱{item.price.toFixed(2)}
             </div>
 
             <div className="text-sm text-gray-600">
