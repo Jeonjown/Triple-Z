@@ -258,7 +258,7 @@ const EmbeddedMenu: React.FC<EmbeddedMenuProps> = ({ onAddToCart }) => {
                     </select>
                   )}
 
-                  <div className="mx-auto mt-auto">
+                  <div className="mx-auto mt-auto pt-5">
                     <Button
                       type="button"
                       onClick={() => handleAddClick(item)}

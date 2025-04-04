@@ -22,8 +22,6 @@ export type CartItem = {
   size?: string;
 };
 
-// Updated Zod schema using normalized date validation and unavailable date check.
-// We pass unavailableDates as a parameter so the refine function can use it.
 const getReservationSchema = (
   minReservation: number,
   maxReservation: number,
@@ -32,7 +30,10 @@ const getReservationSchema = (
 ) =>
   z.object({
     fullName: z.string().nonempty("Full Name is required."),
-    contactNumber: z.string().nonempty("Contact is required"),
+    contactNumber: z
+      .string()
+      .nonempty("Contact is required")
+      .refine((val) => /^\d+$/.test(val), "Contact number must be numeric"),
     partySize: z.preprocess(
       (val) => Number(val),
       z
@@ -66,7 +67,6 @@ const getReservationSchema = (
       // Validate that the selected date is not in the unavailableDates array
       .refine(
         (val) => {
-          // If there are no unavailable dates loaded, pass validation.
           if (!unavailableDates || unavailableDates.length === 0) return true;
           const selectedDate = new Date(val);
           const normSelected = new Date(
@@ -74,7 +74,6 @@ const getReservationSchema = (
             selectedDate.getMonth(),
             selectedDate.getDate(),
           );
-          // Return false if the selected date matches any unavailable date
           return !unavailableDates.some(
             (date) =>
               date.getFullYear() === normSelected.getFullYear() &&
