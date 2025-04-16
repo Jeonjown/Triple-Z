@@ -1,4 +1,3 @@
-// src/controllers/webhookController.ts
 import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { EventReservation } from "../models/eventReservationModel";
@@ -22,20 +21,20 @@ export const handlePaymongoWebhook = async (
   const signatureParts = signatureHeader.split(",");
   const signatureMap: Record<string, string> = {};
   for (const part of signatureParts) {
-    const [key, ...rest] = part.split("=");
-    if (key && rest.length > 0) {
-      signatureMap[key.trim()] = rest.join("=").trim();
+    const [key, value] = part.split("=");
+    if (key && value) {
+      signatureMap[key.trim()] = value.trim();
     } else if (part.trim() !== "") {
       console.warn("Invalid part in signature header:", part);
     }
   }
 
   const timestamp = signatureMap["t"];
-  const expectedSignature = signatureMap["v1"];
+  const expectedSignature = signatureMap["te"];
 
   if (!timestamp || !expectedSignature) {
     console.warn(
-      'Invalid signature format - missing "t" or "v1"',
+      'Invalid signature format - missing "t" or "te"',
       signatureMap
     );
     res.status(400).send("Invalid signature");
@@ -44,8 +43,8 @@ export const handlePaymongoWebhook = async (
 
   const rawBody = (req as any).rawBody as Buffer;
   if (!rawBody) {
-    console.warn("Raw body is missing");
-    res.status(400).send("Raw body is missing");
+    console.warn("Missing raw body for signature verification");
+    res.status(400).send("Missing raw body");
     return;
   }
 
