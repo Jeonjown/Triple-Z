@@ -8,6 +8,7 @@ import helmet from "helmet";
 // Remove permissionsPolicy from Helmet if it's causing issues and set it manually if needed.
 import { ResponseError } from "./utils/createError";
 import passport from "./config/passport";
+import bodyParser from "body-parser";
 
 // Import routes
 import authRoutes from "./routes/authRoutes";
@@ -91,6 +92,13 @@ server.use((req: Request, res: Response, next: NextFunction) => {
 
 // --- Standard Middleware ---
 server.use(express.json());
+server.use(
+  bodyParser.json({
+    verify: (req: any, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 server.use(express.urlencoded({ extended: true, limit: "10mb" }));
 server.use(cookieParser());
 
