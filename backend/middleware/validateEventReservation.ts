@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { EventSettings } from "../models/eventSettingsModel";
 import { EventReservation } from "../models/eventReservationModel";
-// NEW: Import the unavailable dates model (assume it exists)
-
 import { createError } from "../utils/createError";
 import { UnavailableDate } from "../models/unavailableDate";
+import { parse, format, addHours } from "date-fns";
 
 export const validateEventReservation = async (
   req: Request,
@@ -17,7 +16,7 @@ export const validateEventReservation = async (
       fullName,
       contactNumber,
       startTime,
-      endTime,
+      estimatedEventDuration, // Changed from endTime
       partySize,
       eventType,
       cart,
@@ -29,12 +28,22 @@ export const validateEventReservation = async (
       !fullName ||
       !contactNumber ||
       !startTime ||
-      !endTime ||
+      estimatedEventDuration === undefined || // Changed from !endTime
       partySize === undefined ||
       !eventType ||
       !cart
     ) {
       return next(createError("Missing required fields", 400));
+    }
+
+    // Validate estimatedEventDuration is a positive number
+    if (
+      typeof estimatedEventDuration !== "number" ||
+      estimatedEventDuration <= 0
+    ) {
+      return next(
+        createError("Estimated event duration must be a positive number.", 400)
+      );
     }
 
     // 2. Validate Date Format
@@ -50,9 +59,33 @@ export const validateEventReservation = async (
         createError("Start time must be in the format '1:00 AM'", 400)
       );
     }
-    if (!timePattern.test(endTime)) {
-      return next(createError("End time must be in the format '1:00 PM'", 400));
+    // No need to validate endTime format anymore
+
+    // Calculate endTime based on startTime and estimatedEventDuration
+    const [startHourStr, startMinuteStr] = startTime.split(":");
+    const startHour = parseInt(startHourStr, 10);
+    const startMinute = parseInt(startMinuteStr.split(" ")[0], 10);
+    const ampm = startTime.split(" ")[1];
+
+    let adjustedStartHour = startHour;
+    if (ampm === "PM" && startHour !== 12) {
+      adjustedStartHour += 12;
+    } else if (ampm === "AM" && startHour === 12) {
+      adjustedStartHour = 0;
     }
+
+    const startDate = new Date(date);
+    startDate.setHours(adjustedStartHour, startMinute, 0, 0);
+    const endDateCalculated = addHours(startDate, estimatedEventDuration);
+
+    // Format endDate to a comparable format (you might not need this if comparing dates directly)
+    const endHour = endDateCalculated.getHours();
+    const endMinute = endDateCalculated.getMinutes();
+    const endAMPM = endHour < 12 || endHour === 24 ? "AM" : "PM";
+    const formattedEndHour = endHour % 12 === 0 ? 12 : endHour % 12;
+    const endTime = `${formattedEndHour.toString().padStart(2, "0")}:${endMinute
+      .toString()
+      .padStart(2, "0")} ${endAMPM}`;
 
     // 4. Validate cart is a non-empty array
     if (!Array.isArray(cart) || cart.length === 0) {
@@ -179,16 +212,45 @@ export const validateEventReservation = async (
       reservationDate.getDate() + 1
     );
 
+    // Parse startTime and endTime for conflict checking
+    const startTimeDate = parse(
+      `${date} ${startTime}`,
+      "yyyy-MM-dd h:mm a",
+      new Date()
+    );
+    const endTimeDate = parse(
+      `${date} ${endTime}`,
+      "yyyy-MM-dd h:mm a",
+      new Date()
+    ); // Using the calculated endTime
+
     // Query for any existing reservations on the same day that are NOT cancelled
-    const existingReservation = await EventReservation.findOne({
+    const conflictingReservation = await EventReservation.findOne({
       date: { $gte: startOfDay, $lt: endOfDay },
       eventStatus: { $ne: "Cancelled" },
+      $or: [
+        {
+          // Proposed reservation starts within an existing reservation
+          startTime: { $lte: format(startTimeDate, "HH:mm") },
+          endTime: { $gte: format(startTimeDate, "HH:mm") },
+        },
+        {
+          // Proposed reservation ends within an existing reservation
+          startTime: { $lte: format(endTimeDate, "HH:mm") },
+          endTime: { $gte: format(endTimeDate, "HH:mm") },
+        },
+        {
+          // Existing reservation is fully contained within the proposed reservation
+          startTime: { $gte: format(startTimeDate, "HH:mm") },
+          endTime: { $lte: format(endTimeDate, "HH:mm") },
+        },
+      ],
     });
 
-    if (existingReservation) {
+    if (conflictingReservation) {
       return next(
         createError(
-          "The selected date conflicts with an existing reservation. Please choose another date.",
+          "The selected time slot conflicts with an existing reservation. Please choose another time.",
           400
         )
       );

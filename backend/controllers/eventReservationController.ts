@@ -3,9 +3,17 @@ import { EventReservation } from "../models/eventReservationModel";
 import { createError } from "../utils/createError";
 import User from "../models/userModel";
 import { EventSettings } from "../models/eventSettingsModel";
-import { differenceInDays, format, isBefore, parse, subHours } from "date-fns";
+import {
+  addHours,
+  differenceInDays,
+  format,
+  isBefore,
+  parse,
+  subHours,
+} from "date-fns";
 import { createNotification } from "./notificationController";
 import { GroupReservation } from "../models/groupReservationModel";
+import { createPayment } from "./paymentController";
 
 // createReservation
 export const createReservation = async (
@@ -19,32 +27,59 @@ export const createReservation = async (
       return next(createError("UserId is required in URL params", 400));
     }
 
+    // Destructure and type the expected fields with explicit types (avoiding implicit any)
     const {
       date,
       fullName,
       contactNumber,
       startTime,
-      endTime,
+      estimatedEventDuration,
       partySize,
       eventType,
       cart,
       specialRequest,
       isCorkage,
-    } = req.body;
+      paymentAmountOption,
+      paymentMethod,
+    } = req.body as {
+      date: string;
+      fullName: string;
+      contactNumber: string;
+      startTime: string;
+      estimatedEventDuration: number;
+      partySize: number;
+      eventType: string;
+      cart: Array<{ totalPrice: number }>;
+      specialRequest?: string;
+      isCorkage: boolean;
+      paymentAmountOption: string;
+      paymentMethod: "cash" | "online payment";
+    };
 
     if (
       !date ||
       !fullName ||
       !contactNumber ||
       !startTime ||
-      !endTime ||
+      estimatedEventDuration === undefined ||
       partySize === undefined ||
       !eventType ||
       !cart ||
       !Array.isArray(cart) ||
-      isCorkage === undefined
+      isCorkage === undefined ||
+      !paymentMethod ||
+      !paymentAmountOption
     ) {
       return next(createError("Missing required fields", 400));
+    }
+
+    if (
+      typeof estimatedEventDuration !== "number" ||
+      estimatedEventDuration <= 0
+    ) {
+      return next(
+        createError("Estimated event duration must be a positive number.", 400)
+      );
     }
 
     const user = await User.findById(userId);
@@ -54,13 +89,12 @@ export const createReservation = async (
       );
     }
 
-    // Step 2: Check if there's an upcoming reservation for this user
+    // Check for an upcoming reservation for this user
     const existingReservation = await EventReservation.findOne({
       userId,
       date: { $gte: new Date() },
       eventStatus: { $in: ["Pending", "Confirmed"] },
     });
-
     if (existingReservation) {
       return next(
         createError(
@@ -88,6 +122,70 @@ export const createReservation = async (
 
     const totalPayment = cartTotal + eventFee + (isCorkage ? corkageFee : 0);
 
+    // Set default payment status as Not Paid
+    let paymentData: any = null;
+    let paymentStatus: "Not Paid" | "Partially Paid" | "Paid" = "Not Paid";
+
+    // Calculate endTime based on startTime and estimatedEventDuration
+    const [startHourStr, startMinuteStr] = startTime.split(":");
+    const startHour = parseInt(startHourStr, 10);
+    const startMinute = parseInt(startMinuteStr.split(" ")[0], 10);
+    const ampm = startTime.split(" ")[1];
+
+    let adjustedStartHour = startHour;
+    if (ampm === "PM" && startHour !== 12) {
+      adjustedStartHour += 12;
+    } else if (ampm === "AM" && startHour === 12) {
+      adjustedStartHour = 0;
+    }
+
+    const startDate = new Date(date);
+    startDate.setHours(adjustedStartHour, startMinute, 0, 0);
+    const endDate = addHours(startDate, estimatedEventDuration);
+
+    const endHour = endDate.getHours();
+    const endMinute = endDate.getMinutes();
+    const endAMPM = endHour < 12 || endHour === 24 ? "AM" : "PM";
+    const formattedEndHour = endHour % 12 === 0 ? 12 : endHour % 12;
+    const endTime = `${formattedEndHour.toString().padStart(2, "0")}:${endMinute
+      .toString()
+      .padStart(2, "0")} ${endAMPM}`;
+
+    // Payment processing – for online payment, we do not assume as "Paid" immediately.
+    if (paymentMethod === "online payment") {
+      let amountToPay = 0;
+      let description = `Event Reservation for ${fullName} on ${format(
+        new Date(date),
+        "MMMM dd, yyyy"
+      )} from ${startTime} to ${endTime} - User ID: ${userId}`;
+
+      if (paymentAmountOption === "full") {
+        amountToPay = totalPayment * 100; // amount in cents
+      } else if (paymentAmountOption === "partial") {
+        amountToPay = eventFee * 100;
+        description += " (Partial Payment)";
+      }
+      try {
+        const paymongoResponse = await createPayment(
+          {
+            body: { amount: amountToPay, currency: "PHP", description },
+          } as Request,
+          res
+        );
+        if (paymongoResponse) {
+          paymentData = paymongoResponse;
+        } else {
+          console.error("Error creating PayMongo link:", paymongoResponse);
+        }
+      } catch (error) {
+        console.error("Error creating PayMongo link:", error);
+      }
+    } else if (paymentMethod === "cash") {
+      paymentStatus =
+        paymentAmountOption === "full" ? "Paid" : "Partially Paid";
+    }
+
+    // Create and save the new reservation with paymentMethod included.
     const newReservation = new EventReservation({
       userId,
       fullName,
@@ -95,7 +193,8 @@ export const createReservation = async (
       partySize,
       date,
       startTime,
-      endTime,
+      endTime, // Calculated endTime
+      estimatedEventDuration,
       eventType,
       cart,
       specialRequest,
@@ -103,6 +202,11 @@ export const createReservation = async (
       isCorkage,
       subtotal: cartTotal,
       totalPayment,
+      paymentStatus, // Remains "Not Paid" for online payments until payment confirmation
+      reservationType: "Event",
+      paymentLink: paymentData?.attributes?.checkout_url || null,
+      paymentData: paymentData,
+      paymentMethod, // Save paymentMethod in the database
     });
 
     await newReservation.save();
@@ -111,10 +215,24 @@ export const createReservation = async (
       newReservation._id
     ).populate("userId", "username email", User);
 
-    res.status(201).json({
-      message: "Reservation created successfully!",
-      reservation: populatedReservation,
-    });
+    if (paymentMethod === "online payment" && paymentData) {
+      res.status(200).json({
+        message: "Reservation created successfully! Redirecting to payment...",
+        paymentData: paymentData,
+        reservation: populatedReservation,
+      });
+    } else if (paymentMethod === "cash") {
+      res.status(201).json({
+        message:
+          "Reservation created successfully! Payment to be made in cash.",
+        reservation: populatedReservation,
+      });
+    } else {
+      res.status(201).json({
+        message: "Reservation created successfully!",
+        reservation: populatedReservation,
+      });
+    }
   } catch (error: any) {
     console.error(error);
     if (error.message.includes("Only 2 reservations are allowed")) {
@@ -128,7 +246,6 @@ export const createReservation = async (
     next(createError("Failed to create reservation.", 500));
   }
 };
-
 // Controller to get all reservations with auto‑update and notifications
 export const getReservations = async (
   req: Request,

@@ -26,7 +26,8 @@ import blogRoutes from "./routes/blogRoutes";
 import pushNotificationRoutes from "./routes/pushNotificationRoutes";
 import subscriptionRoutes from "./routes/subscriptionRoutes";
 import unavailableDateRoutes from "./routes/unavailableDateRoutes";
-
+import paymentRoutes from "./routes/paymentRoutes";
+import webhookRoutes from "./routes/webhookRoutes";
 import http from "http";
 import { initSocket } from "./socket/socket";
 import analyticsRoutes from "./routes/analyticsRoutes";
@@ -127,6 +128,8 @@ server.use("/api/blogs", blogRoutes);
 server.use("/api/subscriptions", subscriptionRoutes);
 server.use("/api/unavailable-dates", unavailableDateRoutes);
 server.use("/api/analytics", analyticsRoutes);
+server.use("/api/payment", paymentRoutes);
+server.use("/api/webhook", webhookRoutes);
 
 // --- Error Handling Middleware ---
 server.use(

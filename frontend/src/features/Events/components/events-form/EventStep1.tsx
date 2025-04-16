@@ -1,8 +1,9 @@
+// EventStep1.tsx
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { EventFormValues } from "../../pages/EventForm";
 import ScrollToTop from "@/components/ScrollToTop";
 import HourlyTimePicker from "./HourlyTimePicker";
@@ -10,7 +11,8 @@ import EventCalendar from "./EventCalendar";
 import useCheckEventReservationConflict from "../../hooks/useCheckEventReservationConflict";
 import useRemainingReservations from "../../hooks/useRemainingReservations";
 import { TriangleAlert } from "lucide-react";
-import { useGetUnavailableDates } from "../../hooks/useGetUnavailableDates"; // Import unavailable dates hook
+import { useGetUnavailableDates } from "../../hooks/useGetUnavailableDates";
+import EventTypeDropdown from "./EventTypeDropdown"; // Our custom dropdown
 
 type Step1Props = {
   nextStep: () => void;
@@ -24,19 +26,13 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
     watch,
     trigger,
     formState: { errors },
+    control,
   } = useFormContext<EventFormValues>();
 
-  // Watch the date field from the form
   const dateStr = watch("date");
-
-  // Fetch unavailable dates for additional validation
   const { data: unavailableDatesData } = useGetUnavailableDates();
-
-  // Get start and end times from form
   const startTime = watch("startTime");
-  const endTime = watch("endTime");
 
-  // Parse the selected date (or fallback to today)
   const selectedDate = dateStr ? new Date(dateStr) : new Date();
   const displayedMonth = new Date(
     selectedDate.getFullYear(),
@@ -44,22 +40,20 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
     1,
   );
 
-  // Check for conflicts using a custom hook (e.g. reserved dates)
   const { conflict, isPending: conflictPending } =
     useCheckEventReservationConflict(selectedDate);
   const remainingReservations = useRemainingReservations(displayedMonth);
-
-  // Local state for error message
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Clear error when conflict is resolved
+  // Local state to determine whether to show a free-text input instead of dropdown.
+  const [othersSelected, setOthersSelected] = useState<boolean>(false);
+
   useEffect(() => {
     if (!conflict) {
       setErrorMsg("");
     }
   }, [conflict]);
 
-  // New: Check if the selected date is unavailable
   useEffect(() => {
     if (dateStr && unavailableDatesData) {
       const selected = new Date(dateStr);
@@ -86,7 +80,6 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
     }
   }, [dateStr, unavailableDatesData]);
 
-  // Helper function to render an input field with realtime validation
   const renderInputField = (
     id: string,
     label: string,
@@ -108,9 +101,7 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
             id={id}
             placeholder={placeholder}
             {...register(id as keyof EventFormValues)}
-            className={`w-full rounded border p-3 focus:outline-secondary ${
-              fieldError ? "border-red-500 bg-red-200 pr-10" : ""
-            }`}
+            className={`w-full rounded border p-3 focus:outline-secondary ${fieldError ? "border-red-500 bg-red-200 pr-10" : ""}`}
             {...extraProps}
           />
           {fieldError && (
@@ -124,7 +115,6 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
     );
   };
 
-  // Handle moving to the next step, ensuring validations and no conflicts/unavailable date
   const handleNextStep = async () => {
     const valid = await trigger([
       "fullName",
@@ -132,27 +122,21 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
       "partySize",
       "date",
       "startTime",
-      "endTime",
       "eventType",
+      "estimatedEventDuration",
     ]);
-    if (!valid) return;
-    if (conflictPending) return;
-
-    // Show error if there's a conflict or unavailable date
+    if (!valid || conflictPending) return;
     if (conflict) {
       setErrorMsg(
         "The selected date conflicts with an existing reservation. Please choose another date.",
       );
       return;
     }
-    if (errorMsg) return; // errorMsg is set if the date is unavailable
-
+    if (errorMsg) return;
     if (remainingReservations === 0) {
       setErrorMsg("There are no slots left for the selected month.");
       return;
     }
-
-    // Clear any error and move to next step
     setErrorMsg("");
     nextStep();
   };
@@ -164,7 +148,7 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
         {/* Full Name & Contact Number */}
         <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
           {renderInputField("fullName", "Full Name", "text")}
-          {renderInputField("contactNumber", "Contact Number", "text")}
+          {renderInputField("contactNumber", "Phone Number", "text")}
         </div>
 
         {/* Party Size & Event Type */}
@@ -176,52 +160,101 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
             `Minimum of ${minGuests}`,
             { min: minGuests },
           )}
-          {renderInputField(
-            "eventType",
-            "Event Type",
-            "text",
-            "Ex. Birthday, Party",
-          )}
+          <div className="flex-1">
+            <Label htmlFor="eventType" className="mb-1 block">
+              Event Type
+            </Label>
+            <Controller
+              name="eventType"
+              control={control}
+              defaultValue=""
+              render={({ field, fieldState: { error } }) => (
+                <>
+                  {!othersSelected ? (
+                    <EventTypeDropdown
+                      value={field.value}
+                      onChange={field.onChange}
+                      commonEvents={[
+                        "Birthday",
+                        "Party",
+                        "Wedding",
+                        "Meeting",
+                        "Conference",
+                        "Seminar",
+                        "Fundraiser",
+                        "Anniversary",
+                        "Group Meeting",
+                        "Friends Hangout",
+                        "Others",
+                      ]}
+                      onOthersSelect={() => setOthersSelected(true)}
+                    />
+                  ) : (
+                    <div>
+                      <Input
+                        type="text"
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        placeholder="Specify your event type"
+                        className="w-full rounded border p-3 focus:outline-secondary"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setOthersSelected(false)}
+                        className="mt-1 text-sm text-blue-500"
+                      >
+                        Choose from list
+                      </button>
+                    </div>
+                  )}
+                  {error && (
+                    <div className="mt-1 flex items-center text-sm text-red-700">
+                      <TriangleAlert className="inline h-5 w-5" />
+                      <span className="ml-1">{error.message}</span>
+                    </div>
+                  )}
+                </>
+              )}
+            />
+          </div>
         </div>
 
         {/* Calendar & Date Input */}
         <div className="mt-4">
           <EventCalendar />
         </div>
-        <div className="mt-4">
-          <Label htmlFor="date" className="mb-1 block">
-            Date
-          </Label>
-          <div className="relative">
-            <Input
-              type="date"
-              id="date"
-              {...register("date")}
-              className={`mb-4 w-full rounded border p-3 text-center focus:outline-secondary ${
-                errors.date ? "border-red-500 bg-red-200 pr-10" : ""
-              }`}
-            />
+
+        <div className="mt-4 flex flex-col space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
+          <div className="flex-1">
+            <Label htmlFor="date" className="mb-1 block">
+              Date
+            </Label>
+            <div className="relative">
+              <Input
+                type="date"
+                id="date"
+                {...register("date")}
+                className={`mb-4 w-full rounded border p-3 text-center focus:outline-secondary ${errors.date ? "border-red-500 bg-red-200 pr-10" : ""}`}
+              />
+              {errors.date && (
+                <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+              )}
+            </div>
             {errors.date && (
-              <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
+              <div className="mt-1 text-sm text-red-700">
+                {typeof errors.date.message === "string"
+                  ? errors.date.message
+                  : ""}
+              </div>
+            )}
+            {errorMsg && (
+              <div className="mt-2 flex items-center text-sm text-red-700">
+                <TriangleAlert className="mr-1 h-5 w-5" />
+                <span>{errorMsg}</span>
+              </div>
             )}
           </div>
-          {errors.date && (
-            <div className="mt-1 text-sm text-red-700">
-              {typeof errors.date.message === "string"
-                ? errors.date.message
-                : ""}
-            </div>
-          )}
-          {errorMsg && (
-            <div className="mt-2 flex items-center text-sm text-red-700">
-              <TriangleAlert className="mr-1 h-5 w-5" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-        </div>
 
-        {/* Time Pickers */}
-        <div className="mt-4 flex flex-col space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
           <div className="flex-1">
             <Label htmlFor="startTime" className="mb-1 block">
               Start Time
@@ -242,23 +275,30 @@ const EventStep1: React.FC<Step1Props> = ({ nextStep, minGuests }) => {
               </div>
             )}
           </div>
-          <div className="flex-1">
-            <Label htmlFor="endTime" className="mb-1 block">
-              End Time
+          {/* Estimated Duration */}
+          <div className="mt-4 flex-1">
+            <Label htmlFor="estimatedEventDuration" className="mb-1 block">
+              Estimated Event Duration (hrs)
             </Label>
             <div className="relative">
-              <HourlyTimePicker
-                id="endTime"
-                value={endTime}
-                onChange={(time) => setValue("endTime", time)}
+              <Input
+                id="estimatedEventDuration"
+                type="text"
+                placeholder="e.g. 2 "
+                {...register("estimatedEventDuration", { valueAsNumber: true })}
+                className={`w-full rounded border p-3 focus:outline-secondary ${
+                  errors.estimatedEventDuration
+                    ? "border-red-500 bg-red-200 pr-10"
+                    : ""
+                }`}
               />
-              {errors.endTime && (
+              {errors.estimatedEventDuration && (
                 <TriangleAlert className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-700" />
               )}
             </div>
-            {errors.endTime && (
+            {errors.estimatedEventDuration && (
               <div className="mt-1 text-sm text-red-700">
-                {errors.endTime.message}
+                {errors.estimatedEventDuration.message}
               </div>
             )}
           </div>

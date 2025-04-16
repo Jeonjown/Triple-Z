@@ -6,9 +6,10 @@ import { useGetEventReservationSettings } from "../hooks/useGetEventReservationS
 import EventStep1 from "../components/events-form/EventStep1";
 import EventStep2 from "../components/events-form/EventStep2";
 import EventStep3 from "../components/events-form/EventStep3";
-import EventStep4 from "../components/events-form/EventStep4";
+
 import { ProgressBar } from "@/components/ProgressBar";
 import { SelectedItem } from "../components/events-form/EmbeddedMenu";
+import EventStep4 from "../components/events-form/EventStep4";
 
 export type CartItem = {
   _id: string;
@@ -69,7 +70,13 @@ const getReservationSchema = (
         { message: `Date must be at least ${minDaysPrior} days in advance` },
       ),
     startTime: z.string().nonempty("Start Time is required"),
-    endTime: z.string().nonempty("End Time is required"),
+    estimatedEventDuration: z.preprocess(
+      (val) => Number(val),
+      z
+        .number()
+        .min(1, "Please select a duration")
+        .max(8, "Maximum duration is 8 hours"), // Added max validation
+    ),
     eventType: z.string().nonempty("Event Type is required"),
     cart: z.array(
       z.object({
@@ -117,7 +124,7 @@ const EventForm = () => {
   const steps = [
     { step: 1, label: "Details" },
     { step: 2, label: "Packages" },
-    { step: 3, label: "Confirm" },
+    { step: 3, label: "Payment" },
     { step: 4, label: "Thank You" },
   ];
 
@@ -133,7 +140,11 @@ const EventForm = () => {
     },
     {
       header: "Confirm Your Reservation",
-      description: "Review your details and packages before confirming.",
+      description: "Review your details and packages before paying.",
+    },
+    {
+      header: "Thank you for your reservation!",
+      description: "",
     },
     {
       header: "Thank you for your reservation!",
@@ -151,7 +162,7 @@ const EventForm = () => {
       partySize: 0,
       date: "",
       startTime: "",
-      endTime: "",
+
       eventType: "",
       specialRequest: "",
       cart: [],
@@ -167,7 +178,7 @@ const EventForm = () => {
       partySize: 0,
       date: "",
       startTime: "",
-      endTime: "",
+
       eventType: "",
       specialRequest: "",
       cart: [],

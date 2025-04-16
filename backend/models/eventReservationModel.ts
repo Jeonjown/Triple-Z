@@ -25,7 +25,8 @@ const reservationSchema = new mongoose.Schema(
     partySize: { type: Number, required: true, min: 0 },
     date: { type: Date, required: true },
     startTime: { type: String, required: true },
-    endTime: { type: String, required: true },
+    // endTime: { type: String, required: true }, // Removed endTime
+    estimatedEventDuration: { type: Number, required: true, min: 0 }, // Added estimatedEventDuration in hours
     eventType: { type: String, required: true },
     cart: [cartItemSchema], // Added cart array with menu items
     eventStatus: {
@@ -38,6 +39,11 @@ const reservationSchema = new mongoose.Schema(
       enum: ["Not Paid", "Partially Paid", "Paid"],
       default: "Not Paid",
     },
+    paymentMethod: {
+      type: String,
+      enum: ["cash", "online payment"],
+      required: true,
+    },
     specialRequest: { type: String },
     eventFee: { type: Number, required: true },
     isCorkage: { type: Boolean, requried: true },
@@ -48,6 +54,8 @@ const reservationSchema = new mongoose.Schema(
       enum: ["Event"],
       default: "Event",
     },
+    paymentLink: { type: String },
+    paymentData: { type: Object },
   },
   { timestamps: true }
 );
