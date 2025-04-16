@@ -89,7 +89,11 @@ server.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-server.use("/api/webhook", webhookRoutes);
+server.use(
+  "/api/webhook",
+  express.raw({ type: "application/json" }),
+  webhookRoutes
+);
 // --- Standard Middleware ---
 server.use(express.json());
 server.use(express.urlencoded({ extended: true, limit: "10mb" }));
