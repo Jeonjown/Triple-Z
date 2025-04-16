@@ -11,30 +11,40 @@ export const handlePaymongoWebhook = async (
   next: NextFunction
 ): Promise<void> => {
   const signatureHeader = req.headers["paymongo-signature"] as string;
+  console.log("Received Paymongo-Signature header:", signatureHeader); // Added logging
+
   if (!signatureHeader) {
     console.warn("Missing Paymongo-Signature header");
     res.status(400).send("Missing signature");
     return;
   }
 
-  // Signature is sent as "t=timestamp,v1=signature"
   const signatureParts = signatureHeader.split(",");
   const signatureMap: Record<string, string> = {};
   for (const part of signatureParts) {
     const [key, value] = part.split("=");
-    signatureMap[key] = value;
+    if (key && value) {
+      signatureMap[key.trim()] = value.trim(); // Added trim to handle potential whitespace
+    } else {
+      console.warn("Invalid part in signature header:", part);
+      res.status(400).send("Invalid signature format");
+      return;
+    }
   }
 
   const timestamp = signatureMap["t"];
   const expectedSignature = signatureMap["v1"];
 
   if (!timestamp || !expectedSignature) {
-    console.warn("Invalid signature format");
+    console.warn(
+      "Invalid signature format - missing 't' or 'v1'",
+      signatureMap
+    );
     res.status(400).send("Invalid signature");
     return;
   }
 
-  const rawBody = (req as any).rawBody as Buffer; // Must set raw body middleware
+  const rawBody = (req as any).rawBody as Buffer;
   const signedPayload = `${timestamp}.${rawBody.toString()}`;
   const hmac = crypto
     .createHmac("sha256", PAYMONGO_WEBHOOK_SECRET)
@@ -42,7 +52,7 @@ export const handlePaymongoWebhook = async (
     .digest("hex");
 
   if (hmac !== expectedSignature) {
-    console.warn("Signature verification failed");
+    console.warn("Signature verification failed", { hmac, expectedSignature });
     res.status(400).send("Invalid signature");
     return;
   }
