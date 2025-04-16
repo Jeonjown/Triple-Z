@@ -89,6 +89,7 @@ server.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+server.use("/api/webhook", webhookRoutes);
 // --- Standard Middleware ---
 server.use(express.json());
 server.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -129,7 +130,6 @@ server.use("/api/subscriptions", subscriptionRoutes);
 server.use("/api/unavailable-dates", unavailableDateRoutes);
 server.use("/api/analytics", analyticsRoutes);
 server.use("/api/payment", paymentRoutes);
-server.use("/api/webhook", webhookRoutes);
 
 // --- Error Handling Middleware ---
 server.use(
