@@ -91,7 +91,6 @@ server.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // --- Standard Middleware ---
-server.use(express.json());
 server.use(
   bodyParser.json({
     verify: (req: any, res, buf) => {
@@ -99,6 +98,7 @@ server.use(
     },
   })
 );
+server.use(express.json());
 server.use(express.urlencoded({ extended: true, limit: "10mb" }));
 server.use(cookieParser());
 
