@@ -11,7 +11,7 @@ export const handlePaymongoWebhook = async (
   next: NextFunction
 ): Promise<void> => {
   const signatureHeader = req.headers["paymongo-signature"] as string;
-  console.log("Received Paymongo-Signature header:", signatureHeader); // Added logging
+  console.log("Received Paymongo-Signature header:", signatureHeader); // Keep this logging
 
   if (!signatureHeader) {
     console.warn("Missing Paymongo-Signature header");
@@ -24,20 +24,22 @@ export const handlePaymongoWebhook = async (
   for (const part of signatureParts) {
     const [key, value] = part.split("=");
     if (key && value) {
-      signatureMap[key.trim()] = value.trim(); // Added trim to handle potential whitespace
-    } else {
+      signatureMap[key.trim()] = value.trim(); // Keep trim for robustness
+    } else if (part.trim() !== "") {
+      // Ignore empty parts or parts without '='
       console.warn("Invalid part in signature header:", part);
-      res.status(400).send("Invalid signature format");
-      return;
+      // We will not immediately error out here to be more lenient with extra parts
+      // res.status(400).send("Invalid signature format");
+      // return;
     }
   }
 
   const timestamp = signatureMap["t"];
-  const expectedSignature = signatureMap["v1"];
+  const expectedSignature = signatureMap["te"]; // Changed from "v1" to "te"
 
   if (!timestamp || !expectedSignature) {
     console.warn(
-      "Invalid signature format - missing 't' or 'v1'",
+      "Invalid signature format - missing 't' or 'te'",
       signatureMap
     );
     res.status(400).send("Invalid signature");
