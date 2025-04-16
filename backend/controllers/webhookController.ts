@@ -41,7 +41,7 @@ export const handlePaymongoWebhook = async (
     return;
   }
 
-  const rawBody = (req as any).rawBody as Buffer;
+  const rawBody = req.body as Buffer;
   if (!rawBody) {
     console.warn("Missing raw body for signature verification");
     res.status(400).send("Missing raw body");
