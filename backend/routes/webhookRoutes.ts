@@ -6,10 +6,6 @@ import { handlePaymongoWebhook } from "../controllers/webhookController"; // Adj
 const router = express.Router();
 
 // IMPORTANT: Apply express.raw() *only* to this route *before* the verification middleware
-router.post(
-  "/paymongo",
-  express.raw({ type: "application/json" }), // <-- Use raw body parser here
-  handlePaymongoWebhook
-);
+router.post("/paymongo", handlePaymongoWebhook);
 
 export default router;
