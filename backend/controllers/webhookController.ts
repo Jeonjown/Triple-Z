@@ -28,7 +28,7 @@ export const handlePaymongoWebhook = async (
 
   const timestamp = sigMap["t"];
   // Use 'li' for live mode; if you're testing, use 'te'
-  const expectedSig = sigMap["li"];
+  const expectedSig = sigMap["te"];
   if (!timestamp || !expectedSig) {
     console.warn("Invalid signature format", sigMap);
     res.status(400).send("Invalid signature format");
