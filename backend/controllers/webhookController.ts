@@ -11,7 +11,7 @@ export const handlePaymongoWebhook = async (
   next: NextFunction
 ): Promise<void> => {
   const signatureHeader = req.headers["paymongo-signature"] as string;
-  console.log("Received Paymongo-Signature header:", signatureHeader); // Keep this logging
+  console.log("Received Paymongo-Signature header:", signatureHeader);
 
   if (!signatureHeader) {
     console.warn("Missing Paymongo-Signature header");
@@ -22,24 +22,20 @@ export const handlePaymongoWebhook = async (
   const signatureParts = signatureHeader.split(",");
   const signatureMap: Record<string, string> = {};
   for (const part of signatureParts) {
-    const [key, value] = part.split("=");
-    if (key && value) {
-      signatureMap[key.trim()] = value.trim(); // Keep trim for robustness
+    const [key, ...rest] = part.split("=");
+    if (key && rest.length > 0) {
+      signatureMap[key.trim()] = rest.join("=").trim();
     } else if (part.trim() !== "") {
-      // Ignore empty parts or parts without '='
       console.warn("Invalid part in signature header:", part);
-      // We will not immediately error out here to be more lenient with extra parts
-      // res.status(400).send("Invalid signature format");
-      // return;
     }
   }
 
   const timestamp = signatureMap["t"];
-  const expectedSignature = signatureMap["te"]; // Changed from "v1" to "te"
+  const expectedSignature = signatureMap["v1"];
 
   if (!timestamp || !expectedSignature) {
     console.warn(
-      "Invalid signature format - missing 't' or 'te'",
+      'Invalid signature format - missing "t" or "v1"',
       signatureMap
     );
     res.status(400).send("Invalid signature");
@@ -47,6 +43,12 @@ export const handlePaymongoWebhook = async (
   }
 
   const rawBody = (req as any).rawBody as Buffer;
+  if (!rawBody) {
+    console.warn("Raw body is missing");
+    res.status(400).send("Raw body is missing");
+    return;
+  }
+
   const signedPayload = `${timestamp}.${rawBody.toString()}`;
   const hmac = crypto
     .createHmac("sha256", PAYMONGO_WEBHOOK_SECRET)
