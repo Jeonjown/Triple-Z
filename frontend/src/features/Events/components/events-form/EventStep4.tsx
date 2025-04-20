@@ -1,9 +1,22 @@
+// src/components/events-form/EventStep4.tsx
+
 import { CircleCheckBig } from "lucide-react";
 import { Link } from "react-router-dom";
 
+// Define the props interface
+interface EventStep4Props {
+  paymentLink: string | null;
+}
+
 // Step 4: Final Thank You Screen
-const EventStep4 = () => (
+// Accept paymentLink as a prop
+const EventStep4 = ({ paymentLink }: EventStep4Props) => (
   <>
+    <h2 className="mb-4 text-center font-heading text-4xl">
+      {" "}
+      {/* Added consistent heading style */}
+      Thank you for your reservation!
+    </h2>
     <div className="mt-5 flex justify-center">
       <CircleCheckBig className="!size-40 text-green-400" />
     </div>
@@ -12,14 +25,58 @@ const EventStep4 = () => (
       and will be reviewed by our team. You'll receive a confirmation once it
       has been approved by the Triple Z.
     </p>
+
+    {/* Conditionally display the payment link if it exists */}
+    {paymentLink && (
+      <div className="mt-8 text-center">
+        <p className="text-lg font-semibold text-primary">
+          Complete Your Online Payment:
+        </p>
+        <a
+          href={paymentLink}
+          target="_blank" // Opens the link in a new tab
+          rel="noopener noreferrer" // Security best practice for target="_blank"
+          className="mt-2 inline-block break-all text-blue-600 underline hover:text-blue-800" // Added break-all for long links
+        >
+          {paymentLink}
+        </a>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Please use the link above to complete your online payment.
+        </p>
+      </div>
+    )}
+
+    {/* Add instructions for Cash payment if needed */}
+    {!paymentLink && (
+      <div className="mt-8 text-center">
+        <p className="text-lg font-semibold text-primary">
+          Payment Method: Cash
+        </p>
+        <p className="mt-2 text-base text-muted-foreground">
+          Please settle your payment in cash upon arrival or according to the
+          terms you've agreed upon.
+        </p>
+      </div>
+    )}
+
     <p className="mt-10 text-center">
       You can view or modify your reservation in
     </p>
     <Link to="/profile" replace>
       <p className="text-center font-semibold underline">My Account.</p>
     </Link>
+    {/* Optional: Add a button or link to return home */}
+    <div className="mt-6 text-center">
+      <Link to="/" className="text-primary underline hover:no-underline">
+        Return to Homepage
+      </Link>
+    </div>
+
+    {/* Go to Contacts link */}
     <Link to="/contacts" replace>
-      <div className="mt-10 flex items-center justify-center gap-3">
+      <div className="mt-6 flex items-center justify-center gap-3">
+        {" "}
+        {/* Adjusted margin */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -32,7 +89,8 @@ const EventStep4 = () => (
             clipRule="evenodd"
           />
         </svg>
-        <p className="text-center font-semibold underline">Go to Contacts</p>
+        <p className="text-center font-semibold underline">Contact Us</p>{" "}
+        {/* Changed text slightly */}
       </div>
     </Link>
   </>

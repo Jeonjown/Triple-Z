@@ -46,6 +46,7 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row: Row<TData>) => (
@@ -76,7 +77,7 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
           </TableBody>
         </Table>
       </div>
-      <div className="px-4 py-3">
+      <div className="py-cont3 px-4">
         <DataTablePagination />
       </div>
     </div>

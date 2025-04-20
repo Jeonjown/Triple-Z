@@ -55,6 +55,7 @@ export interface Reservation {
   date: string;
   startTime: string;
   endTime: string;
+  paymentLink: string;
   eventType: string;
   cart: CartItem[];
   eventStatus: string;
@@ -91,6 +92,7 @@ export interface Reservation {
     startTime: string;
     endTime: string;
     eventType: string;
+    paymentLink: string;
     reservationType: string;
     partySize: number;
     specialRequest?: string;

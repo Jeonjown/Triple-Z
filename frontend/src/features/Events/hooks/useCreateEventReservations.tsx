@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createEventReservation, Reservation } from "../api/event";
+import { createEventReservation, Reservation } from "../api/event"; // Make sure Reservation type is correct
 import { toast } from "@/hooks/use-toast";
 import { EventFormValues } from "../pages/EventForm";
 import { useParams } from "react-router-dom";
@@ -11,13 +11,22 @@ export const useCreateEventReservations = () => {
   const { userId } = useParams();
   const { mutate: sendPushNotification } = useSendPushNotificationToAdmins();
 
-  const { mutate, isPending, isError, error } = useMutation<
+  // Destructure `data`, `isPending`, `error`, `mutate` directly from useMutation
+  const {
+    mutate,
+    isPending,
+    isError,
+    error,
+    data, // <-- The result is available here after success
+    isSuccess, // <-- Use this state to know when data is ready
+  } = useMutation<
     Reservation, // Success type
     Error, // Error type
     EventFormValues // Input type
   >({
     mutationFn: (values: EventFormValues) => {
       if (!userId) {
+        // Consider handling this earlier in the component if userId might be missing before mutation
         throw new Error("User ID is required");
       }
       return createEventReservation(values, userId);
@@ -29,9 +38,12 @@ export const useCreateEventReservations = () => {
         description: err.message,
         variant: "destructive",
       });
+      // If you had component-level state depending on success/error, you'd update it here
     },
     onSuccess: (data) => {
-      console.log("Reservation created successfully:", data);
+      console.log("Mutation onSuccess in hook:", data.reservation.paymentLink);
+
+      // Side effects that the hook is responsible for:
       queryClient.invalidateQueries({ queryKey: ["eventReservations"] });
       toast({
         title: "Reservation created",
@@ -71,5 +83,6 @@ export const useCreateEventReservations = () => {
     },
   });
 
-  return { mutate, isPending, isError, error };
+  // Return the mutation controls and status, including `data` and `isSuccess`
+  return { mutate, isPending, isError, error, data, isSuccess };
 };

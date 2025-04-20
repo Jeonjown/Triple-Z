@@ -115,6 +115,7 @@ const EventForm = () => {
   const [selectedPackageIds, setSelectedPackageIds] = useState<SelectedItem[]>(
     [],
   );
+  const [paymentLink, setPaymentLink] = useState<string | null>(null);
   const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
@@ -141,10 +142,6 @@ const EventForm = () => {
     {
       header: "Confirm Your Reservation",
       description: "Review your details and packages before paying.",
-    },
-    {
-      header: "Thank you for your reservation!",
-      description: "",
     },
     {
       header: "Thank you for your reservation!",
@@ -178,7 +175,6 @@ const EventForm = () => {
       partySize: 0,
       date: "",
       startTime: "",
-
       eventType: "",
       specialRequest: "",
       cart: [],
@@ -236,9 +232,10 @@ const EventForm = () => {
                 nextStep={nextStep}
                 methods={methods}
                 cart={cart}
+                setPaymentLink={setPaymentLink}
               />
             )}
-            {currentStep === 4 && <EventStep4 />}
+            {currentStep === 4 && <EventStep4 paymentLink={paymentLink} />}
           </div>
         </form>
       </div>
