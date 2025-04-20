@@ -4,11 +4,24 @@ import { useGetEventReservationSettings } from "@/features/Events/hooks/useGetEv
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 
-const Banner: FC = () => {
-  const { data: settings } = useGetEventReservationSettings();
+const AnimatedText: FC<{
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  yOffset?: number;
+  duration?: number;
+  ease?: number[];
+}> = ({
+  children,
+  className,
+  delay = 0.2,
+  yOffset = 50,
+  duration = 1,
+  ease = [0, 0.71, 0.2, 1.01],
+}) => {
   const controls = useAnimation();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true }); // Trigger animation only once when the element comes into view
+  const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
 
   useEffect(() => {
     if (inView) {
@@ -17,130 +30,137 @@ const Banner: FC = () => {
   }, [controls, inView]);
 
   const transition = {
-    duration: 1,
-    delay: 0.3,
-    ease: [0, 0.71, 0.2, 1.01],
+    duration: duration,
+    delay: delay,
+    ease: ease,
   };
 
   return (
-    <section className="relative overflow-hidden">
-      <div className="relative flex min-h-screen w-full flex-col items-center text-center lg:flex-row xl:items-center">
-        {/* Background Image for Mobile */}
-        <img
-          src="paper-background-mobile.png"
-          alt="event background mobile"
-          className="absolute h-full w-full object-cover object-[50%_50%] lg:top-40 xl:hidden"
-        />
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      variants={{
+        hidden: { opacity: 0, y: yOffset },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: transition,
+        },
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
-        {/* Background Image for XL */}
-        <img
-          src="paper-background.png"
-          alt="event pictures"
-          className="absolute left-48 hidden h-full w-full object-cover object-[0%_50%] xl:block"
-        />
+const Banner: FC = () => {
+  const { data: settings } = useGetEventReservationSettings();
 
-        {/* Content */}
-        <div
-          ref={ref}
-          className="relative z-10 px-5 py-10 sm:p-8 lg:max-w-prose xl:ml-20 xl:mr-auto xl:-translate-y-10"
-        >
-          {/* Banner Header */}
-          <motion.h1
-            initial="hidden"
-            animate={controls}
-            variants={{
-              hidden: { opacity: 0, y: -50 },
-              visible: {
-                opacity: 1,
-                y: 0,
-                transition: { ...transition, delay: 0.2 },
-              },
-            }}
-            className="font-heading text-5xl font-light sm:text-6xl lg:text-7xl xl:mt-0 xl:text-8xl"
-          >
-            Welcome to Triple Z
-          </motion.h1>
+  const contentRef = useRef(null);
+  const contentInView = useInView(contentRef, {
+    once: true,
+    margin: "0px 0px -10% 0px",
+  });
+  const contentControls = useAnimation();
 
-          {/* Subheading */}
-          <motion.h2
-            initial="hidden"
-            animate={controls}
-            variants={{
-              hidden: { opacity: 0, y: -50 },
-              visible: {
-                opacity: 1,
-                y: 0,
-                transition: { ...transition, delay: 0.4 },
-              },
-            }}
-            className="mt-6 text-lg sm:mt-5 sm:text-xl"
-          >
-            Discover the perfect space to celebrate life’s special occasions at
-            Triple Z Coffee. Reserve your spot today!
-          </motion.h2>
+  useEffect(() => {
+    if (contentInView) {
+      contentControls.start("visible");
+    }
+  }, [contentControls, contentInView]);
 
-          {/* Opening Hours */}
-          <motion.h3
-            initial="hidden"
-            animate={controls}
-            variants={{
-              hidden: { opacity: 0, y: -50 },
-              visible: {
-                opacity: 1,
-                y: 0,
-                transition: { ...transition, delay: 0.6 },
-              },
-            }}
-            className="my-5 text-base text-[#DFA593] sm:text-lg"
-          >
-            MON-FRI {settings?.openingHours} - {settings?.closingHours}
-          </motion.h3>
+  const imageEntranceTransition = {
+    duration: 1.5,
+    delay: 0.5,
+    ease: [0, 0.71, 0.2, 1.01],
+  };
 
-          {/* Button */}
-          <motion.div
-            initial="hidden"
-            animate={controls}
-            variants={{
-              hidden: { opacity: 0, y: -50 },
-              visible: {
-                opacity: 1,
-                y: 0,
-                transition: { ...transition, delay: 0.6 },
-              },
-            }}
-          >
-            <Link to="/schedule">
-              <Button
-                size="lg"
-                className="w-36 font-heading text-lg font-extralight sm:w-44"
-              >
-                Book Now!
-              </Button>
-            </Link>
-          </motion.div>
+  const imageFloatTransition = {
+    duration: 8,
+    repeat: Infinity,
+    repeatType: "reverse",
+    ease: "easeInOut",
+  };
+
+  const imageRotateTransition = {
+    duration: 12,
+    repeat: Infinity,
+    repeatType: "reverse",
+    ease: "easeInOut",
+    delay: 1,
+  };
+
+  return (
+    <section className="relative overflow-hidden bg-amber-50">
+      {" "}
+      <div
+        ref={contentRef}
+        className="relative z-10 flex min-h-screen w-full flex-col items-center text-center lg:flex-row lg:text-left xl:items-center"
+      >
+        <div className="mx-auto w-full max-w-2xl px-10 sm:px-8 lg:mx-0 lg:w-1/2 lg:max-w-none lg:self-start lg:pr-12 xl:mt-24 xl:pl-24 xl:pr-16">
+          {" "}
+          <AnimatedText delay={0.3}>
+            {" "}
+            <h1 className="mt-10 font-heading text-5xl font-bold leading-tight text-text sm:text-5xl lg:text-6xl xl:text-9xl">
+              Welcome to Triple Z Coffee Shop
+            </h1>
+          </AnimatedText>
+          <AnimatedText delay={0.5}>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-gray-700 sm:mt-6 sm:text-xl">
+              Discover the perfect space to celebrate life’s special occasions
+              at Triple Z Coffee. Reserve your spot today!
+            </p>
+          </AnimatedText>
+          {settings?.openingHours && settings?.closingHours && (
+            <AnimatedText delay={0.7}>
+              <p className="mt-5 text-xl font-semibold text-gray-800">
+                MON-FRI {settings.openingHours} - {settings.closingHours}
+              </p>
+            </AnimatedText>
+          )}
+          <AnimatedText delay={0.9}>
+            {" "}
+            <div className="mt-10">
+              {" "}
+              <Link to="/schedule">
+                <Button
+                  size="lg"
+                  className="w-full rounded-lg bg-primary font-heading text-lg font-semibold text-white transition-colors duration-200 hover:bg-primary sm:w-48"
+                >
+                  Book Now!
+                </Button>
+              </Link>
+            </div>
+          </AnimatedText>
         </div>
-
-        {/* Image Section */}
-        <div className="z-10 flex w-full items-center justify-center">
+        <div className="relative z-10 flex w-full items-center justify-center p-6 lg:w-1/2 lg:flex-grow">
+          <div className="absolute top-10 h-[1100px] w-[1100px] rounded-full bg-primary opacity-10 xl:-top-20 xl:rounded-r-lg"></div>
           <motion.div
-            ref={ref}
             initial="hidden"
-            animate={controls}
+            animate={contentControls}
             variants={{
-              hidden: { scale: 0.7 },
-              visible: { scale: 1.0, transition: transition },
+              hidden: { opacity: 0, scale: 0.9 },
+              visible: {
+                opacity: 1,
+                scale: 1,
+                y: [0, -15, 0],
+                rotate: [0, 1, -1, 0],
+                transition: {
+                  opacity: imageEntranceTransition,
+                  scale: imageEntranceTransition,
+                  y: imageFloatTransition,
+                  rotate: imageRotateTransition,
+                },
+              },
             }}
-            className="flex h-full w-full items-center justify-center"
+            className="h-auto w-full max-w-md md:max-w-lg lg:max-w-full"
           >
             <img
-              src="Triple-z-image.webp"
-              alt="event background mobile"
-              className="w-full max-w-sm md:top-10 md:max-w-lg lg:hidden lg:max-w-xl"
-            />
-            <img
-              src="Triple-z-image.webp"
-              alt="event background mobile"
-              className="hidden w-full max-w-4xl lg:flex"
+              src="/landing.webp"
+              alt="Refreshing coffee drink with coffee beans scattered around"
+              className="h-full w-full rounded-lg object-contain lg:object-cover"
             />
           </motion.div>
         </div>
