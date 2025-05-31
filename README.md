@@ -29,8 +29,7 @@ An online reservation system built for **Triple Z Coffee Shop** to streamline ev
    1. [User Workflow Step-by-Step](#user-workflow-step-by-step)
    2. [Admin Workflow Step-by-Step](#admin-workflow-step-by-step)
 6. [Project Structure](#project-structure)
-7. [Contributing](#contributing)
-8. [License](#license)
+
 
 ---
 
@@ -559,7 +558,7 @@ triplez-reservation-system/
 
 ## Contributing
 
-We welcome contributions! To get started, follow these steps:
+ To get started, follow these steps:
 
 1. **Fork** this repository.
 2. **Clone** your fork locally:
