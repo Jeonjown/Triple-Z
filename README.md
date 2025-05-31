@@ -359,12 +359,12 @@ cd Triple-Z
    npm start
    ```
 
-   * This starts the React dev server on `http://localhost:3000`.
-   * Ensure `REACT_APP_API_URL` in `.env` is `http://localhost:5000/api`.
+   * This starts the React dev server on `http://localhost:5173`.
+   * Ensure `REACT_APP_API_URL` in `.env` is `http://localhost:3000/api`.
 
 3. **Verify**
 
-   * Open `http://localhost:3000` in your browser (or `http://localhost:5000` if frontend is served by Express).
+   * Open `http://localhost:5173` in your browser (or `http://localhost:3000` if frontend is served by Express).
    * You should see the **Triple Z Coffee Shop** landing page.
 
 ---
@@ -377,7 +377,7 @@ Below are step-by-step instructions for both regular users (customers) and admin
 
 1. **Visit Landing Page**
 
-   * Go to `http://localhost:3000` in your browser.
+   * Go to `http://localhost:5173` in your browser.
    * The homepage displays the coffee shop’s highlights, mission, and navigation links.
 
 2. **Create an Account or Log In**
