@@ -552,47 +552,6 @@ triplez-reservation-system/
 ├── .env.example                # Example of required environment variables
 └── README.md                   # This file
 ```
-
----
-
-## Contributing
-
- To get started, follow these steps:
-
-1. **Fork** this repository.
-2. **Clone** your fork locally:
-
-   ```bash
-   git clone https://github.com/<your-username>/triplez-reservation-system.git
-   cd triplez-reservation-system
-   ```
-3. **Create a new branch** for your feature or fix:
-
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-4. **Install dependencies**, implement your changes, and **write tests** if applicable.
-5. **Commit** your changes with a descriptive message:
-
-   ```bash
-   git add .
-   git commit -m "Add feature X to reservation flow"
-   ```
-6. **Push** your branch to your fork:
-
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-7. **Open a Pull Request** against the `main` branch of the original repo.
-8. Wait for review and address any requested changes.
-
-> **Code Style**:
->
-> * Follow existing ESLint + Prettier configuration.
-> * Write clear, concise commit messages.
-> * Ensure all tests pass before submitting.
-
-
 ---
 
 > *Thank you for checking out the Triple Z Coffee Shop Reservation System! We hope this README helps you understand how to set up, use, and contribute. If you have questions or feedback, please open an issue or reach out via the Contact section in the app.*
