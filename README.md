@@ -321,13 +321,14 @@ cd triplez-reservation-system
 1. **Backend** (in project root):
 
    ```bash
+   cd  backend
    npm install
    ```
 
 2. **Frontend** (if you have a separate client folder; otherwise skip):
 
    ```bash
-   cd client
+   cd frontend
    npm install
    cd ..
    ```
@@ -354,7 +355,7 @@ cd triplez-reservation-system
 2. **Start the Frontend** (if separate)
 
    ```bash
-   cd client
+   cd frontend
    npm start
    ```
 
