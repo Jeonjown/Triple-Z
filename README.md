@@ -189,7 +189,7 @@ An online reservation system built for **Triple Z Coffee Shop** to streamline ev
 7. **Admin Live Chat**
 
    * View all active user conversations.
-   * Send/receive real-time messages; mark chats **“Resolved”** or **“Escalated.”**
+   * Send/receive real-time messages
 
 8. **Website Configuration & Settings**
 
