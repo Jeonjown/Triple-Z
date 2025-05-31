@@ -110,7 +110,7 @@ An online reservation system built for **Triple Z Coffee Shop** to streamline ev
 
 7. **Live Chat**
 
-   * Real-time chat widget for quick Q\&A between customers and staff.
+   * Real-time chat widget for quick Q&A between customers and staff.
 
 ---
 
@@ -258,8 +258,8 @@ Follow these steps to get the project running locally (MongoDB only).
 
 ```bash
 # Open terminal (macOS/Linux) or PowerShell (Windows)
-git clone https://github.com/<your-username>/triplez-reservation-system.git
-cd triplez-reservation-system
+git clone https://github.com/Jeonjown/Triple-Z.git
+cd Triple-Z
 ````
 
 ### 3. Environment Variables
@@ -321,11 +321,11 @@ cd triplez-reservation-system
 1. **Backend** (in project root):
 
    ```bash
-   cd  backend
+   cd backend
    npm install
    ```
 
-2. **Frontend** (if you have a separate client folder; otherwise skip):
+2. **Frontend** (if you have a separate frontend folder; otherwise skip):
 
    ```bash
    cd frontend
