@@ -1,7 +1,4 @@
-Below is the **updated README.md** with **Firebase Cloud Messaging (FCM)** added to the Tech Stack for notifications. The rest of the content remains unchanged.
-
----
-
+````markdown
 # Triple Z Coffee Shop Reservation System
 
 An online reservation system built for **Triple Z Coffee Shop** to streamline event bookings, improve customer experience, and simplify administrative management.
@@ -216,7 +213,7 @@ An online reservation system built for **Triple Z Coffee Shop** to streamline ev
 
 * **Frontend**
 
-  * React.js (with Tailwind CSS)
+  * React.js + TypeScript (with Tailwind CSS)
   * React Router
   * React Hook Form + Yup (form handling & validation)
   * TanStack Query + Axios (data fetching & caching)
@@ -264,7 +261,7 @@ Follow these steps to get the project running locally (MongoDB only).
 # Open terminal (macOS/Linux) or PowerShell (Windows)
 git clone https://github.com/<your-username>/triplez-reservation-system.git
 cd triplez-reservation-system
-```
+````
 
 ### 3. Environment Variables
 
@@ -552,6 +549,10 @@ triplez-reservation-system/
 ├── .env.example                # Example of required environment variables
 └── README.md                   # This file
 ```
+
 ---
 
 > *Thank you for checking out the Triple Z Coffee Shop Reservation System! We hope this README helps you understand how to set up, use, and contribute. If you have questions or feedback, please open an issue or reach out via the Contact section in the app.*
+
+```
+```
