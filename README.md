@@ -448,7 +448,6 @@ Below are step-by-step instructions for both regular users (customers) and admin
 
 1. **Log In as Admin**
 
-   * Navigate to `http://localhost:3000/admin/login`.
    * Log in with admin-authorized credentials.
    * You land on the **Admin Dashboard**.
 
