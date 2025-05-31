@@ -252,7 +252,7 @@ Follow these steps to get the project running locally (MongoDB only).
 4. A PayMongo account with API keys for payment integration.
 5. A Google Cloud Storage bucket (with credentials/permissions) for storing images.
 6. A Firebase project configured to use **Cloud Messaging** (FCM) with server credentials.
-7. An SMTP service or credentials for sending confirmation emails (e.g., Gmail SMTP, SendGrid).
+7. An SMTP service or credentials for sending confirmation emails.
 
 ### 2. Clone the Repository
 
