@@ -3,6 +3,8 @@
 An online reservation system built for **Triple Z Coffee Shop** to streamline event bookings, improve customer experience, and simplify administrative management.
 
 ---
+## Website Video Showcase Link: 
+https://drive.google.com/file/d/1SLOLXHS4sCJXsyCrVjSeo3Fj_p3aquhD/view?usp=drive_link
 
 ## Table of Contents
 
