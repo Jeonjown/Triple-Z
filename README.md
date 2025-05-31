@@ -1,4 +1,3 @@
-````markdown
 # Triple Z Coffee Shop Reservation System
 
 An online reservation system built for **Triple Z Coffee Shop** to streamline event bookings, improve customer experience, and simplify administrative management.
