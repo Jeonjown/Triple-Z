@@ -11,8 +11,6 @@ const GoogleMaps = () => {
   const mapId = import.meta.env.VITE_GOOGLE_MAP_ID;
   const apiKey = import.meta.env.VITE_GOOGLE_MAP_API_KEY;
 
-  console.log(apiKey);
-
   return (
     <APIProvider apiKey={apiKey}>
       <div style={containerStyle}>
