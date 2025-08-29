@@ -19,8 +19,8 @@ export const initSocket = (httpServer: any) => {
     cors: {
       origin: [
         "http://localhost:5173",
+        "https://triple-z.vercel.app",
         "https://www.triplez.shop",
-        // "https://triple-z.vercel.app",
       ],
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
       credentials: true,

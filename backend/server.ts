@@ -104,8 +104,9 @@ server.use(
   cors({
     origin: [
       "http://localhost:5173",
-      // "https://triple-z.vercel.app",
+      "https://triple-z.vercel.app",
       "https://www.triplez.shop",
+      "https://triple-z.onrender.com",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
