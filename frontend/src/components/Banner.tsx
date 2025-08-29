@@ -97,7 +97,7 @@ const Banner: FC = () => {
       {" "}
       <div
         ref={contentRef}
-        className="relative z-10 flex min-h-screen w-full flex-col items-center text-center lg:flex-row lg:text-left xl:items-center"
+        className="relative flex min-h-screen w-full flex-col items-center text-center lg:flex-row lg:text-left xl:items-center"
       >
         <div className="mx-auto w-full max-w-2xl px-10 sm:px-8 lg:mx-0 lg:w-1/2 lg:max-w-none lg:self-start lg:pr-12 xl:mt-24 xl:pl-24 xl:pr-16">
           {" "}

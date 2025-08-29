@@ -18,8 +18,8 @@ const OrderCheckout = () => {
   // }
 
   return (
-    <div className="flex min-h-screen items-center justify-center py-8">
-      <div className="w-full max-w-md overflow-hidden rounded-md border bg-white shadow-md">
+    <div className="flex min-h-screen items-center justify-center px-2 py-8">
+      <div className="w-full max-w-lg overflow-hidden rounded-md border bg-white shadow-md">
         <div className="border-b px-6 py-4">
           <h2 className="text-center text-lg font-semibold text-gray-800">
             Order Checkout
