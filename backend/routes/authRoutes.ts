@@ -52,10 +52,10 @@ router.get(
       res.cookie("auth_token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 259200000,
       });
-    } // ✅ Close the if block properly
+    }
 
     const redirectUri = req.query.state as string;
 
